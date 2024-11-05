@@ -1,0 +1,26 @@
+---
+title: "Untitled"
+format: html
+---
+
+| Code         | Variable                                                      |
+|--------------|---------------------------------------------------------------|
+| **PPRD**     | Primary production                                            |
+| RCV_RCY      | Recovered and recycled products                               |
+| **IMP**      | Imports                                                       |
+| **EXP**      | Exports                                                       |
+| GAE          | Gross available energy                                        |
+| NRGSUP       | Total energy supply                                           |
+| GIC2020-2030 | Gross inland consumption (Europe 2020-2030)                   |
+| PEC2020-2030 | Primary energy consumption (Europe 2020-2030)                 |
+| FEC2020-2030 | Final energy consumption (Europe 2020-2030)               |
+| AFC          | Available for final consumption                               |
+| FC_NE        | Final consumption - non-energy use                            |
+| FC_IND_NE    | Final consumption - industry sector - non-energy use          |
+| FC_TRA_NE    | Final consumption - transport sector - non-energy use         |
+| FC_OTH_NE    | Final consumption - other sectors - non-energy use            |
+| **FC_E**     | Final consumption - energy use                                |
+| FC_IND_E     | Final consumption - industry sector - energy use              |
+| FC_TRA_E     | Final consumption - transport sector - energy use             |
+| FC_OTH_E     | ?                                                             | 
+: Variables in Eurostat Energy Balances for code `nrg_bal`.

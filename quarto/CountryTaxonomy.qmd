@@ -1,0 +1,248 @@
+---
+title: "Clustering"
+format: 
+  html:
+    number-sections: true
+  pdf:
+    number-sections: true
+execute: 
+  warning: false
+  message: false
+  echo: false
+---
+
+```{r}
+here::i_am("R/clustering.R")
+library(here)
+library(data.table)
+library(dplyr)
+library(tidyr)
+library(countrycode)
+library(purrr)
+library(cluster)
+library(factoextra)
+library(ggalluvial)
+library(knitr)
+source(here("R/country_classification.R"))
+base_data <- as_tibble(fread(here("data/tidy/full_taxonomy_data.csv")))
+```
+
+# Open issues
+
+-   What about the source/greeness of energy production? These are also in the energy balance data set
+    -   **Suggestion**: For total domestic energy supply export of energy only use energy that has been produced by green sources?
+-   Consideration of employment dimension
+-   Consideration of green products in export basket
+-   Discuss results against the descriptives for the clusters below, so far the discrimination is not very convincing
+
+# Data setup
+
+```{r}
+first_year <- 2014
+last_year <- 2018
+```
+
+We focus on the time between `r first_year` and `r last_year` and consider the following variables:
+
+```{r}
+reduced_data <- base_data %>% 
+  filter(
+    year<=last_year, year>=first_year
+  ) %>% 
+  mutate(population = population*1000) %>%
+  mutate(# Here the normalization is done
+    GWP_trade_normed = (GWP_Imports - GWP_Exports)/population, # GWP net imports per capita
+    GWP_normed = GWP_pba/population, # GWP per capita
+    ValueAdded_normed = ValueAdded_pba/population, # ValueAdded per capita
+    EnergyProduction_normed = PrimaryEnergyProduction/population, # PrimaryEnergyProduction per capita
+    EnergyConsumption_normed = FinalEnergyConsumption / population, # FinalEnergyConsumption per capita
+    EnergyExports_normed = EnergyNetTrade / population, # EnergyNetExports per capita
+    GreenPatents_normed = GreenPatents_n / (population/1000000) # Green patents per million capita
+  ) %>%
+  select(all_of(c("country")), contains("_normed")) %>%
+  summarise(across(.cols = everything(), .fns = mean),.by = "country") %>% 
+  mutate(country=countrycode(country, "iso3c", "country.name"))
+```
+
+| Dimension                               | Rationale                                                                                            | Variable                                              | Source                     |
+|-----------------------------------------|------------------------------------------------------------------------------------------------------|-------------------------------------------------------|----------------------------|
+| Externalization of ecological stressors | Countries that externalize more have a less sustainable more of provisioning.                        | Net GWP imports per capita                            | EXIOBASE, own calculation. |
+| Total domestic GHG emissions            | Countries the emit a lot GHG need to change more drastically.                                        | GWP emissions per capita                              | EXIOBASE, own calculation. |
+| Economic strength                       | Countries with more economic strength can more easily support the transition and counter challenges. | Domestic value added                                  | EXIOBASE, own calculation. |
+| Domestic energy supply                  | Countries with high domestic supply **IF GREEN?** are more independent and more flexible.            | Total primary energy production per capita            | Eurostat                   |
+| Domestic energy demand                  | Countries with high domestic demand are less flexible and more dependent.                            | Total energy consumption per capita                   | Eurostat                   |
+| Export of energy                        | Countries that export more energy **IF GREEN?** are more likely to benefit.                          | Total energy exports per capita                       | Eurostat                   |
+| Innovation in green technologies        | Countries with technological capabilities in green areas are likely to benefit more.                 | Green patents per million people (EPO classification) | PATSTAT                    |
+| Dependence on brown employment          | Countries that depend a lot on brown jobs face bigger challenge of transition.                       | **TBD**                                               |                            |
+| Production of green products            | Countries that produce many green products are likely to benefit more.                               | **TBD**                                               |                            |
+|                                         |                                                                                                      |                                                       |                            |
+
+# Conduct the clustering
+
+## Choice of the clustering algorithm
+
+Data preparation:
+
+```{r}
+# Coerce into data.frame structure:
+reduced_data_df <- as.data.frame(reduced_data)
+rownames(reduced_data_df) <- reduced_data_df$country
+reduced_data_df$country <- NULL
+
+# Scale data
+reduced_data_scaled <- scale(reduced_data_df)
+
+# Compute dissimilarity matrix
+reduced_data_dist <- dist(reduced_data_scaled, method = "euclidean")
+```
+
+There are four different agglomerative cluster algorithm. 
+Usually one chooses the one that yields the highest clustering coefficient:
+
+```{r}
+# methods to assess
+m <- c( "average", "single", "complete", "ward")
+names(m) <- c( "average", "single", "complete", "ward")
+
+# function to compute coefficient
+ac <- function(x) {
+  agnes(reduced_data_dist, method = x)$ac
+}
+ac_overview <- map_dbl(m, ac)
+knitr::kable(tibble("Algorithm"=names(ac_overview), "Coefficient"=ac_overview))
+# 
+# pltree(hc_complete_agnes, cex = 0.6, hang = -1, main = "Dendrogram of agnes") 
+```
+
+Thus, in our case we should use the WARD algorithm.
+
+```{r}
+hc_ward_agnes <- agnes(reduced_data_dist, method = "ward")
+```
+
+We might also assess the quality by comparing the cophenetic distance of the
+clustered data and the original euclidean distances:
+
+```{r}
+cor(reduced_data_dist, cophenetic(hc_ward_agnes))
+```
+
+This is a satisfactory number.
+
+What remains open is the right number of clusters, but this is also a question of interpretation.
+
+
+## Result of the clustering
+
+Here is the overall result of the clustering assuming 4 clusters.
+
+```{r}
+fviz_dend(hc_ward_agnes,
+          main = "Titel",
+          xlab = "Countries", ylab = "",
+          k = 4, # Cut in groups
+          cex = 0.75, # label size
+          rect = TRUE, # Add rectangle around groups
+          rect_fill = TRUE,
+          color_labels_by_k = TRUE, # color labels by groups
+          # k_colors = RColorBrewer::brewer.pal(n_groups, "Dark2"),
+          # rect_border = RColorBrewer::brewer.pal(n_groups, "Dark2"),
+          horiz = TRUE
+)
+
+```
+
+
+
+
+```{r}
+clusters_obtained <- cutree(as.hclust(hc_ward_agnes), k = 4)
+clusters_obtained_tab <- tibble(
+  "country" = names(clusters_obtained),
+  "Ecological model" = as.character(clusters_obtained)
+  ) 
+
+m1 <- filter(clusters_obtained_tab, `Ecological model`=="1") %>% select(country) %>% rename(`Model` = country)
+m2 <- filter(clusters_obtained_tab, `Ecological model`=="2") %>% select(country) %>% rename(`Model` = country)
+m3 <- filter(clusters_obtained_tab, `Ecological model`=="3") %>% select(country) %>% rename(`Model` = country)
+m4 <- filter(clusters_obtained_tab, `Ecological model`=="4") %>% select(country) %>% rename(`Model` = country)
+max_n <- max(nrow(m1), nrow(m2), nrow(m3), nrow(m4))
+cluster_list <- list(
+  "Ecological model 1" = m1 %>% add_row(`Model`=rep("", max_n-nrow(m1))) %>% pull(Model), 
+  "Ecological model 2" = m2 %>% pull(Model),# %>% add_row(`Model 2`=rep(NA, max_n-nrow(m2))), 
+  "Ecological model 3" = m3 %>% add_row(`Model`=rep("", max_n-nrow(m3))) %>% pull(Model),
+  "Ecological model 4" = m4 %>% add_row(`Model`=rep("", max_n-nrow(m4))) %>% pull(Model)
+)
+kable(as_tibble(cluster_list))
+```
+
+Here I visualize the relationship to the development models classification:
+
+```{r}
+clusters_obtained_tb <- tibble(
+  "country" = names(clusters_obtained),
+  "Ecological model" = as.character(clusters_obtained),
+  "Development model" = get_country_classification(
+    countrycode(country, "country.name", "iso3c"), "jee")
+  ) %>% 
+  pivot_longer(
+    cols = -country, names_to = "group", values_to = "code"
+    )%>%
+  mutate(time_=ifelse(group=="Ecological model", 2, 1))
+
+ggplot(clusters_obtained_tb,
+       aes(
+         x = group, stratum = code, 
+         alluvium = country,
+         fill = code, label = code)
+       ) +
+  scale_fill_brewer(type = "qual", palette = "Set2") +
+  geom_flow(
+    stat = "alluvium", lode.guidance = "frontback",
+    color = "darkgray", curve_type = "linear"
+    ) +
+  geom_stratum() +
+  geom_text(stat = "stratum", size = 3) +
+  theme(legend.position = "bottom") +
+  ggtitle("Development and ecological models") +
+  theme_void() +
+  theme(
+    axis.text.x = element_text(), 
+    legend.position = "none", 
+    plot.title = element_text(hjust = 0.5)
+    )
+```
+
+## Descriptive statistics for the clusters
+
+This is not weighted by population. Should we do this?
+
+```{r}
+#| fig-height: 12
+#| fig-width: 6
+get_ecol_cluster <- function(country){
+  as.character(unname(clusters_obtained[country]))
+}
+get_ecol_cluster <- Vectorize(get_ecol_cluster)
+
+descriptive_data <- reduced_data %>%
+  mutate(ecolmodel=get_ecol_cluster(country)) 
+
+make_plot <- function(var_used){
+  ggplot(
+  descriptive_data, 
+  aes(x=ecolmodel, y=.data[[var_used]], 
+      color=ecolmodel, fill=ecolmodel, group=ecolmodel)
+  ) +
+  labs(title = var_used, x="Ecological model") +
+  scale_y_continuous(labels = scales::label_number(scale = 0.001, suffix = "k")) +
+  geom_jitter() + geom_violin(drop = FALSE, alpha=0.5) + 
+  theme_linedraw() + theme(plot.title = element_text(hjust = 0.5), legend.position = "none")
+}
+
+vars_used <- setdiff(names(descriptive_data), c("country", "ecolmodel"))
+p_list <- map(.x = vars_used, .f = make_plot)
+library(ggpubr)
+ggarrange(plotlist = p_list, ncol = 2, nrow = 4)
+```
+
