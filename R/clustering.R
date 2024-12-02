@@ -2,6 +2,8 @@ here::i_am("R/clustering.R")
 library(here)
 library(data.table)
 library(dplyr)
+library(tidyr)
+library(purrr)
 library(countrycode)
 library(cluster)
 library(factoextra)
@@ -109,33 +111,33 @@ ggplot(clusters_obtained_tb,
 # NOTES FROM STRUC CHANGE--------------
 
 # Conduct the clustering and create the plot object =========================
-work_data_v1 <- select(work_data_v1, -country)
-clustering_object <- work_data_v1 %>%
-  get_diff_matrix(raw_dat = FALSE) %>% # Scale the data
-  agnes(method = "ward") # Compute hierachical clustering
-dendo_plot <- fviz_dend(clustering_object,
-                        main = dendo_title,
-                        xlab = "Countries", ylab = "",
-                        k = n_groups, # Cut in groups
-                        cex = 0.75, # label size
-                        rect = TRUE, # Add rectangle around groups
-                        rect_fill = TRUE,
-                        color_labels_by_k = TRUE, # color labels by groups
-                        k_colors = RColorBrewer::brewer.pal(n_groups, "Dark2"),
-                        rect_border = RColorBrewer::brewer.pal(n_groups, "Dark2"),
-                        horiz = TRUE
-)
-sub_grp <- cutree(as.hclust(clustering_object), k = n_groups)
-
-# Create the factor map =======================================================  
-factor_map <- fviz_cluster(list(
-  data = get_diff_matrix(work_data_v1, raw_dat = T),
-  cluster = sub_grp
-),
-repel = TRUE, # Avoid label overlapping
-show.clust.cent = TRUE, # Show cluster centers
-palette = "jco", # Color palette see ?ggpubr::ggpar
-ggtheme = theme_minimal(),
-main = factor_title
-)
+# work_data_v1 <- select(work_data_v1, -country)
+# clustering_object <- work_data_v1 %>%
+#   get_diff_matrix(raw_dat = FALSE) %>% # Scale the data
+#   agnes(method = "ward") # Compute hierachical clustering
+# dendo_plot <- fviz_dend(clustering_object,
+#                         main = dendo_title,
+#                         xlab = "Countries", ylab = "",
+#                         k = n_groups, # Cut in groups
+#                         cex = 0.75, # label size
+#                         rect = TRUE, # Add rectangle around groups
+#                         rect_fill = TRUE,
+#                         color_labels_by_k = TRUE, # color labels by groups
+#                         k_colors = RColorBrewer::brewer.pal(n_groups, "Dark2"),
+#                         rect_border = RColorBrewer::brewer.pal(n_groups, "Dark2"),
+#                         horiz = TRUE
+# )
+# sub_grp <- cutree(as.hclust(clustering_object), k = n_groups)
+# 
+# # Create the factor map =======================================================  
+# factor_map <- fviz_cluster(list(
+#   data = get_diff_matrix(work_data_v1, raw_dat = T),
+#   cluster = sub_grp
+# ),
+# repel = TRUE, # Avoid label overlapping
+# show.clust.cent = TRUE, # Show cluster centers
+# palette = "jco", # Color palette see ?ggpubr::ggpar
+# ggtheme = theme_minimal(),
+# main = factor_title
+# )
 
