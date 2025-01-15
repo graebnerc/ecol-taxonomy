@@ -8,10 +8,11 @@ library(here)
 library(countrycode)
 source(here("R/country_classification.R"))
 
-get_wdi <- FALSE
-download_eurostat_balance <- FALSE # If Eurostat data should be downloaded
+get_wdi <- TRUE
+download_eurostat_balance <- TRUE # If Eurostat data should be downloaded
 tidy_eurostat_energy_balance <- TRUE # If raw data downloaded from Eurostat
 # should be prepared into a tidy data set from scratch
+tidy_eurostat_energy_balance_s <- TRUE
 
 # Get population data from World Bank
 # Get energy balances from Eurostat
@@ -47,6 +48,15 @@ if (download_eurostat_balance){
   saveRDS(
     object = energy_balance_raw, 
     file = here("data/raw/eurostat_energy-balance_nrg_bal_c.Rds"))
+  
+  energy_balance_raw <- get_eurostat(
+    id = "nrg_bal_s", time_format = "num", 
+    stringsAsFactors = FALSE)
+  setDT(energy_balance_raw)
+  energy_balance_raw[,c("freq"):=NULL]
+  saveRDS(
+    object = energy_balance_raw, 
+    file = here("data/raw/eurostat_energy-balance_nrg_bal_s.Rds"))
 } 
 
 if (tidy_eurostat_energy_balance){
@@ -96,6 +106,51 @@ if (tidy_eurostat_energy_balance){
   energy_balance <- as_tibble(fread(here("data/tidy/eurostat_energy-balance.csv")))
 }
 
+if (tidy_eurostat_energy_balance_s){
+  energy_balance_raw <- readRDS(here("data/raw/eurostat_energy-balance_nrg_bal_s.Rds"))
+  
+  energy_balance_raw <- energy_balance_raw[
+    nrg_bal %in% c("PPRD") &
+      unit %in% c("GWH") & 
+      geo %in% countrycode(base_countries, "country.name", "eurostat") &
+      siec %in% c("TOTAL", 
+                  "RA000", # RenewablesBiofuels
+                  "C0000X0350-0370", #solid fossil fuels
+                  "G3000", # Natural gas
+                  "O4000XBIO") # Oil and petroleum products 
+  ]
+  
+  energy_balance_raw <- energy_balance_raw[
+    , .(siec, country=geo, year=TIME_PERIOD, values)]
+  
+  energy_balance_tidy <- as_tibble(energy_balance_raw) %>% 
+    pivot_wider(names_from = "siec", values_from = "values") %>% 
+    dplyr::mutate(country=countrycode(country, "eurostat", "iso3c")) %>% 
+    rename(
+      TOTAL=TOTAL, 
+      RenewablesBiofuels=`RA000`, 
+      SolicFossilFuels=`C0000X0350-0370`, 
+      NaturalGas=`G3000`,
+      OilPetroleum=`O4000XBIO`
+    ) %>%
+    dplyr::mutate(ShareRenewables_PrimEnProd=RenewablesBiofuels/TOTAL,
+                  ShareFossils_PrimEnProd=(SolicFossilFuels + NaturalGas + OilPetroleum)/TOTAL) %>%
+    select(country,  year, ShareRenewables_PrimEnProd, ShareFossils_PrimEnProd)
+  
+  if (anyDuplicated(select(energy_balance_tidy, country, year)) == 0){
+    print("No duplicates in energy balances")
+  } else{
+    warning("DUPLICATES IN ENERGY BALANCES!")
+  }
+  
+  fwrite(
+    x = energy_balance_tidy, 
+    file = here("data/tidy/eurostat_energy-balance_PrimaryProduction.csv"))
+  energy_balance_PrimaryProduction <- energy_balance_tidy
+} else{
+  energy_balance_PrimaryProduction <- as_tibble(fread(here("data/tidy/eurostat_energy-balance_PrimaryProduction.csv")))
+}
+
 # Data from EXIOBASE --------
 # This data is prepared from the raw IO tables using the script:
 #  TXNY-paper_gwp_balance.py
@@ -133,6 +188,7 @@ full_data_2 <- left_join(
   ) %>%
   left_join(., y = green_patents, by = c("country", "year")) %>%
   mutate(GreenPatents_n = ifelse(is.na(GreenPatents_n), 0, GreenPatents_n)) %>%
+  left_join(., y = energy_balance_PrimaryProduction, by = c("country", "year")) %>%
   filter(country %in% countrycode(base_countries, "country.name", "iso3c"))
 
 fwrite(full_data_2, file = here("data/tidy/full_taxonomy_data.csv"))

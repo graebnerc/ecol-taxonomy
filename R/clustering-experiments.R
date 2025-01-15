@@ -22,12 +22,28 @@ years <- unique(base_data$year)
 if (FALSE){
   new_data <- WDI::WDI(
     country = countries, start = min(years), end = max(years), 
-    indicator = c("GDP"="NY.GDP.MKTP.PP.KD")) %>% 
+    indicator = c(
+      "GDP_ppp"="NY.GDP.MKTP.PP.KD",
+      "GDP_real"="NY.GDP.MKTP.KD")
+    ) %>% 
     select(-c("country", "iso2c"))
+  
+  
+  ma_data_fossil <- fread(here("data/raw/estat_nrg_ind_ffgae_en.csv")) %>%
+    select(c("geo", "TIME_PERIOD", "OBS_VALUE")) %>%
+    rename(ShareFossils_GrossAvEn=OBS_VALUE)
+    
+  ma_data_renew <- fread(here("data/raw/estat_nrg_ind_ren_en.csv")) %>%
+    select(c("geo", "TIME_PERIOD", "OBS_VALUE")) %>%
+    rename(ShareRenewables_GrossAvEn=OBS_VALUE)
+  
+  ma_data <- full_join(ma_data_fossil, ma_data_renew, by = c("geo", "TIME_PERIOD")) %>%
+    dplyr::mutate(geo=countrycode(geo, "eurostat", "iso3c"))
+  
+  new_data <- left_join(new_data, ma_data, by = c("iso3c"="geo", "year"="TIME_PERIOD"))
   fwrite(new_data, here("data/tidy/new_data.csv"))
 }
 new_data <- fread(here("data/tidy/new_data.csv"))
-
 reduced_data <- base_data %>% 
   filter(
     year<=last_year, year>=first_year
@@ -35,22 +51,99 @@ reduced_data <- base_data %>%
   left_join(., new_data, by = c("country"="iso3c", "year")) %>%
   mutate(population = population*1000) %>%
   mutate(# Here the normalization is done
-    GWP_trade_normed = (GWP_Imports - GWP_Exports)/population, # GWP net imports per capita
-    GWP_normed = GWP_pba/population, # GWP per capita
-    ValueAdded_normed = ValueAdded_pba/population, # ValueAdded per capita
-    EnergyProduction_normed = PrimaryEnergyProduction/population, # PrimaryEnergyProduction per capita
-    EnergyConsumption_normed = FinalEnergyConsumption / population, # FinalEnergyConsumption per capita
-    EnergyExports_normed = EnergyNetTrade / population, # EnergyNetExports per capita
-    GreenPatents_normed = GreenPatents_n / (population/1000000), # Green patents per million capita
-    GDP_normed = GDP/population
+    GreenPatents_normed = GreenPatents_n / (population/1000000), # Green patents per million capita -> YES
+    EnergyConsumption_normed = FinalEnergyConsumption / population, # FinalEnergyConsumption per capita -> YES
+    EnergyIntensity_va_normed = FinalEnergyConsumption / ValueAdded_pba, # energy intensity of the economy -> NO
+    EnergyIntensity_gdp_normed = FinalEnergyConsumption / GDP_ppp, # energy intensity of the economy -> NO
+    EnergyProduction_normed = PrimaryEnergyProduction/population, # PrimaryEnergyProduction per capita -> YES
+    ShareRenewables_PrimEnProd_normed=ShareRenewables_PrimEnProd, # -> YES
+    ShareFossils_PrimEnProd_normed=ShareFossils_PrimEnProd, # -> NO
+    ShareFossils_GrossAvEn_normed = ShareFossils_GrossAvEn, # share of fossils in gross available consumption -> YES
+    ShareRenewables_GrossAvEn_normed = ShareRenewables_GrossAvEn, # share of renewables in gross available consumption -> NO
+    GDP_ppp_normed = GDP_ppp/population, # -> TEST
+    GDP_real_normed = GDP_real/population,# -> TEST
+    GWP_trade_normed = (GWP_Imports - GWP_Exports)/population, # GWP net imports per capita# -> TEST
+    GWP_normed = GWP_pba/population, # GWP per capita# -> TEST
+    # ValueAdded_normed = ValueAdded_pba/population, # ValueAdded per capita
+    EnergyExports_pop_normed = EnergyNetTrade / population, # EnergyNetExports per capita -> NO
+    EnergyExports_prod_normed = EnergyNetTrade / PrimaryEnergyProduction # Energy security -> NO
   ) %>%
   select(all_of(c("country")), contains("_normed")) %>%
   summarise(across(.cols = everything(), .fns = mean),.by = "country") %>% 
   mutate(country=countrycode(country, "iso3c", "country.name"))
 
+# Explore data-------
+get_vis <- function(var1, var2){
+  reduced_data %>%
+    summarise(across(.cols = everything(), 
+                     .fns = ~ mean(.x, na.rm = TRUE)), .by = "country") %>%
+    ggplot(
+      data = ., 
+      aes(
+        x=.data[[var1]], 
+        y=.data[[var2]], color=country)) +
+    geom_point() +
+    geom_label(aes(label=country)) +
+    theme_light() +
+    theme(legend.position = "none")
+}
+# Production and consumption -> keep both
+get_vis("EnergyConsumption_normed", "EnergyProduction_normed")
+
+# Kinds of renewables
+get_vis("ShareRenewables_PrimEnProd_normed", "ShareRenewables_GrossAvEn_normed") 
+get_vis("ShareFossils_PrimEnProd_normed", "ShareFossils_GrossAvEn_normed")
+
+
+# The mismatch is surprising; gdp is more in line with official statistics
+get_vis("EnergyIntensity_va_normed", "EnergyIntensity_gdp_normed")
+
+# 
+get_vis("EnergyIntensity_va_normed", "EnergyConsumption_normed")
+get_vis("EnergyIntensity_gdp_normed", "EnergyConsumption_normed")
+get_vis("EnergyIntensity_gdp_normed", "GDP_ppp_normed")
+get_vis("EnergyConsumption_normed", "GDP_ppp_normed")
+
+
+get_vis("FossilShare_normed", "RenewShare_normed")
+# using energy exports?
+get_vis("EnergyExports_prod_normed", "EnergyProduction_normed")
+get_vis("EnergyExports_pop_normed", "EnergyProduction_normed")
+get_vis("EnergyExports_prod_normed", "EnergyConsumption_normed")
+get_vis("EnergyExports_pop_normed", "EnergyConsumption_normed") # -> correlation -> not used
+
+reduced_data %>%
+  summarise(across(.cols = everything(), 
+                   .fns = ~ mean(.x, na.rm = TRUE)), .by = "country") %>%
+  ggplot(
+    data = ., 
+    aes(
+      x=reorder(country, -EnergyExports_prod_normed), 
+      y=EnergyExports_prod_normed, 
+      color=country, fill = country)) +
+  geom_bar(stat="identity") +
+  theme_light()
+# Given the small variance and some outliers we decide not to use it
+
+
+
 # CONDUCT CLUSTERING-------
+# TODO: rename
+reduced_data_used <- reduced_data %>%
+  select(all_of(c("country", 
+                  "GreenPatents_normed", 
+                  "EnergyConsumption_normed", 
+                  "EnergyProduction_normed", 
+                  "ShareRenewables_PrimEnProd_normed", 
+                  #"ShareFossils_GrossAvEn_normed",  
+                  "GDP_ppp_normed", 
+                  #"GDP_real_normed", 
+                  "GWP_trade_normed", 
+                  "GWP_normed"
+                  )
+))
 # Coerce into data.frame structure:
-reduced_data_df <- as.data.frame(reduced_data)
+reduced_data_df <- as.data.frame(reduced_data_used)
 rownames(reduced_data_df) <- reduced_data_df$country
 reduced_data_df$country <- NULL
 # Scale data
@@ -69,7 +162,7 @@ tibble("Algorithm"=names(ac_overview), "Coefficient"=ac_overview)
 hc_ward_agnes <- agnes(reduced_data_dist, method = "ward")
 
 # DENDOGRAM-------
-n_clusters <- 4
+n_clusters <- 5
 
 fviz_dend(hc_ward_agnes,
           main = "Titel",
@@ -82,7 +175,8 @@ fviz_dend(hc_ward_agnes,
           # k_colors = RColorBrewer::brewer.pal(n_groups, "Dark2"),
           # rect_border = RColorBrewer::brewer.pal(n_groups, "Dark2"),
           horiz = TRUE
-)
+) + ggtitle("No ffossils")
+ggsave(filename = here("plots/NoFossil.pdf"))
 
 clusters_obtained <- cutree(as.hclust(hc_ward_agnes), k = n_clusters)
 clusters_obtained_tab <- tibble(
@@ -121,7 +215,7 @@ ggplot(clusters_obtained_tb,
          alluvium = country,
          fill = code, label = code)
 ) +
-  scale_fill_brewer(type = "qual", palette = "Set2") +
+  # scale_fill_brewer(type = "qual", palette = "Set2") +
   geom_flow(
     stat = "alluvium", lode.guidance = "frontback",
     color = "darkgray", curve_type = "linear"
@@ -146,7 +240,7 @@ get_ecol_cluster <- function(country){
 }
 get_ecol_cluster <- Vectorize(get_ecol_cluster)
 
-descriptive_data <- reduced_data %>%
+descriptive_data <- reduced_data_used %>%
   mutate(ecolmodel=get_ecol_cluster(country)) 
 
 make_plot <- function(var_used){
@@ -164,6 +258,29 @@ make_plot <- function(var_used){
 vars_used <- setdiff(names(descriptive_data), c("country", "ecolmodel"))
 p_list <- map(.x = vars_used, .f = make_plot)
 library(ggpubr)
-ggarrange(plotlist = p_list, ncol = 2, nrow = 4)
+ggarrange(plotlist = p_list, ncol = 3, nrow = 4)
+
+
+
+
+
+
+
+
+make_plot_bar <- function(var_used){
+  ggplot(
+    descriptive_data, 
+    aes(x=reorder(country, -.data[[var_used]]), y=.data[[var_used]], 
+        color=ecolmodel, fill=ecolmodel)
+  ) +
+    labs(title = var_used, x="Ecological model") +
+    scale_y_continuous(labels = scales::label_number(scale = 0.001, suffix = "k")) +
+    geom_bar(stat = "identity")+
+    theme_linedraw() + theme(plot.title = element_text(hjust = 0.5), legend.position = "none")
+}
+
+p_list_bar <- map(.x = vars_used, .f = make_plot_bar)
+ggarrange(plotlist = p_list_bar, ncol = 3, nrow = 4)
+
 
 
