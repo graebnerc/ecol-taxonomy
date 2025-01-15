@@ -42,6 +42,21 @@ first_year <- 2014
 last_year <- 2018
 ```
 
+Additional variables?
+```{r}
+countries <- unique(base_data$country)
+years <- unique(base_data$year)
+if (FALSE){
+  new_data <- WDI::WDI(
+  country = countries, start = min(years), end = max(years), 
+  indicator = c("GDP"="NY.GDP.MKTP.PP.KD")) %>% 
+  select(-c("country", "iso2c"))
+fwrite(new_data, here("data/tidy/new_data.csv"))
+}
+new_data <- fread(here("data/tidy/new_data.csv"))
+```
+
+
 We focus on the time between `r first_year` and `r last_year` and consider the following variables:
 
 ```{r}
@@ -49,6 +64,7 @@ reduced_data <- base_data %>%
   filter(
     year<=last_year, year>=first_year
   ) %>% 
+  left_join(., new_data, by = c("country"="iso3c", "year")) %>%
   mutate(population = population*1000) %>%
   mutate(# Here the normalization is done
     GWP_trade_normed = (GWP_Imports - GWP_Exports)/population, # GWP net imports per capita
@@ -57,7 +73,8 @@ reduced_data <- base_data %>%
     EnergyProduction_normed = PrimaryEnergyProduction/population, # PrimaryEnergyProduction per capita
     EnergyConsumption_normed = FinalEnergyConsumption / population, # FinalEnergyConsumption per capita
     EnergyExports_normed = EnergyNetTrade / population, # EnergyNetExports per capita
-    GreenPatents_normed = GreenPatents_n / (population/1000000) # Green patents per million capita
+    GreenPatents_normed = GreenPatents_n / (population/1000000), # Green patents per million capita
+    GDP_normed = GDP/population
   ) %>%
   select(all_of(c("country")), contains("_normed")) %>%
   summarise(across(.cols = everything(), .fns = mean),.by = "country") %>% 
@@ -169,7 +186,7 @@ m4 <- filter(clusters_obtained_tab, `Ecological model`=="4") %>% select(country)
 max_n <- max(nrow(m1), nrow(m2), nrow(m3), nrow(m4))
 cluster_list <- list(
   "Ecological model 1" = m1 %>% add_row(`Model`=rep("", max_n-nrow(m1))) %>% pull(Model), 
-  "Ecological model 2" = m2 %>% pull(Model),# %>% add_row(`Model 2`=rep(NA, max_n-nrow(m2))), 
+  "Ecological model 2" = m2 %>% add_row(`Model`=rep("", max_n-nrow(m2))) %>% pull(Model),# %>% add_row(`Model 2`=rep(NA, max_n-nrow(m2))), 
   "Ecological model 3" = m3 %>% add_row(`Model`=rep("", max_n-nrow(m3))) %>% pull(Model),
   "Ecological model 4" = m4 %>% add_row(`Model`=rep("", max_n-nrow(m4))) %>% pull(Model)
 )
