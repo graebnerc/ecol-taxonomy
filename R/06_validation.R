@@ -2,8 +2,9 @@
 #
 # (A) External validity: do the vulnerability/potential scores predict outcomes
 #     they SHOULD, controlling for GDP per capita? Validators are variables NOT
-#     used to build the scores: renewable share of gross available energy and
-#     real GDP growth over the window (both offline, from new_data.csv).
+#     used to build the scores: the overall renewable share (Eurostat SHARES REN,
+#     column renew_share_overall) and real GDP growth over the window (both
+#     offline, from new_data.csv; built by R/get_data_extra.R).
 # (B) Comparison with the Graebner et al. (2020) growth-model groups (JEE) and
 #     the geographic grouping: group-mean scores, contingency of quadrants, an
 #     alluvial map, and Cramer's V. Also cross-tabs against the data-driven
@@ -32,7 +33,7 @@ val <- nd |>
   filter(year >= REF_FIRST_YEAR, year <= REF_LAST_YEAR) |>
   group_by(iso3 = iso3c) |>
   summarise(
-    renew_share = mean(ShareRenewables_GrossAvEn, na.rm = TRUE),
+    renew_share = mean(renew_share_overall, na.rm = TRUE),  # Eurostat SHARES REN (overall)
     gdp_growth  = (last(GDP_real) / first(GDP_real))^(1 / (REF_LAST_YEAR - REF_FIRST_YEAR)) - 1,
     loggdp_pc   = log(mean(GDP_ppp, na.rm = TRUE)),  # per-country GDP level (control)
     .groups = "drop"

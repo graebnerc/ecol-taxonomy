@@ -6,7 +6,8 @@
 #'
 #' @param base_data Panel read from data/tidy/full_taxonomy_data.csv (ISO3 x year).
 #' @param extra_data Panel read from data/tidy/new_data.csv (adds GDP_ppp etc.);
-#'   pass NULL to skip GDP-based indicators.
+#'   one row per country-year (see R/get_data_extra.R); pass NULL to skip
+#'   GDP-based indicators.
 #' @param first_year,last_year Reference window (inclusive).
 #' @return Tibble, one row per country (English country name), with `*_normed`
 #'   indicator columns averaged over the window.
@@ -16,6 +17,9 @@ build_indicator_table <- function(base_data, extra_data,
     dplyr::filter(year <= last_year, year >= first_year)
 
   if (!is.null(extra_data)) {
+    # Guard against the B1 defect: extra_data must be one row per country-year,
+    # else the left_join silently fans out the panel (see R/get_data_extra.R).
+    stopifnot(!anyDuplicated(extra_data[, c("iso3c", "year")]))
     dat <- dplyr::left_join(
       dat, extra_data, by = c("country" = "iso3c", "year")
     )

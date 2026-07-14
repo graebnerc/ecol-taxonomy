@@ -67,6 +67,11 @@ Supporting:
   balances (`nrg_bal_c`, `nrg_bal_s`), World Bank population, EXIOBASE footprints
   (`TXNY_GWP_Trade.csv`, produced by an external Python script in another project), and
   PATSTAT green patents (see `sql/`). Downloads are gated by `if` flags near the top.
+- `R/get_data_extra.R` — builds the external-validator panel `data/tidy/new_data.csv`
+  (GDP PPP/real + `renew_share_overall`), one row per country-year. `DOWNLOAD = TRUE`
+  rebuilds from WDI + Eurostat `nrg_ind_ren`; `DOWNLOAD = FALSE` (default) reproduces it
+  offline from `_archive/data/new_data_blended_raw.csv` by selecting the overall (REN)
+  series. Fixes audit finding B1 (the old file duplicated each country-year four times).
 - `R/build_green_list.R` — reconstructs the green-product list in HS1992 6-digit from the
   OECD CLEG (`info/OECD-Report_List.pdf`, Table A.1) via the HS2007→HS1992 concordance
   (`info/HS 2007-to-HS1992 .xls`). Writes `data/tidy/green_products_hs6.csv` (244 codes,
@@ -94,7 +99,9 @@ Panel, country (ISO3) × year, EU-27. Notable columns:
 - `GWP_pba` — production-based GHG emissions; `ValueAdded_pba`, `Employment_pba` — sectoral totals.
 - `PrimaryEnergyProduction`, `FinalEnergyConsumption`, `EnergyExports`/`Imports`/`NetTrade` (GWh, Eurostat).
 - `population` (1000s), `GreenPatents_n`, `ShareRenewables_PrimEnProd`, `ShareFossils_PrimEnProd`.
-- `new_data.csv` adds `GDP_ppp`, `GDP_real`, and gross-available-energy fossil/renewable shares.
+- `new_data.csv` adds `GDP_ppp`, `GDP_real`, `ShareFossils_GrossAvEn`, and the overall
+  renewable share `renew_share_overall` (Eurostat SHARES REN). One row per country-year;
+  built by `R/get_data_extra.R` (do not re-introduce the old blended multi-indicator rows).
 
 Convention: raw levels are turned into per-capita or share indicators (`*_normed`) inside
 each script before scaling — normalisation is **not** baked into the tidy CSV.
