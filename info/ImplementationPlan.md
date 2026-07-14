@@ -102,8 +102,9 @@ fossil share of primary energy. PC1 = 61% var, all-positive loadings.
 **Potential block** — green patents p.c., GCI, GCP. PC1 = 61% var, driven by GCI/GCP.
 
 - [x] PCA within each block; PC1 scores oriented (fossil-share / GCI anchors).
-- [x] **GO/NO-GO PASSED**: cor(vulnerability, potential) = −0.17 (orthogonal); potential
-      R² vs log GDP p.c. = 0.05 (income-independent); vulnerability R² = 0.50 (correlates
+- [x] **GO/NO-GO PASSED**: cor(vulnerability, potential) = −0.19 (orthogonal); potential
+      R² vs log GDP p.c. = 0.07 (income-independent, ≤0.19 leave-one-out); vulnerability
+      R² = 0.50 (correlates
       with income, but substantively — catch-up economies really are more carbon-intensive
       — and the axis is coherent). The 2-D structure is not reducible to income.
 
@@ -111,12 +112,13 @@ fossil share of primary energy. PC1 = 61% var, all-positive loadings.
 
 - [x] **Headline figure:** `R/04_typology.R` → `plots/typology_map.{pdf,png}`; quadrant
       membership + scores in `data/tidy/taxonomy_scores.csv`.
-- [x] Quadrants (median splits): Winners = Austria, Denmark, Finland, France, Germany,
-      Italy, Portugal, Spain, Sweden; **Exposed but capable = Czechia, Hungary,
+- [x] Quadrants (median splits): Winners = Austria, Belgium, Denmark, Finland, France,
+      Germany, Italy, Portugal, Spain, Sweden; **Exposed but capable = Czechia,
       Netherlands, Poland, Slovenia** (the polarization tension — capable but carbon-locked);
-      At risk = Bulgaria, Croatia, Cyprus, Estonia, Greece, Latvia, Lithuania, Romania,
-      Slovakia; Low-stakes = Belgium, Ireland, Luxembourg, Malta. The Workbench group splits
-      on *potential* while sharing high vulnerability.
+      At risk = Bulgaria, Croatia, Cyprus, Estonia, Greece, Hungary, Latvia, Lithuania,
+      Romania, Slovakia; Low-stakes = Ireland, Luxembourg, Malta. The Workbench group splits
+      on *potential* while sharing high vulnerability. (Belgium and the Netherlands sit
+      exactly on a median — borderline; see the tie-convention check in `07_robustness.R`.)
 - [ ] **Robustness layer — clustering:** align `R/05_clustering.R` to cluster on the block
       variables / the two scores; validate cluster number with
       indicators (and separately on the two scores). Validate cluster number with
@@ -128,34 +130,35 @@ fossil share of primary energy. PC1 = 61% var, all-positive loadings.
 
 `R/06_validation.R`.
 - [x] External validity (validators NOT used to build scores; partial corr controls for
-      log GDP p.c.): potential → renewable share of energy raw +0.27 / partial **+0.44**
+      log GDP p.c.): potential → renewable share of energy raw +0.24 / partial **+0.43**
       (green capability predicts renewables even more strongly net of income). potential →
-      GDP growth −0.59 / −0.46 (β-convergence: capability sits in mature, slower-growing
+      GDP growth −0.60 / −0.49 (β-convergence: capability sits in mature, slower-growing
       economies — a convergence confound, not a failure). Vulnerability → renewables weakly
       negative, as expected. **OECD EPS added** (`info/OECD-EPS-Index.csv`, aggregate EPS,
-      20/27 EU states — 7 small/newer-EU missing): potential → EPS +0.31 raw / **+0.39**
-      partial; vulnerability → EPS −0.27 — green capability predicts stricter policy net of
-      income (reproduces Mealy & Teytelboym). TODO: env. patents validator if wanted.
+      20/27 EU states — 7 small/newer-EU missing, 6 of them "At risk", so read as
+      indicative): potential → EPS +0.34 raw / **+0.42** partial; vulnerability → EPS −0.27 —
+      green capability predicts stricter policy net of income. TODO: env. patents validator.
 - [x] Comparison with Gräbner et al. (2020) growth models — **supports H1–H3**:
-      group means → Core (vuln −0.71, pot +0.80), Periphery (−0.35, +0.13), Workbench
-      (**+0.88, −0.16**), Finance (−0.83, −0.96). Regressions vs Core: Workbench
-      vulnerability **+1.60 (p<0.001)**, potential **−0.96 (p<0.05)** — catch-up economies
+      group means → Core (vuln −0.71, pot +0.85), Periphery (−0.35, +0.10), Workbench
+      (**+0.88, −0.18**), Finance (−0.83, −0.92). Regressions vs Core: Workbench
+      vulnerability **+1.60 (p<0.001)**, potential **−1.03 (p<0.05)** — catch-up economies
       are systematically more exposed and less capable. Quadrant × growth model Cramér's
-      V = **0.65**; quadrant × data-driven cluster (05) V = 0.59 (robustness). Figures:
+      V = **0.71** (bias-corrected 0.67, Monte-Carlo Fisher p<1e-5); quadrant × data-driven
+      cluster (05) V = 0.64 (robustness). Figures:
       `plots/validation_scores_by_group.{pdf,png}`, `plots/validation_alluvial.{pdf,png}`.
-- [x] The "Exposed but capable" quadrant (Poland, Czechia, Hungary, Slovenia, NL) nuances
+- [x] The "Exposed but capable" quadrant (Poland, Czechia, Slovenia, NL) nuances
       the story: some catch-up economies have real green capability despite high burden.
 
 ## Phase 6 — Robustness & sensitivity
 
 ### Section A — self-contained (`R/07_robustness.R`)  [DONE]
-- [x] Reference window / pooling: EU-27 GCI rank corr per-year vs pooled = 0.97–1.00
-      (mean 0.99). Pooling and window choice are innocuous.
+- [x] Reference window / pooling: EU-27 GCI rank corr per-year vs pooled ≥ 0.97
+      (mean 0.98). Pooling and window choice are innocuous.
 - [x] Variable set (GCI vs ECI; renewable-only GCI; drop vulnerability vars) and
       PCA vs simple mean: Spearman corr with baseline ≥0.90 and ≤4/27 quadrant changes
       in every case **except two** — robust (median/MAD) scaling of the potential axis
-      (corr 0.45, 10 changes) and swapping ECI for GCI on the potential axis
-      (corr 0.72, 4 changes). The ECI swap is *expected* to move the ranking: it replaces
+      (corr 0.51, 8 changes) and swapping ECI for GCI on the potential axis
+      (corr 0.77, 4 changes). The ECI swap is *expected* to move the ranking: it replaces
       the green signal with general economic complexity, so a lower rank correlation is the
       point — that it still yields only 4 quadrant changes is what shows the map is robust.
       Robust rescaling reflects green-patent skew (patents load low, 0.26; GCI/GCP drive

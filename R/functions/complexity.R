@@ -12,6 +12,12 @@
 #'   (removes micro-reporters; default ~ USD 1bn/yr over a 5-year window).
 #' @return list(M = binary matrix, rca = RCA matrix), rows = countries, cols = products.
 build_rca_matrix <- function(exp_dt, min_country_export = 5e9) {
+  # Drop Atlas "unspecified" trade codes (~4.8% of world exports): 999999 and the
+  # text sentinel XXXXXX are not real products and must not enter the RCA/PCI
+  # estimation (audit finding N2). Effect on ECI/GCI/GCP is small (cor ~ 0.998),
+  # but a few countries near the median flip quadrant, so it is applied on principle.
+  exp_dt <- exp_dt[!(as.character(exp_dt$hs6) %in% c("999999", "XXXXXX")), ]
+
   # Country x product export matrix via a sparse pivot (fast; a dense tapply on
   # ~600k pairs is both slow and memory-heavy).
   fi <- factor(exp_dt$iso3)

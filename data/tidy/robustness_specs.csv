@@ -1,7 +1,7 @@
 spec,cor_vuln,cor_pot,quad_changes
-simple mean (not PCA),0.99,0.94,4
-robust (median/MAD) scaling,0.95,0.45,10
-potential: ECI replaces GCI,1,0.72,4
-potential: renewable-only GCI,1,0.96,4
+simple mean (not PCA),0.99,0.95,2
+robust (median/MAD) scaling,0.95,0.51,8
+potential: ECI replaces GCI,1,0.77,4
+potential: renewable-only GCI,1,0.96,2
 vuln: drop fossil share,0.92,1,2
 vuln: drop carbon intensity,0.9,1,2

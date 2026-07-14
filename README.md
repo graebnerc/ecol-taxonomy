@@ -24,8 +24,8 @@ trade data — it is orthogonal to income and is what lets the taxonomy say some
   fossil share of primary energy — intensity-based (per value added), which removes the
   mechanical scale effect. The vulnerability score still correlates with income
   (R² = 0.50 vs log GDP p.c.), which we read as substantive (catch-up economies are more
-  carbon-intensive), while the potential axis is income-independent (R² = 0.05,
-  ≤ 0.17 leave-one-out).
+  carbon-intensive), while the potential axis is income-independent (R² = 0.07,
+  ≤ 0.19 leave-one-out).
 - Potential = green patents per capita, Green Complexity Index (GCI), Green Complexity
   Potential (GCP).
 
@@ -53,27 +53,27 @@ sources (Eurostat, WDI, EXIOBASE, PATSTAT).
 
 ## What we did — and the headline results
 
-- **Green complexity built & validated** — GCI top-10 reproduces Mealy & Teytelboym Fig. 3
-  (Germany #1; Italy, Austria, Czechia, Denmark, China, USA, Japan, France, UK),
+- **Green complexity built & validated** — GCI top-10 is consistent with Mealy & Teytelboym
+  Fig. 3 (Germany #1; Italy, Austria, USA, Denmark, China, Japan, Czechia, France, UK),
   cor(GCI, ECI) = 0.78. Crucially GCI is **income-independent** (R² vs log GDP p.c. ≈ 0.01):
   the catch-up East (Czechia, Poland) outranks high-GDP finance economies (Luxembourg,
   Ireland, Netherlands).
-- **Typology passes the go/no-go check** — the two axes are orthogonal (cor = −0.17) and
-  the potential axis is income-independent (R² = 0.05, ≤ 0.17 leave-one-out), so the 2-D
-  structure is *not* reducible to GDP. Quadrants: Winners (DE, DK, AT, FR, SE, IT, ES, FI, PT), **Exposed but
-  capable (PL, CZ, HU, SI, NL)** — the polarization tension — At risk (BG, RO, Baltics, HR,
-  SK, EL, CY), Low-stakes (LU, IE, MT, BE). Note NL and HU sit *exactly* on the
-  vulnerability and potential medians respectively: they are borderline, and under the
-  opposite median-tie convention NL is a Winner and HU is At risk (see `07_robustness.R`).
-- **Externally valid** — potential predicts renewable share (partial +0.44 net of GDP,
-  Eurostat SHARES overall) and OECD EPS policy stringency (+0.39, but only on the 20 OECD-
+- **Typology passes the go/no-go check** — the two axes are orthogonal (cor = −0.19) and
+  the potential axis is income-independent (R² = 0.07, ≤ 0.19 leave-one-out), so the 2-D
+  structure is *not* reducible to GDP. Quadrants: Winners (DE, DK, AT, FR, SE, IT, ES, FI, PT, BE),
+  **Exposed but capable (CZ, NL, PL, SI)** — the polarization tension — At risk (BG, RO,
+  Baltics, HR, SK, EL, CY, HU), Low-stakes (LU, IE, MT). Note NL and BE sit *exactly* on
+  the vulnerability and potential medians respectively: they are borderline, and under the
+  opposite median-tie convention NL is a Winner and BE is Low-stakes (see `07_robustness.R`).
+- **Externally valid** — potential predicts renewable share (partial +0.43 net of GDP,
+  Eurostat SHARES overall) and OECD EPS policy stringency (+0.42, but only on the 20 OECD-
   member EU states — 6 of the 9 "At risk" countries are missing, so this validator cannot
   speak to the low-potential tail). Comparison with the Gräbner et al. (2020) growth models
-  is close (Cramér's V = 0.65, a descriptive association index; n=27 is too sparse for
+  is close (Cramér's V = 0.71, a descriptive association index; n=27 is too sparse for
   chi-square, so significance is from a Monte-Carlo Fisher test) and supports H1–H3 (the
   catch-up "Workbench" group is significantly more vulnerable, +1.60 p<0.001, and less
-  capable, −0.96 p<0.05).
-- **Robust** — GCI is stable year-to-year (rank corr 0.97–1.00 vs pooled); the typology
+  capable, −1.03 p<0.05).
+- **Robust** — GCI is stable year-to-year (rank corr ≥ 0.97 vs pooled, mean 0.98); the typology
   survives PCA-vs-mean, renewable-only GCI, variable drops, and outlier removal; discrete
   cluster structure is weak (silhouette ≈ 0.28, gap k=1), which supports the continuous map.
 
