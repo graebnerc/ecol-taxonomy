@@ -21,7 +21,11 @@ trade data — it is orthogonal to income and is what lets the taxonomy say some
 
 **Blocks** (`R/config.R`):
 - Vulnerability = carbon intensity (GHG / value added), energy intensity (energy / VA),
-  fossil share of primary energy — all income-neutral.
+  fossil share of primary energy — intensity-based (per value added), which removes the
+  mechanical scale effect. The vulnerability score still correlates with income
+  (R² = 0.50 vs log GDP p.c.), which we read as substantive (catch-up economies are more
+  carbon-intensive), while the potential axis is income-independent (R² = 0.05,
+  ≤ 0.17 leave-one-out).
 - Potential = green patents per capita, Green Complexity Index (GCI), Green Complexity
   Potential (GCP).
 
@@ -55,10 +59,12 @@ sources (Eurostat, WDI, EXIOBASE, PATSTAT).
   the catch-up East (Czechia, Poland) outranks high-GDP finance economies (Luxembourg,
   Ireland, Netherlands).
 - **Typology passes the go/no-go check** — the two axes are orthogonal (cor = −0.17) and
-  the potential axis is income-independent (R² = 0.05), so the 2-D structure is *not*
-  reducible to GDP. Quadrants: Winners (DE, DK, AT, FR, SE, IT, ES, FI, PT), **Exposed but
+  the potential axis is income-independent (R² = 0.05, ≤ 0.17 leave-one-out), so the 2-D
+  structure is *not* reducible to GDP. Quadrants: Winners (DE, DK, AT, FR, SE, IT, ES, FI, PT), **Exposed but
   capable (PL, CZ, HU, SI, NL)** — the polarization tension — At risk (BG, RO, Baltics, HR,
-  SK, EL, CY), Low-stakes (LU, IE, MT, BE).
+  SK, EL, CY), Low-stakes (LU, IE, MT, BE). Note NL and HU sit *exactly* on the
+  vulnerability and potential medians respectively: they are borderline, and under the
+  opposite median-tie convention NL is a Winner and HU is At risk (see `07_robustness.R`).
 - **Externally valid** — potential predicts renewable share (partial +0.44 net of GDP) and
   OECD EPS policy stringency (+0.39); comparison with the Gräbner et al. (2020) growth
   models is strong (Cramér's V = 0.65) and supports H1–H3 (the catch-up "Workbench" group

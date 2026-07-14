@@ -87,6 +87,25 @@ print(rob, row.names = FALSE)
 cat("(cor = Spearman rank corr vs baseline; quad_changes out of 27 countries)\n")
 fwrite(rob, here("data/tidy/robustness_specs.csv"))
 
+# --- Median-tie convention sensitivity (finding A1) ---------------------------
+# assign_quadrant() uses `>=` (ties go to the high side). With n = 27 one country
+# sits exactly on each median; flip to `>` (ties go low) and report who moves.
+cat("\n----- Median-tie convention: >= (baseline) vs > (ties go low) -----\n")
+assign_quadrant_lowtie <- function(vuln, pot) {
+  mx <- median(vuln); my <- median(pot)
+  ifelse(vuln <= mx & pot >  my, "Winners",
+  ifelse(vuln >  mx & pot >  my, "Exposed",
+  ifelse(vuln <= mx & pot <= my, "Low-stakes", "At risk")))
+}
+q_flip  <- assign_quadrant_lowtie(base$vuln, base$pot)
+moved   <- which(q_flip != base_q)
+cat(sprintf("Countries exactly on a median: %s\n",
+            paste(ind$country[abs(base$vuln - median(base$vuln)) < 1e-9 |
+                              abs(base$pot  - median(base$pot))  < 1e-9], collapse = ", ")))
+cat(sprintf("Flipping the tie convention moves %d/27 countries:\n", length(moved)))
+if (length(moved))
+  for (i in moved) cat(sprintf("  %-12s %s -> %s\n", ind$country[i], base_q[i], q_flip[i]))
+
 # === 3. Number of clusters ====================================================
 cat("\n===== 3. Clustering: how many clusters? =====\n")
 Xs <- scale(as.matrix(ind[, c(VULN_VARS, POT_VARS)])); rownames(Xs) <- ind$country

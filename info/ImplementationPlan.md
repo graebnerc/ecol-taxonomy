@@ -150,10 +150,13 @@ fossil share of primary energy. PC1 = 61% var, all-positive loadings.
       (mean 0.99). Pooling and window choice are innocuous.
 - [x] Variable set (GCI vs ECI; renewable-only GCI; drop vulnerability vars) and
       PCA vs simple mean: Spearman corr with baseline ≥0.90 and ≤4/27 quadrant changes
-      in every case **except** robust (median/MAD) scaling of the potential axis
-      (corr 0.45, 10 changes) — the potential ranking is stable to most choices but
-      sensitive to robust rescaling, reflecting green-patent skew (patents load low, 0.26;
-      GCI/GCP drive PC1 — renewable-only GCI corr 0.96 confirms the green signal is stable).
+      in every case **except two** — robust (median/MAD) scaling of the potential axis
+      (corr 0.45, 10 changes) and swapping ECI for GCI on the potential axis
+      (corr 0.72, 4 changes). The ECI swap is *expected* to move the ranking: it replaces
+      the green signal with general economic complexity, so a lower rank correlation is the
+      point — that it still yields only 4 quadrant changes is what shows the map is robust.
+      Robust rescaling reflects green-patent skew (patents load low, 0.26; GCI/GCP drive
+      PC1 — renewable-only GCI corr 0.96 confirms the green signal is stable).
 - [x] Cluster number: silhouette peaks at k=3 but is low (~0.28) and the gap statistic
       gives k=1 — i.e. **weak discrete structure**, which *supports* the continuous 2-D
       map over hard clustering (clustering stays illustrative only).

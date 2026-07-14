@@ -50,28 +50,36 @@ cat("Interpretation: if both R^2 are high AND |cor| ~ 1, the taxonomy is just\n"
 
 # --- 2-D typology map ---------------------------------------------------------
 mx <- median(scores$vulnerability); my <- median(scores$potential)
+# Median split via the shared helper (identical machinery to 07_robustness.R).
+# With n = 27 (odd) exactly one country sits ON each median; assign_quadrant()'s
+# `>=` convention puts it on the high side. Flag countries within BOUNDARY_EPS of
+# either median as borderline (finding A1), so the hard partition is not oversold
+# and 07_robustness.R can test flipping the tie convention.
+BOUNDARY_EPS <- 0.10
 scores <- scores |>
-  mutate(quadrant = case_when(
-    vulnerability <  mx & potential >= my ~ "Winners (low vuln / high pot)",
-    vulnerability >= mx & potential >= my ~ "Exposed but capable",
-    vulnerability <  mx & potential <  my ~ "Low-stakes / low capability",
-    TRUE                                  ~ "At risk (high vuln / low pot)"
-  ))
+  mutate(quadrant = assign_quadrant(vulnerability, potential, "long"),
+         boundary = abs(vulnerability - mx) < BOUNDARY_EPS |
+                    abs(potential - my)     < BOUNDARY_EPS)
 fwrite(scores, here("data/tidy/taxonomy_scores.csv"))
 cat("\n--- Quadrant membership ---\n")
 scores |> arrange(quadrant, country) |>
   group_by(quadrant) |> summarise(countries = paste(country, collapse = ", "), .groups = "drop") |>
   as.data.frame() |> print(right = FALSE)
+cat(sprintf("\nBorderline (|score - median| < %.2f, quadrant is convention-sensitive): %s\n",
+            BOUNDARY_EPS, paste(scores$country[scores$boundary], collapse = ", ")))
 
 p_map <- ggplot(scores, aes(vulnerability, potential, colour = group)) +
   geom_hline(yintercept = my, linetype = 2, colour = "grey60") +
   geom_vline(xintercept = mx, linetype = 2, colour = "grey60") +
   geom_point(size = 2) +
+  geom_point(data = dplyr::filter(scores, boundary), shape = 1, size = 4.2,
+             colour = "grey30", stroke = 0.7, show.legend = FALSE) +
   ggrepel::geom_text_repel(aes(label = country), size = 3, max.overlaps = 20) +
   labs(title = "EU-27 green-transition typology",
        x = "Vulnerability  (transition burden)  →",
        y = "Potential  (green capability)  →",
-       colour = "Growth model") +
+       colour = "Growth model",
+       caption = sprintf("Hollow rings: within %.2f of a median axis - quadrant is sensitive to the median-tie convention.", BOUNDARY_EPS)) +
   theme_minimal()
 ggsave(here("plots/typology_map.pdf"), p_map, width = 9, height = 7)
 message("04_typology.R done: wrote taxonomy_scores.csv and plots/typology_map.pdf")
