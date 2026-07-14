@@ -75,17 +75,17 @@ Supporting:
   `get_country_classification(x, classification)` mapping ISO codes to the Gräbner et al.
   (2020) growth-model groups (`jee`: Core / Finance / Periphery / Workbench / Germany /
   France) and to `geo_struc` (Central / Eastern / Southern Europe). Sourced by all scripts.
-- `R/experiments/` — archived exploratory scripts, **reference only**: `clustering_legacy.R`
-  (former canonical clustering, now superseded by `03_analysis.R`), `clustering2.R`,
-  `clustering-experiments.R` (variants with different variable sets / cluster counts).
-- `quarto/CountryTaxonomy.qmd` — report from the legacy pipeline (renders to `.html`/`.pdf`);
-  to be rebuilt around the numbered pipeline in Phase 7. Contains an "Open issues" list.
-- `sql/get_green_patents.sql` — PATSTAT query for EPO-tagged green patents (rest is testing).
+- `quarto/CountryTaxonomy.qmd` — the (legacy) report source, to be rebuilt around the
+  numbered pipeline in Phase 7; its old rendered `.html`/`.pdf` are in `_archive/quarto/`.
+- `sql/get_green_patents.sql` — live PATSTAT query for EPO-tagged green patents (testing
+  SQL / notes are in `_archive/sql/`).
 - `data/tidy/` — analysis-ready CSVs. `full_taxonomy_data.csv` and `taxonomy_indicators.csv`
   are committed vantage points, so the pipeline runs without re-downloading. `data/raw/`
   is gitignored.
-- `plots/`, `md/` — exported figures and an energy-variable reference note.
-- `info/` — proposal, Mealy & Teytelboym green-complexity paper, and the implementation plan.
+- `plots/` — current pipeline figures only (stale exploration plots are in `_archive/plots/`).
+- `info/` — proposal, Mealy & Teytelboym green-complexity paper, OECD CLEG + HS concordance,
+  OECD EPS, and the implementation plan.
+- `_archive/` — superseded scripts/plots/report/notes, reference only (see `_archive/README.md`).
 
 ## Key data columns (`data/tidy/full_taxonomy_data.csv`)
 

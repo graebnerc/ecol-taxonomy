@@ -1,7 +1,7 @@
 # 03 - Typology analysis (current canonical clustering).
 # Reads data/tidy/taxonomy_indicators.csv and reproduces the hierarchical
 # clustering typology. This is the consolidated successor to the legacy
-# clustering script (now in R/experiments/clustering_legacy.R).
+# clustering script (now in _archive/R/clustering_legacy.R).
 #
 # Phase 3/4 of the plan will replace the single pooled clustering with
 # PCA-per-block scores + a vulnerability x potential map, keeping clustering as
