@@ -1,4 +1,4 @@
-here::i_am("R/clustering.R")
+here::i_am("R/experiments/clustering_legacy.R")
 library(here)
 library(data.table)
 library(dplyr)
@@ -11,8 +11,9 @@ library(ggalluvial)
 source(here("R/country_classification.R"))
 base_data <- as_tibble(fread(here("data/tidy/full_taxonomy_data.csv")))
 
-# Maciek a proposal based on my suggestions, with inclusion of energy mix
-# both options, with VApc and witout, generate nice results :)
+# What about the source/greeness of energy production?
+# TODO: employment?
+# TODO: Green products
 
 first_year <- 2014
 last_year <- 2018
@@ -23,18 +24,13 @@ reduced_data <- base_data %>%
   ) %>% 
   mutate(population = population*1000) %>%
   mutate(# Here the normalization is done
-    # GWP_trade_normed = (GWP_Imports - GWP_Exports)/population, # GWP net imports per capita
+    GWP_trade_normed = (GWP_Imports - GWP_Exports)/population, # GWP net imports per capita
     GWP_normed = GWP_pba/population, # GWP per capita
-    FossilShare_normed = FossilShare, # share of fossils in 
-    RenewShare_normed = RenewShare, # share of renewables in 
-    EnergyIntesity_normed = FinalEnergyConsumption / ValueAdded_pba, # energy intensity of the economy
-    EnergyExports_normed = EnergyNetTrade / PrimaryEnergyProduction, # Energy security
-    GreenPatents_normed = GreenPatents_n / (population/1000000), # Green patents per million capita
-    # ValueAdded_normed = ValueAdded_pba/population, # ValueAdded per capita
-    # EnergyProduction_normed = PrimaryEnergyProduction/population, # PrimaryEnergyProduction per capita
-    # EnergyConsumption_normed = FinalEnergyConsumption / population, # FinalEnergyConsumption per capita
-    # EnergyExports_normed = EnergyNetTrade / population, # EnergyNetExports per capita
-    
+    ValueAdded_normed = ValueAdded_pba/population, # ValueAdded per capita
+    EnergyProduction_normed = PrimaryEnergyProduction/population, # PrimaryEnergyProduction per capita
+    EnergyConsumption_normed = FinalEnergyConsumption / population, # FinalEnergyConsumption per capita
+    EnergyExports_normed = EnergyNetTrade / population, # EnergyNetExports per capita
+    GreenPatents_normed = GreenPatents_n / (population/1000000) # Green patents per million capita
   ) %>%
   select(all_of(c("country")), contains("_normed")) %>%
   summarise(across(.cols = everything(), .fns = mean),.by = "country") %>% 
@@ -47,9 +43,6 @@ reduced_data_df$country <- NULL
 
 # Scale data
 reduced_data_scaled <- scale(reduced_data_df)
-
-# write scaled data in csv
-fwrite(reduced_data, file = here("data/tidy/clustered_data.csv"))
 
 # Compute dissimilarity matrix
 reduced_data_dist <- dist(reduced_data_scaled, method = "euclidean")
@@ -76,7 +69,7 @@ hc_ward_agnes <- agnes(reduced_data_dist, method = "ward")
 fviz_dend(hc_ward_agnes,
           main = "Titel",
           xlab = "Countries", ylab = "",
-          k = 6, # Cut in groups
+          k = 4, # Cut in groups
           cex = 0.75, # label size
           rect = TRUE, # Add rectangle around groups
           rect_fill = TRUE,
@@ -87,16 +80,16 @@ fviz_dend(hc_ward_agnes,
 )
 
 # Visualization of the results
-clusters_obtained <- cutree(as.hclust(hc_ward_agnes), k = 6)
+clusters_obtained <- cutree(as.hclust(hc_ward_agnes), k = 4)
 clusters_obtained_tb <- tibble(
   "country" = names(clusters_obtained),
   "Ecological model" = as.character(clusters_obtained),
   "Development model" = get_country_classification(
     countrycode(country, "country.name", "iso3c"), "jee")
-) %>% 
+  ) %>% 
   pivot_longer(
     cols = -country, names_to = "group", values_to = "code"
-  )%>%
+    )%>%
   mutate(time_=ifelse(group=="Ecological model", 2, 1))
 
 # Relationship to development models
@@ -110,8 +103,10 @@ ggplot(clusters_obtained_tb,
   geom_stratum() +
   geom_text(stat = "stratum", size = 3) +
   theme(legend.position = "bottom") +
-  #ggtitle("Relationship clusters - development models") +
+  ggtitle("student curricula across several semesters") +
   theme_bw()
+
+
 
 # NOTES FROM STRUC CHANGE--------------
 

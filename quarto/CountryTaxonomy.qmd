@@ -12,7 +12,7 @@ execute:
 ---
 
 ```{r}
-here::i_am("R/clustering.R")
+here::i_am("quarto/CountryTaxonomy.qmd")
 library(here)
 library(data.table)
 library(dplyr)
