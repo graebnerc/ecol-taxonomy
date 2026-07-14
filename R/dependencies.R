@@ -1,13 +1,17 @@
 # Package dependencies for this project.
 #
-# Reproducibility (Phase 0): we recommend pinning versions with renv. renv is
-# not initialised automatically because renv::init() downloads/installs the full
-# dependency tree and is best run interactively. To pin the environment:
+# Reproducibility (Phase 0): exact versions are pinned in `renv.lock` (R 4.4.3,
+# CRAN; 129 packages = the direct dependencies below plus their recursive tree).
+# To restore that exact environment into a project-local library:
 #
 #   install.packages("renv")
-#   renv::init()          # snapshots the packages below into renv.lock
+#   renv::restore()       # installs the versions recorded in renv.lock
 #
-# Until then, this script installs any missing packages so the pipeline runs.
+# The lockfile is a plain manifest: we deliberately did NOT run renv::init(), so
+# there is no renv/activate.R or .Rprofile hook and the project still runs against
+# your system library. To refresh the lockfile after changing dependencies, re-run
+# the renv::snapshot(packages = required, lockfile = "renv.lock") call used to
+# create it. Meanwhile, this script installs any missing packages so it runs.
 
 required <- c(
   # pipeline

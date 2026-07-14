@@ -35,7 +35,10 @@ Environmental Innovation and Societal Transitions, or Journal of Economic Struct
       `R/02_complexity.R`, `R/03_analysis.R`, sourced helpers in `R/functions/`.
 - [ ] Decide reference window (currently 2014–2018 mean). Keep, but document the choice
       and test sensitivity later.
-- [ ] Pin package versions (renv) so results are reproducible for co-authors/referees.
+- [x] Pin package versions (renv) so results are reproducible for co-authors/referees.
+      `renv.lock` records R 4.4.3 + 129 packages; restore with `renv::restore()`. No
+      renv/activate.R hook (manifest only), so the project still runs against the system
+      library. See `R/dependencies.R`.
 
 ## Phase 1 — Data acquisition & indicator construction
 
