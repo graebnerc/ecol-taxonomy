@@ -40,8 +40,10 @@ val <- nd |>
   )
 
 # OECD Environmental Policy Stringency (aggregate EPS, 0-6). Covers 20/27 EU
-# states (OECD members) - the 7 missing are small/newer-EU, mostly in the
-# at-risk quadrant, so read the EPS results as indicative.
+# states (OECD members). The 7 missing (BG, HR, CY, LV, LT, RO, MT) are 6 of the
+# 9 "At risk" countries, so the EPS partial correlation is estimated under severe
+# range restriction on the taxonomy's low-potential tail (finding M1) - read it
+# as indicative and do not let it speak to the At-risk group.
 eps <- fread(here("info/OECD-EPS-Index.csv"))[
   CLIM_POL == "EPS" & TIME_PERIOD >= REF_FIRST_YEAR & TIME_PERIOD <= REF_LAST_YEAR &
     !is.na(OBS_VALUE), .(eps = mean(OBS_VALUE)), by = .(iso3 = REF_AREA)]
@@ -86,14 +88,30 @@ print(summary(lm(potential ~ group, dat))$coefficients[, c(1, 4)], digits = 2)
 cat("\n--- vulnerability ~ growth-model group (ref = Core) ---\n")
 print(summary(lm(vulnerability ~ group, dat))$coefficients[, c(1, 4)], digits = 2)
 
-# Contingency of quadrant x growth model + Cramer's V
-cram_v <- function(tab) {
+# Contingency of quadrant x growth model + Cramer's V. With n = 27 and a 4x4
+# table every expected count is < 5, so the chi-square p-value is invalid
+# (finding M2). We keep V as a DESCRIPTIVE index of association and take the
+# p-value from a Monte-Carlo Fisher test instead. V is also reported with
+# Bergsma's (2013) bias correction, which the uncorrected V inflates in sparse
+# tables.
+cram_v <- function(tab, bias_correct = FALSE) {
+  n   <- sum(tab); r <- nrow(tab); k <- ncol(tab)
   chi <- suppressWarnings(chisq.test(tab)$statistic)
-  sqrt(chi / (sum(tab) * (min(dim(tab)) - 1)))
+  phi2 <- as.numeric(chi) / n
+  if (!bias_correct) return(sqrt(phi2 / (min(r, k) - 1)))
+  phi2c <- max(0, phi2 - (r - 1) * (k - 1) / (n - 1))          # Bergsma 2013
+  rc <- r - (r - 1)^2 / (n - 1); kc <- k - (k - 1)^2 / (n - 1)
+  sqrt(phi2c / (min(rc, kc) - 1))
+}
+report_assoc <- function(tab, what, B = 1e5) {
+  p  <- fisher.test(tab, simulate.p.value = TRUE, B = B)$p.value
+  ps <- if (p < 1 / B) sprintf("< %.0e", 1 / B) else sprintf("%.4f", p)
+  cat(sprintf("Cramer's V (%s) = %.2f (bias-corrected %.2f); Monte-Carlo Fisher p = %s\n",
+              what, cram_v(tab), cram_v(tab, TRUE), ps))
 }
 tab <- table(quadrant = dat$quadrant, group = as.character(dat$group))
 cat("\n=== Quadrant x growth model ===\n"); print(tab)
-cat(sprintf("Cramer's V (quadrant, growth model) = %.2f\n", cram_v(tab)))
+report_assoc(tab, "quadrant, growth model")
 
 # Cross-tab against the data-driven clusters (05_clustering.R), if present
 cl_path <- here("data/tidy/cluster_membership.csv")
@@ -102,7 +120,7 @@ if (file.exists(cl_path)) {
   dat <- left_join(dat, cl, by = "country")
   ct <- table(quadrant = dat$quadrant, cluster = dat$ecological_model)
   cat("\n=== Quadrant x data-driven cluster (05) ===\n"); print(ct)
-  cat(sprintf("Cramer's V (quadrant, cluster) = %.2f\n", cram_v(ct)))
+  report_assoc(ct, "quadrant, cluster")
 }
 
 # ---- Figures -----------------------------------------------------------------
@@ -117,6 +135,7 @@ p_grp <- ggplot(score_long, aes(reorder(group, value), value, fill = group)) +
        x = NULL, y = "standardised score") +
   theme_minimal() + theme(legend.position = "none")
 ggsave(here("plots/validation_scores_by_group.pdf"), p_grp, width = 10, height = 5)
+ggsave(here("plots/validation_scores_by_group.png"), p_grp, width = 10, height = 5, dpi = 150)
 
 alluv <- dat |>
   transmute(country, `Growth model` = as.character(group), Quadrant = quadrant) |>
@@ -128,6 +147,7 @@ p_al <- ggplot(alluv,
   labs(title = "Growth model -> transition quadrant") +
   theme_void() + theme(legend.position = "none", plot.title = element_text(hjust = .5))
 suppressMessages(ggsave(here("plots/validation_alluvial.pdf"), p_al, width = 8, height = 6))
+suppressMessages(ggsave(here("plots/validation_alluvial.png"), p_al, width = 8, height = 6, dpi = 150))
 
 fwrite(val_tbl, here("data/tidy/validation_external.csv"))
 fwrite(grp_tbl, here("data/tidy/validation_group_means.csv"))

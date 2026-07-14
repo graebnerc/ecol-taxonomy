@@ -82,4 +82,5 @@ p_map <- ggplot(scores, aes(vulnerability, potential, colour = group)) +
        caption = sprintf("Hollow rings: within %.2f of a median axis - quadrant is sensitive to the median-tie convention.", BOUNDARY_EPS)) +
   theme_minimal()
 ggsave(here("plots/typology_map.pdf"), p_map, width = 9, height = 7)
-message("04_typology.R done: wrote taxonomy_scores.csv and plots/typology_map.pdf")
+ggsave(here("plots/typology_map.png"), p_map, width = 9, height = 7, dpi = 150)
+message("04_typology.R done: wrote taxonomy_scores.csv and plots/typology_map.{pdf,png}")

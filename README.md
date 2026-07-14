@@ -65,10 +65,14 @@ sources (Eurostat, WDI, EXIOBASE, PATSTAT).
   SK, EL, CY), Low-stakes (LU, IE, MT, BE). Note NL and HU sit *exactly* on the
   vulnerability and potential medians respectively: they are borderline, and under the
   opposite median-tie convention NL is a Winner and HU is At risk (see `07_robustness.R`).
-- **Externally valid** — potential predicts renewable share (partial +0.44 net of GDP) and
-  OECD EPS policy stringency (+0.39); comparison with the Gräbner et al. (2020) growth
-  models is strong (Cramér's V = 0.65) and supports H1–H3 (the catch-up "Workbench" group
-  is significantly more vulnerable, +1.60 p<0.001, and less capable, −0.96 p<0.05).
+- **Externally valid** — potential predicts renewable share (partial +0.44 net of GDP,
+  Eurostat SHARES overall) and OECD EPS policy stringency (+0.39, but only on the 20 OECD-
+  member EU states — 6 of the 9 "At risk" countries are missing, so this validator cannot
+  speak to the low-potential tail). Comparison with the Gräbner et al. (2020) growth models
+  is close (Cramér's V = 0.65, a descriptive association index; n=27 is too sparse for
+  chi-square, so significance is from a Monte-Carlo Fisher test) and supports H1–H3 (the
+  catch-up "Workbench" group is significantly more vulnerable, +1.60 p<0.001, and less
+  capable, −0.96 p<0.05).
 - **Robust** — GCI is stable year-to-year (rank corr 0.97–1.00 vs pooled); the typology
   survives PCA-vs-mean, renewable-only GCI, variable drops, and outlier removal; discrete
   cluster structure is weak (silhouette ≈ 0.28, gap k=1), which supports the continuous map.

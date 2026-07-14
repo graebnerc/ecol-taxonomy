@@ -23,19 +23,24 @@ source(here("R/config.R"))
 source(here("R/country_classification.R"))
 source(here("R/functions/complexity.R"))
 
-atlas_path <- here("data/raw/atlas_hs92_6d.csv")
-green_path <- here("data/tidy/green_products_hs6.csv")
-cache_path <- here("data/raw/pooled_exports_1418.rds")   # gitignored derived cache
+atlas_path  <- here("data/raw/atlas_hs92_6d.csv")
+green_path  <- here("data/tidy/green_products_hs6.csv")
+cache_path  <- here("data/raw/pooled_exports_1418.rds")    # gitignored derived cache
+byyear_path <- here("data/raw/exports_by_year_1418.rds")   # gitignored; used by 07
 stopifnot("Green list missing (run build_green_list.R)" = file.exists(green_path))
 
 # --- Load & pool exports over the reference window ---------------------------
-# The 968MB Atlas read is slow, so we cache the pooled country x product table.
-if (file.exists(cache_path)) {
-  message("Loading cached pooled exports (", basename(cache_path), ") ...")
+# The 968MB Atlas read is slow, so we cache the country x product table both
+# pooled (this script) and by year (07_robustness.R's per-year stability check).
+# Both caches are derived from a single Atlas read; the pooled table is the
+# by-year table summed over years, so they are consistent by construction.
+if (file.exists(cache_path) && file.exists(byyear_path)) {
+  message("Loading cached exports (", basename(cache_path), ", ",
+          basename(byyear_path), ") ...")
   exp_dt <- readRDS(cache_path)
 } else {
   stopifnot("Atlas data missing (see plan Phase 1a)" = file.exists(atlas_path))
-  message("Reading Atlas data (first run; will cache) ...")
+  message("Reading Atlas data (first run; will cache pooled + by-year) ...")
   atlas <- fread(
     atlas_path,
     select = c("country_iso3_code", "product_hs92_code", "year", "export_value"),
@@ -43,9 +48,11 @@ if (file.exists(cache_path)) {
   )
   setnames(atlas, c("iso3", "hs6", "year", "export"))
   atlas[, hs6 := formatC(hs6, width = 6, flag = "0")]
-  exp_dt <- atlas[year >= REF_FIRST_YEAR & year <= REF_LAST_YEAR & export > 0,
-                  .(export = sum(export)), by = .(iso3, hs6)]
-  saveRDS(exp_dt, cache_path)
+  eby <- atlas[year >= REF_FIRST_YEAR & year <= REF_LAST_YEAR & export > 0,
+               .(export = sum(export)), by = .(iso3, hs6, year)]
+  saveRDS(eby, byyear_path)                                 # per-year cache for 07
+  exp_dt <- eby[, .(export = sum(export)), by = .(iso3, hs6)]
+  saveRDS(exp_dt, cache_path)                               # pooled cache
 }
 message(sprintf("Pooled %d-%d: %d countries x %d products.",
                 REF_FIRST_YEAR, REF_LAST_YEAR,

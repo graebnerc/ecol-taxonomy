@@ -2,7 +2,9 @@ indicator,r2_vs_logGDPpc
 ValueAdded_normed,0.919441736857378
 GreenPatents_normed,0.618246811388147
 EnergyConsumption_normed,0.611186690340309
+EnergyIntensity_normed,0.509035525298057
 GWP_trade_normed,0.499597806997629
+CarbonIntensity_normed,0.455167534584972
 EnergyExports_normed,0.411737232180841
 ECI,0.364236616891323
 GWP_normed,0.142270111581641

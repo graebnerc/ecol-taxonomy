@@ -35,7 +35,11 @@ compute_complexity <- function(exp_dt, codes = green_codes) {
 
 # === 1. Per-year complexity vs pooled =========================================
 cat("\n===== 1. Complexity: per-year vs pooled cross-section =====\n")
-eby <- readRDS(here("data/raw/exports_by_year_1418.rds"))
+byyear_path <- here("data/raw/exports_by_year_1418.rds")
+stopifnot(
+  "exports_by_year_1418.rds missing - run 02_complexity.R from the Atlas first (it builds this cache)" =
+    file.exists(byyear_path))
+eby <- readRDS(byyear_path)
 pooled <- as_tibble(fread(here("data/tidy/green_complexity_eu.csv")))
 per_year <- lapply(REF_FIRST_YEAR:REF_LAST_YEAR, function(y) {
   gi <- compute_complexity(eby[year == y, .(iso3, hs6, export)])
