@@ -142,11 +142,25 @@ fossil share of primary energy. PC1 = 61% var, all-positive loadings.
 
 ## Phase 6 — Robustness & sensitivity
 
-- [ ] Reference window (single year vs 2014–2018 vs later years).
-- [ ] Variable set (drop/add brown employment; GCI vs ECI; with/without externalisation).
-- [ ] Normalisation choice (per capita vs per VA; standardised vs robust-scaled).
-- [ ] Cluster count k and linkage; Luxembourg / small-state outlier sensitivity.
-- [ ] PCA vs simple standardised averages for the block scores.
+### Section A — self-contained (`R/07_robustness.R`)  [DONE]
+- [x] Reference window / pooling: EU-27 GCI rank corr per-year vs pooled = 0.97–1.00
+      (mean 0.99). Pooling and window choice are innocuous.
+- [x] Variable set (GCI vs ECI; renewable-only GCI; drop vulnerability vars) and
+      PCA vs simple mean: Spearman corr with baseline ≥0.90 and ≤4/27 quadrant changes
+      in every case **except** robust (median/MAD) scaling of the potential axis
+      (corr 0.45, 10 changes) — the potential ranking is stable to most choices but
+      sensitive to robust rescaling, reflecting green-patent skew (patents load low, 0.26;
+      GCI/GCP drive PC1 — renewable-only GCI corr 0.96 confirms the green signal is stable).
+- [x] Cluster number: silhouette peaks at k=3 but is low (~0.28) and the gap statistic
+      gives k=1 — i.e. **weak discrete structure**, which *supports* the continuous 2-D
+      map over hard clustering (clustering stays illustrative only).
+- [x] Outlier sensitivity: dropping Luxembourg or Malta changes only 2/26 quadrants.
+
+### Section B — needs new data / decisions (optional, not gating)
+- [ ] OECD EPS + environmental patents as extra external validators (needs download).
+- [ ] Brown-employment dimension (EXIOBASE sector employment) — decision: currently OUT.
+- [ ] Swap in Mealy & Teytelboym's 293-code green list when the authors reply.
+- [ ] Per-year averaging of the *full* typology (not just complexity), if desired.
 
 ## Phase 7 — Writing
 

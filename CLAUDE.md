@@ -53,6 +53,12 @@ Numbered pipeline (run in order from the project root; see README):
   growth; partial correlations net of GDP p.c.) and comparison with the Gräbner et al.
   growth-model / geographic groups (group means, quadrant contingency, Cramér's V,
   alluvial). Writes `validation_*.csv` and `plots/validation_*`.
+- `R/07_robustness.R` — Phase 6 (section A): per-year vs pooled complexity, score-spec
+  sensitivity (PCA vs mean, scaling, GCI vs ECI, renewable-only GCI, dropping vulnerability
+  vars), cluster-number diagnostics (silhouette/gap), outlier drops. Writes `robustness_specs.csv`.
+- `R/functions/typology.R` — shared scoring helpers (`scale_mat`, `block_score`,
+  `assign_quadrant`) used by `04` and `07`. Block variable sets live in `R/config.R`
+  (`VULN_VARS`, `POT_VARS`).
 - `R/dependencies.R` — installs required packages; notes on pinning with renv (Phase 0).
 
 Supporting:

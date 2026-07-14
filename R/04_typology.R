@@ -15,28 +15,13 @@ library(ggrepel)
 library(countrycode)
 source(here("R/config.R"))
 source(here("R/country_classification.R"))
+source(here("R/functions/typology.R"))
 
 ind <- as_tibble(fread(here("data/tidy/taxonomy_indicators.csv")))
 ind$group <- get_country_classification(
   countrycode::countrycode(ind$country, "country.name", "iso3c"), "jee")
 
-# --- Block definitions (map to the four boxes of Fig. 1) ----------------------
-# Vulnerability (higher = harder/costlier transition): carbon intensity and
-#   energy intensity (both per value added, so income-neutral) and fossil share.
-# Potential (higher = better positioned): green patents p.c., GCI, GCP.
-VULN_VARS <- c("CarbonIntensity_normed", "EnergyIntensity_normed", "ShareFossils_normed")
-POT_VARS  <- c("GreenPatents_normed", "GCI", "GCP")
-
-#' PCA on a block; return PC1 score oriented so it rises with `anchor`, plus a report.
-block_score <- function(df, vars, anchor) {
-  pc <- prcomp(df[, vars], scale. = TRUE)
-  score <- pc$x[, 1]
-  if (cor(score, df[[anchor]]) < 0) { score <- -score; pc$rotation[, 1] <- -pc$rotation[, 1] }
-  list(score = as.numeric(scale(score)),
-       loadings = pc$rotation[, 1],
-       var_explained = summary(pc)$importance[2, 1])
-}
-
+# Blocks are defined in config.R (VULN_VARS, POT_VARS) and map to Fig. 1.
 vuln <- block_score(ind, VULN_VARS, anchor = "ShareFossils_normed")
 pot  <- block_score(ind, POT_VARS,  anchor = "GCI")
 

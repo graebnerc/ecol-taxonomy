@@ -25,13 +25,10 @@ source(here("R/functions/clustering_helpers.R"))
 
 indicators <- as_tibble(fread(here("data/tidy/taxonomy_indicators.csv")))
 
-# Cluster on the same six block variables used for the 2-D typology, so the
-# data-driven clusters are directly comparable to the vulnerability x potential
-# quadrants (robustness layer for 04_typology.R).
-ANALYSIS_VARS <- c(
-  "CarbonIntensity_normed", "EnergyIntensity_normed", "ShareFossils_normed",
-  "GreenPatents_normed", "GCI", "GCP"
-)
+# Cluster on the same six block variables used for the 2-D typology (defined in
+# config.R), so the data-driven clusters are directly comparable to the
+# vulnerability x potential quadrants (robustness layer for 04_typology.R).
+ANALYSIS_VARS <- c(VULN_VARS, POT_VARS)
 K <- 4
 
 scaled <- scale_indicators(indicators, vars = ANALYSIS_VARS)

@@ -11,6 +11,12 @@
 REF_FIRST_YEAR <- 2014
 REF_LAST_YEAR  <- 2018
 
+# Typology blocks (Fig. 1) ----------------------------------------------------
+# Vulnerability = per-value-added carbon & energy intensity + fossil share
+# (income-neutral). Potential = green innovation + green production capability.
+VULN_VARS <- c("CarbonIntensity_normed", "EnergyIntensity_normed", "ShareFossils_normed")
+POT_VARS  <- c("GreenPatents_normed", "GCI", "GCP")
+
 # Paths -----------------------------------------------------------------------
 TIDY_DIR <- here::here("data", "tidy")
 PLOT_DIR <- here::here("plots")
