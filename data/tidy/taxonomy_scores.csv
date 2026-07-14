@@ -1,0 +1,28 @@
+country,group,vulnerability,potential,quadrant
+Austria,Core,-0.863112047982496,1.19639874320598,Winners (low vuln / high pot)
+Belgium,Core,-0.885266513950998,-0.255187869340089,Low-stakes / low capability
+Bulgaria,Workbench,2.51113571198386,-0.262417817210594,At risk (high vuln / low pot)
+Cyprus,Periphery,0.0741619883883595,-1.69635253592545,At risk (high vuln / low pot)
+Czechia,Workbench,1.09714686945804,0.692997062487214,Exposed but capable
+Germany,Core,-0.519237944530074,2.06724631055035,Winners (low vuln / high pot)
+Denmark,Core,-0.480077303114334,1.26446280383679,Winners (low vuln / high pot)
+Estonia,Workbench,1.06162936519724,-0.411870439770172,At risk (high vuln / low pot)
+Spain,Periphery,-0.849199419000989,0.831512920629883,Winners (low vuln / high pot)
+Finland,Core,-0.354892861671962,-0.0644480054638439,Winners (low vuln / high pot)
+France,Periphery,-1.13875046933759,1.0679999200812,Winners (low vuln / high pot)
+Greece,Periphery,1.21004927569914,-1.34176631776241,At risk (high vuln / low pot)
+Croatia,Workbench,0.725686842634252,-0.249816500193629,At risk (high vuln / low pot)
+Hungary,Workbench,0.597988243794847,-0.181046484439253,Exposed but capable
+Ireland,Finance,-0.832124080857863,-1.64999102527835,Low-stakes / low capability
+Italy,Periphery,-0.763165760141942,1.91719645971735,Winners (low vuln / high pot)
+Lithuania,Workbench,0.177023652183414,-0.445174244027612,At risk (high vuln / low pot)
+Luxembourg,Finance,-1.0998501335134,-0.484867706142684,Low-stakes / low capability
+Latvia,Workbench,0.479231967778516,-0.652046428103564,At risk (high vuln / low pot)
+Malta,Finance,-1.25943474221751,-1.75007355331989,Low-stakes / low capability
+Netherlands,Finance,-0.144345256317561,0.0336281639927929,Exposed but capable
+Poland,Workbench,1.97240856804566,0.534814316311437,Exposed but capable
+Portugal,Periphery,-0.653393485453252,-0.0196300366276294,Winners (low vuln / high pot)
+Romania,Workbench,0.875009335867118,-0.247182390767802,At risk (high vuln / low pot)
+Sweden,Core,-1.17206197830956,0.595377370361472,Winners (low vuln / high pot)
+Slovenia,Workbench,0.102146880532958,0.0385823252230158,Exposed but capable
+Slovakia,Workbench,0.13129329483612,-0.528345042024528,At risk (high vuln / low pot)

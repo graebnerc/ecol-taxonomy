@@ -7,7 +7,7 @@
 # PCA-per-block scores + a vulnerability x potential map, keeping clustering as
 # a robustness layer. For now this preserves the existing, working result.
 
-here::i_am("R/03_analysis.R")
+here::i_am("R/05_clustering.R")
 library(here)
 library(data.table)
 library(dplyr)

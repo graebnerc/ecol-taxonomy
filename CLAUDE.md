@@ -40,9 +40,14 @@ Numbered pipeline (run in order from the project root; see README):
   `data/tidy/green_complexity_eu.csv`. Math in `R/functions/complexity.R`. Caches the
   pooled country×product table at `data/raw/pooled_exports_1418.rds` (gitignored) so the
   968MB read happens only once. **Run before `01`** so the indicator table folds in GCI.
-- `R/03_analysis.R` — the consolidated typology analysis (Ward clustering, dendrogram,
-  alluvial vs. growth-model groups, membership table). Reproduces the former canonical
-  result; helpers in `R/functions/clustering_helpers.R`.
+- `R/03_descriptives.R` — Phase 2: correlation matrix, income-drivenness (R² of each
+  indicator on log GDP p.c.), ranked bar charts. Writes figures + `indicator_*.csv`.
+- `R/04_typology.R` — Phase 3/4 headline: PCA per block → vulnerability & potential PC1
+  scores, the go/no-go independence check, and the 2-D quadrant map (`plots/typology_map.*`,
+  `data/tidy/taxonomy_scores.csv`). Blocks: vulnerability = carbon/energy intensity (per
+  value added) + fossil share; potential = green patents + GCI + GCP.
+- `R/05_clustering.R` — clustering robustness layer (Ward, dendrogram, alluvial vs.
+  growth-model groups, membership); helpers in `R/functions/clustering_helpers.R`.
 - `R/dependencies.R` — installs required packages; notes on pinning with renv (Phase 0).
 
 Supporting:

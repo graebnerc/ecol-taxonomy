@@ -13,7 +13,9 @@ source("R/dependencies.R")   # install required packages (see file re: renv)
 Rscript R/build_green_list.R      # OECD CLEG -> data/tidy/green_products_hs6.csv (HS92)
 Rscript R/02_complexity.R         # green complexity -> data/tidy/green_complexity_eu.csv
 Rscript R/01_build_indicators.R   # base indicators + complexity -> taxonomy_indicators.csv
-Rscript R/03_analysis.R           # typology / clustering -> plots + membership
+Rscript R/03_descriptives.R       # correlations, income R^2, ranked bar charts
+Rscript R/04_typology.R           # PCA per block -> vulnerability x potential map + scores
+Rscript R/05_clustering.R         # clustering robustness layer -> dendrogram + membership
 ```
 
 `02_complexity.R` needs the Atlas HS92 6-digit file at `data/raw/atlas_hs92_6d.csv`

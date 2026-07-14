@@ -25,11 +25,14 @@ build_indicator_table <- function(base_data, extra_data,
   dat <- dat |>
     dplyr::mutate(population = population * 1000) |>
     dplyr::mutate(
-      # --- Vulnerability block --------------------------------------------
+      # --- Vulnerability block (intensity/mix; income-independent) ---------
+      CarbonIntensity_normed   = GWP_pba / ValueAdded_pba,                 # GHG per unit value added
+      EnergyIntensity_normed   = FinalEnergyConsumption / ValueAdded_pba,  # energy per unit value added
+      ShareFossils_normed      = ShareFossils_PrimEnProd,                  # fossil share of primary production
+      # --- Other energy/emissions indicators (context, robustness) --------
       GWP_trade_normed         = (GWP_Imports - GWP_Exports) / population, # net embodied-GWP imports p.c.
       GWP_normed               = GWP_pba / population,                     # production-based GHG p.c.
       EnergyConsumption_normed = FinalEnergyConsumption / population,      # final energy demand p.c.
-      ShareFossils_normed      = ShareFossils_PrimEnProd,                  # fossil share of primary production
       # --- Potential block ------------------------------------------------
       GreenPatents_normed      = GreenPatents_n / (population / 1000000),  # green patents per million
       ValueAdded_normed        = ValueAdded_pba / population,              # value added p.c.

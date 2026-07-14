@@ -78,45 +78,44 @@ Environmental Innovation and Societal Transitions, or Journal of Economic Struct
       columns grouped by block (see Phase 3). All per-capita / share / intensity
       transforms done here, explicitly, with a data dictionary.
 
-## Phase 2 — Descriptive analysis (WP1 deliverable in its own right)
+## Phase 2 — Descriptive analysis (WP1 deliverable in its own right)  [DONE]
 
-- [ ] Dimension-by-dimension descriptives: ranked bar charts + summary tables for each
-      indicator, EU-27, coloured by growth-model group (JEE) for orientation.
-- [ ] Correlation matrix of all indicators; flag redundant/collinear variables and the
-      degree to which each is driven by economic scale (regress on GDP p.c., inspect).
-- [ ] Short narrative per dimension — this alone answers the "descriptive statistics"
-      requirement of the WP.
+`R/03_descriptives.R`.
+- [x] Ranked bar charts per indicator, coloured by growth-model group (`plots/descriptives_rankings.pdf`).
+- [x] Correlation matrix (`plots/descriptives_correlations.pdf`, `indicator_correlations.csv`)
+      + income-drivenness: R² of each indicator on log GDP p.c. (`indicator_income_r2.csv`).
+      Key finding: GCI (0.01) and GCP (0.00) and fossil/renewable shares are essentially
+      income-independent; value added (0.92), green patents (0.62) and per-capita energy
+      (0.61) are income-driven — hence the vulnerability block uses per-value-added
+      intensities, not per-capita levels (see Phase 3).
 
-## Phase 3 — Dimensionality reduction (two block scores)
+## Phase 3 — Dimensionality reduction (two block scores)  [DONE]
 
-Candidate variables (finalise after Phase 2 correlations):
+`R/04_typology.R`. Final blocks (per-capita levels were dropped from vulnerability after
+the first PCA gave an incoherent, income-dominated PC1):
 
-**Vulnerability block**
-- production-based GHG per capita
-- energy intensity (final energy / value added or GDP)
-- fossil share of primary energy / gross available energy
-- externalised emissions (net embodied-GWP imports p.c.) — *watch the sign/interpretation*
-- (optional) brown employment share
+**Vulnerability block** — carbon intensity (GHG / VA), energy intensity (energy / VA),
+fossil share of primary energy. PC1 = 61% var, all-positive loadings.
+**Potential block** — green patents p.c., GCI, GCP. PC1 = 61% var, driven by GCI/GCP.
 
-**Potential block**
-- green patents per capita
-- Green Complexity Index (GCI)
-- Green Complexity Potential (GCP)
-
-- [ ] Standardise; run **PCA within each block** separately.
-- [ ] Report loadings + variance explained; confirm PC1 of each block is interpretable
-      and correctly signed (higher = more vulnerable / more potential). Flip signs if needed.
-- [ ] Extract `vulnerability_score` and `potential_score` (PC1 of each block).
-- [ ] Sanity check: are the two scores roughly independent of each other, and not both
-      just proxies for GDP p.c.? (This is the test of whether the paper says something new.)
+- [x] PCA within each block; PC1 scores oriented (fossil-share / GCI anchors).
+- [x] **GO/NO-GO PASSED**: cor(vulnerability, potential) = −0.17 (orthogonal); potential
+      R² vs log GDP p.c. = 0.05 (income-independent); vulnerability R² = 0.50 (correlates
+      with income, but substantively — catch-up economies really are more carbon-intensive
+      — and the axis is coherent). The 2-D structure is not reducible to income.
 
 ## Phase 4 — The typology
 
-- [ ] **Headline figure:** scatter of EU-27 on vulnerability (x) × potential (y), median
-      splits → four quadrants, points labelled + coloured by growth-model group.
-- [ ] Narrate the quadrants: winners (low vuln / high pot), at-risk (high vuln / low pot),
-      and the two mixed types. This is the taxonomy.
-- [ ] **Robustness layer — clustering:** Ward hierarchical clustering on the standardised
+- [x] **Headline figure:** `R/04_typology.R` → `plots/typology_map.{pdf,png}`; quadrant
+      membership + scores in `data/tidy/taxonomy_scores.csv`.
+- [x] Quadrants (median splits): Winners = Austria, Denmark, Finland, France, Germany,
+      Italy, Portugal, Spain, Sweden; **Exposed but capable = Czechia, Hungary,
+      Netherlands, Poland, Slovenia** (the polarization tension — capable but carbon-locked);
+      At risk = Bulgaria, Croatia, Cyprus, Estonia, Greece, Latvia, Lithuania, Romania,
+      Slovakia; Low-stakes = Belgium, Ireland, Luxembourg, Malta. The Workbench group splits
+      on *potential* while sharing high vulnerability.
+- [ ] **Robustness layer — clustering:** align `R/05_clustering.R` to cluster on the block
+      variables / the two scores; validate cluster number with
       indicators (and separately on the two scores). Validate cluster number with
       silhouette + gap statistic (not just the agnes `ac` coefficient). Show dendrogram.
 - [ ] Cross-tabulate clusters vs. quadrants vs. growth-model groups (alluvial). Do the
