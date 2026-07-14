@@ -35,9 +35,11 @@ Numbered pipeline (run in order from the project root; see README):
 - `R/01_build_indicators.R` — reads `full_taxonomy_data.csv` (+ `new_data.csv`), builds the
   per-country indicator table `data/tidy/taxonomy_indicators.csv`. All per-capita/share
   transforms live in `R/functions/indicators.R::build_indicator_table()`.
-- `R/02_complexity.R` — green economic complexity (Dimension 4). **Currently a Phase 1
-  stub**: runs, reports which inputs are missing (Atlas HS92 6-digit data + green HS6
-  list), and exits cleanly. Method spec in the file header and `info/ImplementationPlan.md`.
+- `R/02_complexity.R` — green economic complexity (Dimension 4). Computes ECI/PCI/GCI/GCP
+  from Atlas HS92 data on the global country set (pooled 2014–2018), extracts EU-27 →
+  `data/tidy/green_complexity_eu.csv`. Math in `R/functions/complexity.R`. Caches the
+  pooled country×product table at `data/raw/pooled_exports_1418.rds` (gitignored) so the
+  968MB read happens only once. **Run before `01`** so the indicator table folds in GCI.
 - `R/03_analysis.R` — the consolidated typology analysis (Ward clustering, dendrogram,
   alluvial vs. growth-model groups, membership table). Reproduces the former canonical
   result; helpers in `R/functions/clustering_helpers.R`.

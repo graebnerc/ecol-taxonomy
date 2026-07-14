@@ -13,6 +13,8 @@ required <- c(
   # pipeline
   "here", "data.table", "dplyr", "tidyr", "purrr", "tibble", "countrycode",
   "cluster", "factoextra", "ggalluvial", "ggplot2", "knitr", "scales", "ggpubr",
+  # green list + complexity (Phase 1)
+  "pdftools", "readxl", "stringr", "Matrix",
   # data acquisition (get_data.R)
   "WDI", "eurostat"
 )

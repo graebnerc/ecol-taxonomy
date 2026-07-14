@@ -20,9 +20,18 @@ indicators <- build_indicator_table(
   first_year = REF_FIRST_YEAR, last_year = REF_LAST_YEAR
 )
 
-# NOTE (Phase 1): once green complexity (green_complexity_eu.csv) and brown
-# employment are built by 02_complexity.R, left_join them here so the indicator
-# table carries all four dimensions.
+# Fold in green complexity (Dimension 4) once 02_complexity.R has produced it.
+# Run order is therefore: 02_complexity.R -> 01_build_indicators.R -> 03_analysis.R.
+green_path <- here("data/tidy/green_complexity_eu.csv")
+if (file.exists(green_path)) {
+  green <- as_tibble(fread(green_path)) |>
+    select(country, ECI, GCI, GCP)
+  indicators <- left_join(indicators, green, by = "country")
+  message("Joined green complexity (ECI, GCI, GCP).")
+} else {
+  message("green_complexity_eu.csv not found - run 02_complexity.R, then re-run 01. ",
+          "Building base indicators only.")
+}
 
 fwrite(indicators, here("data/tidy/taxonomy_indicators.csv"))
 message(sprintf("Wrote taxonomy_indicators.csv: %d countries, %d indicators.",

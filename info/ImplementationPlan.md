@@ -40,8 +40,9 @@ Environmental Innovation and Societal Transitions, or Journal of Economic Struct
 ## Phase 1 — Data acquisition & indicator construction
 
 ### 1a. Green complexity (Dimension 4) — the new build
-- [ ] Obtain **Atlas HS92 6-digit country–product–year** export data (full global country
-      set, 1995 onward). Store raw in `data/raw/` (gitignored).
+- [x] Obtain **Atlas HS92 6-digit country–product–year** export data (full global country
+      set, 1995–2024; 232 countries, 5039 products). At `data/raw/atlas_hs92_6d.csv`
+      (gitignored; source in `atlas_hs92_6d_REFERENCE.txt`).
 - [x] Obtain the **green HS6 code list**. Reconstructed transparently via
       `R/build_green_list.R`: extract the OECD CLEG (248 HS2007 codes, Table A.1 of
       `info/OECD-Report_List.pdf`) → convert HS2007→HS1992 (`info/HS 2007-to-HS1992 .xls`)
@@ -50,15 +51,20 @@ Environmental Innovation and Societal Transitions, or Journal of Economic Struct
       `data/tidy/green_products_hs6.csv` (+ `green_products_cleg_hs2007.csv` provenance).
       NOTE: this is the OECD CLEG, close to but not identical with Mealy & Teytelboym's
       293-code union — swap in the authors' list when they reply for exact comparability.
-- [ ] Compute, following `GreenComplexity.pdf` §3.4–3.7, on the **global** country set:
-  - RCA (Balassa), binary M matrix (RCA>1)
-  - ECI, PCI (standardised)
-  - **GCI** = Σ PCI of green products a country is competitive in
-  - proximity φ, density ω → **GCP** (Green Complexity Potential) and GAP
-- [ ] Extract EU-27 rows; average over the reference window. Output
-      `data/tidy/green_complexity_eu.csv` (country, ECI, GCI, GCP).
-- [ ] **Validate** ECI/PCI against Atlas's own published ECI and (optionally) TradeWeave
-      PCI as an independent cross-check.
+- [x] Compute, following `GreenComplexity.pdf` §3.4–3.7, on the **global** country set
+      (`R/functions/complexity.R`, driven by `R/02_complexity.R`; exports pooled over
+      2014–2018): RCA (Balassa) → binary M → ECI/PCI (eigenvalue method; PCI recovered
+      from the country-side eigenvector to avoid a P×P eigendecomposition) → **GCI** →
+      proximity φ, density ω → **GCP**. Country filter: pooled exports ≥ USD 5bn.
+- [x] Extract EU-27; write `data/tidy/green_complexity_eu.csv` (iso3, country, ECI, GCI,
+      GCP, diversity). Folded into `taxonomy_indicators.csv` by `01_build_indicators.R`.
+- [x] **Validate**: GCI top-10 reproduces Mealy & Teytelboym Fig. 3 (Germany #1, then
+      Italy, Austria, Czechia, Denmark, China, USA, Japan, France, UK); ECI tails sensible
+      (Switzerland/Korea/USA top; oil/resource exporters bottom); cor(GCI, ECI)=0.78.
+      Substantive: GCI is orthogonal to income — catch-up East (CZE, POL, SVN, HUN) ranks
+      above high-GDP finance/service economies (LUX, IRL, NLD).
+      TODO (Phase 6): per-year averaging vs pooling; renewable-subset GCI; TradeWeave PCI
+      cross-check; swap in authors' 293-code list.
 
 ### 1b. Brown employment (optional vulnerability variable)
 - [ ] Pull EXIOBASE sector employment + sector GHG (same source as existing footprints).

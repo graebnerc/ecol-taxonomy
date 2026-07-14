@@ -10,10 +10,15 @@ Run the numbered scripts in order from the project root:
 
 ```r
 source("R/dependencies.R")   # install required packages (see file re: renv)
-Rscript R/01_build_indicators.R   # panel -> data/tidy/taxonomy_indicators.csv
-Rscript R/02_complexity.R         # green complexity (Phase 1 stub; needs Atlas data)
+Rscript R/build_green_list.R      # OECD CLEG -> data/tidy/green_products_hs6.csv (HS92)
+Rscript R/02_complexity.R         # green complexity -> data/tidy/green_complexity_eu.csv
+Rscript R/01_build_indicators.R   # base indicators + complexity -> taxonomy_indicators.csv
 Rscript R/03_analysis.R           # typology / clustering -> plots + membership
 ```
+
+`02_complexity.R` needs the Atlas HS92 6-digit file at `data/raw/atlas_hs92_6d.csv`
+(gitignored; see `data/raw/atlas_hs92_6d_REFERENCE.txt`). It runs before `01` so the
+indicator table can fold in ECI/GCI/GCP.
 
 - `R/config.R` — central settings (reference window `2014–2018`, paths).
 - `R/country_classification.R` — EU-27 list + growth-model / geographic group lookups.

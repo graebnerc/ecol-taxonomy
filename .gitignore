@@ -4,3 +4,4 @@
 .Ruserdata
 .DS_Store
 data/raw/atlas_hs92_6d.csv
+data/raw/*.rds
