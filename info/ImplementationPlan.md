@@ -129,7 +129,10 @@ fossil share of primary energy. PC1 = 61% var, all-positive loadings.
       (green capability predicts renewables even more strongly net of income). potential →
       GDP growth −0.59 / −0.46 (β-convergence: capability sits in mature, slower-growing
       economies — a convergence confound, not a failure). Vulnerability → renewables weakly
-      negative, as expected. TODO: add OECD EPS + env. patents when downloaded.
+      negative, as expected. **OECD EPS added** (`info/OECD-EPS-Index.csv`, aggregate EPS,
+      20/27 EU states — 7 small/newer-EU missing): potential → EPS +0.31 raw / **+0.39**
+      partial; vulnerability → EPS −0.27 — green capability predicts stricter policy net of
+      income (reproduces Mealy & Teytelboym). TODO: env. patents validator if wanted.
 - [x] Comparison with Gräbner et al. (2020) growth models — **supports H1–H3**:
       group means → Core (vuln −0.71, pot +0.80), Periphery (−0.35, +0.13), Workbench
       (**+0.88, −0.16**), Finance (−0.83, −0.96). Regressions vs Core: Workbench
@@ -157,7 +160,8 @@ fossil share of primary energy. PC1 = 61% var, all-positive loadings.
 - [x] Outlier sensitivity: dropping Luxembourg or Malta changes only 2/26 quadrants.
 
 ### Section B — needs new data / decisions (optional, not gating)
-- [ ] OECD EPS + environmental patents as extra external validators (needs download).
+- [x] OECD EPS added as an external validator (see Phase 5). Environmental patents still
+      optional.
 - [ ] Brown-employment dimension (EXIOBASE sector employment) — decision: currently OUT.
 - [ ] Swap in Mealy & Teytelboym's 293-code green list when the authors reply.
 - [ ] Per-year averaging of the *full* typology (not just complexity), if desired.

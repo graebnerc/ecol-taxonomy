@@ -37,18 +37,26 @@ val <- nd |>
     loggdp_pc   = log(mean(GDP_ppp, na.rm = TRUE)),  # per-country GDP level (control)
     .groups = "drop"
   )
-dat <- left_join(scores, val, by = "iso3")
+
+# OECD Environmental Policy Stringency (aggregate EPS, 0-6). Covers 20/27 EU
+# states (OECD members) - the 7 missing are small/newer-EU, mostly in the
+# at-risk quadrant, so read the EPS results as indicative.
+eps <- fread(here("info/OECD-EPS-Index.csv"))[
+  CLIM_POL == "EPS" & TIME_PERIOD >= REF_FIRST_YEAR & TIME_PERIOD <= REF_LAST_YEAR &
+    !is.na(OBS_VALUE), .(eps = mean(OBS_VALUE)), by = .(iso3 = REF_AREA)]
+dat <- scores |> left_join(val, by = "iso3") |> left_join(as_tibble(eps), by = "iso3")
+cat(sprintf("EPS coverage: %d of %d EU-27 countries.\n", sum(!is.na(dat$eps)), nrow(dat)))
 
 # ---- (A) Correlations, raw and partial (controlling for log GDP p.c.) --------
 partial <- function(x, y, z) {
-  rxy <- cor(x, y, use = "complete.obs")
-  rxz <- cor(x, z, use = "complete.obs")
-  ryz <- cor(y, z, use = "complete.obs")
+  ok <- complete.cases(x, y, z)          # common subset (some validators have NAs)
+  x <- x[ok]; y <- y[ok]; z <- z[ok]
+  rxy <- cor(x, y); rxz <- cor(x, z); ryz <- cor(y, z)
   (rxy - rxz * ryz) / sqrt((1 - rxz^2) * (1 - ryz^2))
 }
 cat("\n=== (A) External validity: correlations with scores ===\n")
 val_tbl <- expand_grid(score = c("vulnerability", "potential"),
-                       outcome = c("renew_share", "gdp_growth")) |>
+                       outcome = c("renew_share", "gdp_growth", "eps")) |>
   rowwise() |>
   mutate(
     raw_cor     = cor(dat[[score]], dat[[outcome]], use = "complete.obs"),
@@ -56,7 +64,8 @@ val_tbl <- expand_grid(score = c("vulnerability", "potential"),
   ) |>
   ungroup()
 print(as.data.frame(val_tbl), row.names = FALSE, digits = 2)
-cat("Expect: potential +/higher renewables & growth; vulnerability -/lower.\n")
+cat("Expect: potential +/higher renewables, growth & policy stringency (EPS);\n",
+    "vulnerability -/lower. (partial_cor controls for log GDP p.c.)\n", sep = "")
 
 # ---- (B) Comparison with development-model & geographic groups ---------------
 cat("\n=== (B) Mean scores by growth-model group (Graebner et al. 2020) ===\n")
