@@ -5,3 +5,5 @@ potential: ECI replaces GCI,1,0.77,4
 potential: renewable-only GCI,1,0.96,2
 vuln: drop fossil share,0.92,1,2
 vuln: drop carbon intensity,0.9,1,2
+window shift 2013-2017,1,0.99,0
+window shift 2015-2019,1,1,0

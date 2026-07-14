@@ -38,8 +38,10 @@ Numbered pipeline (run in order from the project root; see README):
 - `R/02_complexity.R` — green economic complexity (Dimension 4). Computes ECI/PCI/GCI/GCP
   from Atlas HS92 data on the global country set (pooled 2014–2018), extracts EU-27 →
   `data/tidy/green_complexity_eu.csv`. Math in `R/functions/complexity.R`. Caches the
-  pooled country×product table at `data/raw/pooled_exports_1418.rds` (gitignored) so the
-  968MB read happens only once. **Run before `01`** so the indicator table folds in GCI.
+  pooled country×product table (`data/raw/pooled_exports_1418.rds`) and a by-year table
+  spanning 2013–2019 (`exports_by_year_1319.rds`; window ±1 so 07 can shift the window),
+  both gitignored, so the 968MB read happens only once. **Run before `01`** so the
+  indicator table folds in GCI.
 - `R/03_descriptives.R` — Phase 2: correlation matrix, income-drivenness (R² of each
   indicator on log GDP p.c.), ranked bar charts. Writes figures + `indicator_*.csv`.
 - `R/04_typology.R` — Phase 3/4 headline: PCA per block → vulnerability & potential PC1
@@ -55,7 +57,8 @@ Numbered pipeline (run in order from the project root; see README):
   alluvial). Writes `validation_*.csv` and `plots/validation_*`.
 - `R/07_robustness.R` — Phase 6 (section A): per-year vs pooled complexity, score-spec
   sensitivity (PCA vs mean, scaling, GCI vs ECI, renewable-only GCI, dropping vulnerability
-  vars), cluster-number diagnostics (silhouette/gap), outlier drops. Writes `robustness_specs.csv`.
+  vars), cluster-number diagnostics (silhouette/gap), outlier drops, and the full-typology
+  indicator-window shift (2013–2017 / 2015–2019). Writes `robustness_specs.csv`.
 - `R/functions/typology.R` — shared scoring helpers (`scale_mat`, `block_score`,
   `assign_quadrant`) used by `04` and `07`. Block variable sets live in `R/config.R`
   (`VULN_VARS`, `POT_VARS`).

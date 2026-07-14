@@ -61,9 +61,9 @@ Environmental Innovation and Societal Transitions, or Journal of Economic Struct
       proximity φ, density ω → **GCP**. Country filter: pooled exports ≥ USD 5bn.
 - [x] Extract EU-27; write `data/tidy/green_complexity_eu.csv` (iso3, country, ECI, GCI,
       GCP, diversity). Folded into `taxonomy_indicators.csv` by `01_build_indicators.R`.
-- [x] **Validate**: GCI top-10 reproduces Mealy & Teytelboym Fig. 3 (Germany #1, then
-      Italy, Austria, Czechia, Denmark, China, USA, Japan, France, UK); ECI tails sensible
-      (Switzerland/Korea/USA top; oil/resource exporters bottom); cor(GCI, ECI)=0.78.
+- [x] **Validate**: GCI top-10 consistent with Mealy & Teytelboym Fig. 3 (Germany #1, then
+      Italy, Austria, USA, Denmark, China, Japan, Czechia, France, UK); ECI tails sensible
+      (Japan/Switzerland/Germany top; oil/resource exporters bottom); cor(GCI, ECI)=0.78.
       Substantive: GCI is orthogonal to income — catch-up East (CZE, POL, SVN, HUN) ranks
       above high-GDP finance/service economies (LUX, IRL, NLD).
       TODO (Phase 6): per-year averaging vs pooling; renewable-subset GCI; TradeWeave PCI
@@ -99,7 +99,7 @@ the first PCA gave an incoherent, income-dominated PC1):
 
 **Vulnerability block** — carbon intensity (GHG / VA), energy intensity (energy / VA),
 fossil share of primary energy. PC1 = 61% var, all-positive loadings.
-**Potential block** — green patents p.c., GCI, GCP. PC1 = 61% var, driven by GCI/GCP.
+**Potential block** — green patents p.c., GCI, GCP. PC1 = 62% var, driven by GCI/GCP.
 
 - [x] PCA within each block; PC1 scores oriented (fossil-share / GCI anchors).
 - [x] **GO/NO-GO PASSED**: cor(vulnerability, potential) = −0.19 (orthogonal); potential
@@ -161,7 +161,7 @@ fossil share of primary energy. PC1 = 61% var, all-positive loadings.
       (corr 0.77, 4 changes). The ECI swap is *expected* to move the ranking: it replaces
       the green signal with general economic complexity, so a lower rank correlation is the
       point — that it still yields only 4 quadrant changes is what shows the map is robust.
-      Robust rescaling reflects green-patent skew (patents load low, 0.26; GCI/GCP drive
+      Robust rescaling reflects green-patent skew (patents load low, 0.28; GCI/GCP drive
       PC1 — renewable-only GCI corr 0.96 confirms the green signal is stable).
 - [x] Cluster number: silhouette peaks at k=3 but is low (~0.28) and the gap statistic
       gives k=1 — i.e. **weak discrete structure**, which *supports* the continuous 2-D
@@ -170,8 +170,13 @@ fossil share of primary energy. PC1 = 61% var, all-positive loadings.
 - [x] Median-tie convention: flipping `>=` to `>` moves exactly 2/27 countries (the two on
       a median); export threshold for the global RCA (2.5e9 / 1e10) is innocuous (cor_pot
       1.00, 0 quadrant changes). Both in `07_robustness.R`.
-- [ ] Indicator-window shift (2013–2017 / 2015–2019) for the *full* typology — still open;
-      needs re-pooling the Atlas over the wider window (the cached exports are 2014–2018).
+- [x] Indicator-window shift (2013–2017 / 2015–2019) for the *full* typology: complexity
+      re-pooled from the Atlas (the by-year cache now spans 2013–2019), indicators
+      re-averaged over the shifted years, blocks re-scored (`07_robustness.R` section 5;
+      rows in `robustness_specs.csv`). Result: vulnerability rank corr 1.00, potential
+      ≥ 0.99, **0/27 quadrant changes in both windows** — the window choice is innocuous.
+      All core sources cover 2013–2019 in full (EXIOBASE ends 2019), so neither shifted
+      window uses partial years.
 
 ### Section B — needs new data / decisions (optional, not gating)
 - [x] OECD EPS added as an external validator (see Phase 5). Environmental patents still

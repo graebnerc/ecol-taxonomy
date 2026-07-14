@@ -23,9 +23,9 @@ trade data — it is orthogonal to income and is what lets the taxonomy say some
 - Vulnerability = carbon intensity (GHG / value added), energy intensity (energy / VA),
   fossil share of primary energy — intensity-based (per value added), which removes the
   mechanical scale effect. The vulnerability score still correlates with income
-  (R² = 0.50 vs log GDP p.c.), which we read as substantive (catch-up economies are more
-  carbon-intensive), while the potential axis is income-independent (R² = 0.07,
-  ≤ 0.19 leave-one-out).
+  (R² = 0.50 vs log GDP p.c., 0.46–0.53 leave-one-out), which we read as substantive
+  (catch-up economies are more carbon-intensive), while the potential axis is
+  income-independent (R² = 0.07; at most 0.19 leave-one-out, when dropping Luxembourg).
 - Potential = green patents per capita, Green Complexity Index (GCI), Green Complexity
   Potential (GCP).
 
@@ -73,11 +73,27 @@ sources (Eurostat, WDI, EXIOBASE, PATSTAT).
   chi-square, so significance is from a Monte-Carlo Fisher test) and supports H1–H3 (the
   catch-up "Workbench" group is significantly more vulnerable, +1.60 p<0.001, and less
   capable, −1.03 p<0.05).
-- **Robust** — GCI is stable year-to-year (rank corr ≥ 0.97 vs pooled, mean 0.98); the typology
-  survives PCA-vs-mean, renewable-only GCI, variable drops, and outlier removal; discrete
-  cluster structure is weak (silhouette ≈ 0.28, gap k=1), which supports the continuous map.
+- **Robust** — GCI is stable year-to-year (rank corr ≥ 0.97 vs pooled, mean 0.98), and
+  shifting the whole reference window to 2013–2017 or 2015–2019 (complexity re-pooled from
+  the Atlas, indicators re-averaged) changes **no quadrant at all** (rank corr vs baseline
+  ≥ 0.99) — the window choice is innocuous. The typology also survives PCA-vs-mean,
+  renewable-only GCI, variable drops, RCA-threshold changes (2.5–10bn, zero changes), and
+  outlier removal (drop LU/MT: 2/26 change). The only sensitive specification is robust
+  (median/MAD) rescaling of the potential axis (rank corr 0.51), which reflects green-patent
+  skew, not the green signal (renewable-only GCI corr 0.96). Discrete cluster structure is
+  weak (silhouette ≈ 0.28, gap k=1), which supports the continuous map over hard clusters.
 
 Key figure: `plots/typology_map.png`. Scores: `data/tidy/taxonomy_scores.csv`.
+
+## Verification status
+
+The pipeline was independently re-verified after the 2026-07-14 audit fixes: every committed
+`data/tidy/*.csv` regenerates **byte-identically** from the committed inputs on a clean
+checkout (including the full Atlas → cache → complexity path), the complexity implementation
+was cross-checked against the method of reflections (agreement to machine precision, and the
+recovered PCI satisfies the product-side eigen relation exactly), the green list (244 unique
+HS92 codes, 52 renewable) is fully present in the Atlas data, and the external validators
+enter neither block (no circularity). Every number quoted above matches the re-run exactly.
 
 ## What is open
 

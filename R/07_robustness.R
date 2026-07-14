@@ -6,6 +6,8 @@
 #    correlation with the baseline and number of countries changing quadrant.
 # 3. Clustering: silhouette + gap statistic for the number of clusters.
 # 4. Outlier sensitivity: drop Luxembourg / Malta and re-map.
+# 5. Indicator-window shift: rebuild the FULL typology (complexity re-pooled +
+#    indicators re-averaged) on 2013-2017 and 2015-2019.
 
 here::i_am("R/07_robustness.R")
 library(here)
@@ -35,9 +37,9 @@ compute_complexity <- function(exp_dt, codes = green_codes, min_export = 5e9) {
 
 # === 1. Per-year complexity vs pooled =========================================
 cat("\n===== 1. Complexity: per-year vs pooled cross-section =====\n")
-byyear_path <- here("data/raw/exports_by_year_1418.rds")
+byyear_path <- here("data/raw/exports_by_year_1319.rds")
 stopifnot(
-  "exports_by_year_1418.rds missing - run 02_complexity.R from the Atlas first (it builds this cache)" =
+  "exports_by_year_1319.rds missing - run 02_complexity.R from the Atlas first (it builds this cache)" =
     file.exists(byyear_path))
 eby <- readRDS(byyear_path)
 pooled <- as_tibble(fread(here("data/tidy/green_complexity_eu.csv")))
@@ -89,7 +91,7 @@ rob <- lapply(names(specs), function(nm) {
 }) |> bind_rows()
 print(rob, row.names = FALSE)
 cat("(cor = Spearman rank corr vs baseline; quad_changes out of 27 countries)\n")
-fwrite(rob, here("data/tidy/robustness_specs.csv"))
+# robustness_specs.csv is written at the end, after the window-shift rows (section 5).
 
 # --- Median-tie convention sensitivity (finding A1) ---------------------------
 # assign_quadrant() uses `>=` (ties go to the high side). With n = 27 one country
@@ -151,4 +153,46 @@ for (drop in c("Luxembourg", "Malta")) {
   cat(sprintf("Drop %-11s -> %d/%d remaining countries change quadrant\n",
               drop, sum(q != base_sub), nrow(sub)))
 }
+
+# === 5. Indicator-window shift (2013-2017 / 2015-2019) ========================
+# Shifts the FULL typology, not just complexity: re-pool the Atlas exports over
+# the shifted window (the by-year cache spans 2013-2019 for exactly this),
+# recompute global ECI/PCI/GCI/GCP, re-average the indicator table over the
+# shifted years, and re-score. All core sources cover 2013-2019 in full
+# (EXIOBASE ends 2019), so no window uses imputed or partial years.
+cat("\n===== 5. Indicator-window shift (full typology re-built) =====\n")
+source(here("R/functions/indicators.R"))
+base_data  <- as_tibble(fread(here("data/tidy/full_taxonomy_data.csv")))
+extra_data <- as_tibble(fread(here("data/tidy/new_data.csv")))
+shift_spec <- function(w1, w2) {
+  gi <- compute_complexity(
+    eby[year >= w1 & year <= w2, .(export = sum(export)), by = .(iso3, hs6)])
+  ind_w <- build_indicator_table(base_data, extra_data,
+                                 first_year = w1, last_year = w2)
+  ind_w$iso3 <- countrycode(ind_w$country, "country.name", "iso3c")
+  m <- match(ind_w$iso3, gi$iso3)
+  ind_w$GCI <- gi$GCI[m]; ind_w$GCP <- gi$GCP[m]
+  stopifnot("EU country lost from complexity in shifted window" = !anyNA(ind_w$GCI))
+  ind_w <- ind_w[match(ind$country, ind_w$country), ]   # align to baseline order
+  score_spec(ind_w, VULN_VARS, POT_VARS)
+}
+win_rows <- lapply(list(c(REF_FIRST_YEAR - 1, REF_LAST_YEAR - 1),
+                        c(REF_FIRST_YEAR + 1, REF_LAST_YEAR + 1)), function(w) {
+  s <- shift_spec(w[1], w[2])
+  q <- assign_quadrant(s$vuln, s$pot, "short")
+  moved <- ind$country[q != base_q]
+  cat(sprintf("  window %d-%d: cor_vuln %.2f, cor_pot %.2f (Spearman vs baseline), %d/27 quadrant changes%s\n",
+              w[1], w[2],
+              cor(base$vuln, s$vuln, method = "spearman"),
+              cor(base$pot,  s$pot,  method = "spearman"),
+              length(moved),
+              if (length(moved)) paste0(": ", paste(moved, collapse = ", ")) else ""))
+  data.frame(spec = sprintf("window shift %d-%d", w[1], w[2]),
+             cor_vuln = round(cor(base$vuln, s$vuln, method = "spearman"), 2),
+             cor_pot  = round(cor(base$pot,  s$pot,  method = "spearman"), 2),
+             quad_changes = length(moved))
+})
+rob <- bind_rows(rob, win_rows)
+fwrite(rob, here("data/tidy/robustness_specs.csv"))
+
 message("\n07_robustness.R done: wrote data/tidy/robustness_specs.csv")
