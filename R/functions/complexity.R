@@ -4,7 +4,9 @@
 # All measures are computed on the GLOBAL country set; EU-27 rows are extracted
 # afterwards by the caller. Matrices are country x product (rows x cols).
 
-#' Build the binary Balassa (RCA > 1) matrix from a country-product export table.
+#' Build the binary Balassa (RCA >= 1) matrix from a country-product export table.
+#' (Mealy & Teytelboym write RCA > 1; the >= vs > distinction is measure-zero in
+#' continuous export data. The code uses >= 1 at the M <- (rca >= 1) step below.)
 #'
 #' @param exp_dt data.table/data.frame with columns iso3, hs6, export (pooled
 #'   over the reference window).
@@ -86,6 +88,11 @@ complexity_indices <- function(M) {
 }
 
 #' Green Complexity Index (GCI) and Green Complexity Potential (GCP) per country.
+#'
+#' Note: in this data GCI is ~ a count of green products a country makes with
+#' RCA >= 1 (cor(GCI, green diversity) ~ 0.998; the PCI weighting adds little),
+#' as Mealy & Teytelboym also observe (their fn. 9). Read GCI as green diversity
+#' more than "technologically sophisticated green capability".
 #'
 #' @param M binary RCA matrix (country x product).
 #' @param PCI standardised product complexity (named by product code).

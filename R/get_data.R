@@ -187,6 +187,9 @@ full_data_2 <- left_join(
     EnergyNetTrade=NetTrade
   ) %>%
   left_join(., y = green_patents, by = c("country", "year")) %>%
+  # A missing patent count means the PATSTAT GROUP BY returned no rows for that
+  # country-year, i.e. a true zero (affects ~10 EU country-years in the window:
+  # BG, CY, EE, HR, LT, LV, MT, RO), not missing data - so recode NA -> 0.
   mutate(GreenPatents_n = ifelse(is.na(GreenPatents_n), 0, GreenPatents_n)) %>%
   left_join(., y = energy_balance_PrimaryProduction, by = c("country", "year")) %>%
   filter(country %in% countrycode(base_countries, "country.name", "iso3c"))

@@ -25,8 +25,8 @@ green    <- fread(here("data/tidy/green_products_hs6.csv"), colClasses = list(ch
 green_codes <- green$hs6
 renew_codes <- green$hs6[green$is_renewable == 1]
 
-compute_complexity <- function(exp_dt, codes = green_codes) {
-  rca <- build_rca_matrix(exp_dt)
+compute_complexity <- function(exp_dt, codes = green_codes, min_export = 5e9) {
+  rca <- build_rca_matrix(exp_dt, min_country_export = min_export)
   ci  <- complexity_indices(rca$M)
   gi  <- green_indicators(rca$M, ci$PCI, codes)
   gi$ECI <- ci$ECI[gi$iso3]
@@ -109,6 +109,21 @@ cat(sprintf("Countries exactly on a median: %s\n",
 cat(sprintf("Flipping the tie convention moves %d/27 countries:\n", length(moved)))
 if (length(moved))
   for (i in moved) cat(sprintf("  %-12s %s -> %s\n", ind$country[i], base_q[i], q_flip[i]))
+
+# --- Export threshold for the global RCA estimation (baseline 5e9) ------------
+# The min-country-export filter (functions/complexity.R) is otherwise never
+# varied. Recompute the global complexity at 2.5e9 / 1e10, refresh EU GCI/GCP,
+# and re-score the potential axis. (All 27 EU states survive every threshold.)
+cat("\n----- Export threshold for the global RCA (baseline 5e9) -----\n")
+for (thr in c(2.5e9, 1e10)) {
+  gi  <- compute_complexity(pooled_exp, min_export = thr)
+  m   <- match(ind$iso3, gi$iso3)
+  ind_t <- ind; ind_t$GCI <- gi$GCI[m]; ind_t$GCP <- gi$GCP[m]
+  s   <- score_spec(ind_t, VULN_VARS, POT_VARS)
+  q   <- assign_quadrant(s$vuln, s$pot, "short")
+  cat(sprintf("  threshold %.1e: cor_pot %.2f (Spearman vs baseline), %d/27 quadrant changes\n",
+              thr, cor(base$pot, s$pot, method = "spearman"), sum(q != base_q)))
+}
 
 # === 3. Number of clusters ====================================================
 cat("\n===== 3. Clustering: how many clusters? =====\n")

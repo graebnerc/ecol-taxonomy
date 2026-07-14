@@ -34,7 +34,8 @@ val <- nd |>
   group_by(iso3 = iso3c) |>
   summarise(
     renew_share = mean(renew_share_overall, na.rm = TRUE),  # Eurostat SHARES REN (overall)
-    gdp_growth  = (last(GDP_real) / first(GDP_real))^(1 / (REF_LAST_YEAR - REF_FIRST_YEAR)) - 1,
+    gdp_growth  = (GDP_real[year == REF_LAST_YEAR] / GDP_real[year == REF_FIRST_YEAR])^
+                    (1 / (REF_LAST_YEAR - REF_FIRST_YEAR)) - 1,  # explicit endpoints, not row order
     loggdp_pc   = log(mean(GDP_ppp, na.rm = TRUE)),  # per-country GDP level (control)
     .groups = "drop"
   )

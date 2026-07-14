@@ -1,11 +1,14 @@
-# 03 - Typology analysis (current canonical clustering).
-# Reads data/tidy/taxonomy_indicators.csv and reproduces the hierarchical
+# 05 - Clustering robustness layer.
+# Reads data/tidy/taxonomy_indicators.csv and runs the hierarchical (Ward)
 # clustering typology. This is the consolidated successor to the legacy
 # clustering script (now in _archive/R/clustering_legacy.R).
 #
-# Phase 3/4 of the plan will replace the single pooled clustering with
-# PCA-per-block scores + a vulnerability x potential map, keeping clustering as
-# a robustness layer. For now this preserves the existing, working result.
+# The vulnerability x potential map (04_typology.R) is the headline; this
+# clustering is kept only as an illustrative robustness layer. K is fixed at 4
+# for continuity with the earlier growth-model comparison, NOT because the data
+# support four groups: 07_robustness.R finds silhouette peaks weakly at k=3 and
+# the gap statistic gives k=1 (little discrete structure), which is itself the
+# argument for the continuous map over hard clustering.
 
 here::i_am("R/05_clustering.R")
 library(here)
@@ -29,7 +32,7 @@ indicators <- as_tibble(fread(here("data/tidy/taxonomy_indicators.csv")))
 # config.R), so the data-driven clusters are directly comparable to the
 # vulnerability x potential quadrants (robustness layer for 04_typology.R).
 ANALYSIS_VARS <- c(VULN_VARS, POT_VARS)
-K <- 4
+K <- 4  # illustrative only; unsupported by silhouette/gap (see 07_robustness.R)
 
 scaled <- scale_indicators(indicators, vars = ANALYSIS_VARS)
 dist_mat <- dist(scaled, method = "euclidean")
@@ -62,4 +65,4 @@ membership <- tibble(
 print(membership, n = Inf)
 fwrite(membership, here("data/tidy/cluster_membership.csv"))
 
-message("03_analysis.R done: wrote dendrogram.pdf, clusters_vs_development.pdf, cluster_membership.csv")
+message("05_clustering.R done: wrote dendrogram.pdf, clusters_vs_development.pdf, cluster_membership.csv")

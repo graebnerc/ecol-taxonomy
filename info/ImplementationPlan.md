@@ -167,6 +167,11 @@ fossil share of primary energy. PC1 = 61% var, all-positive loadings.
       gives k=1 — i.e. **weak discrete structure**, which *supports* the continuous 2-D
       map over hard clustering (clustering stays illustrative only).
 - [x] Outlier sensitivity: dropping Luxembourg or Malta changes only 2/26 quadrants.
+- [x] Median-tie convention: flipping `>=` to `>` moves exactly 2/27 countries (the two on
+      a median); export threshold for the global RCA (2.5e9 / 1e10) is innocuous (cor_pot
+      1.00, 0 quadrant changes). Both in `07_robustness.R`.
+- [ ] Indicator-window shift (2013–2017 / 2015–2019) for the *full* typology — still open;
+      needs re-pooling the Atlas over the wider window (the cached exports are 2014–2018).
 
 ### Section B — needs new data / decisions (optional, not gating)
 - [x] OECD EPS added as an external validator (see Phase 5). Environmental patents still
