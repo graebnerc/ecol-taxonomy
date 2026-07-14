@@ -1,0 +1,5 @@
+The Growth Lab at Harvard University, 2026, "International Trade Data (HS92)", https://doi.org/10.7910/DVN/T4CHWJ, Harvard Dataverse
+
+Downloaded July 14, 2026
+
+Original file name: hs92_country_product_year_6.csv

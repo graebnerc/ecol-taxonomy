@@ -49,6 +49,10 @@ Supporting:
   balances (`nrg_bal_c`, `nrg_bal_s`), World Bank population, EXIOBASE footprints
   (`TXNY_GWP_Trade.csv`, produced by an external Python script in another project), and
   PATSTAT green patents (see `sql/`). Downloads are gated by `if` flags near the top.
+- `R/build_green_list.R` — reconstructs the green-product list in HS1992 6-digit from the
+  OECD CLEG (`info/OECD-Report_List.pdf`, Table A.1) via the HS2007→HS1992 concordance
+  (`info/HS 2007-to-HS1992 .xls`). Writes `data/tidy/green_products_hs6.csv` (244 codes,
+  consumed by `02_complexity.R`) and `green_products_cleg_hs2007.csv` (provenance).
 - `R/country_classification.R` — defines `base_countries` (EU-27) and
   `get_country_classification(x, classification)` mapping ISO codes to the Gräbner et al.
   (2020) growth-model groups (`jee`: Core / Finance / Periphery / Workbench / Germany /

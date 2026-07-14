@@ -42,9 +42,14 @@ Environmental Innovation and Societal Transitions, or Journal of Economic Struct
 ### 1a. Green complexity (Dimension 4) — the new build
 - [ ] Obtain **Atlas HS92 6-digit country–product–year** export data (full global country
       set, 1995 onward). Store raw in `data/raw/` (gitignored).
-- [ ] Obtain the **green HS6 code list** (293 products) + renewable subset (57) from
-      Mealy & Teytelboym (author request / supplement, or reconstruct from WTO+OECD+APEC).
-      Store as `data/tidy/green_products_hs6.csv`.
+- [x] Obtain the **green HS6 code list**. Reconstructed transparently via
+      `R/build_green_list.R`: extract the OECD CLEG (248 HS2007 codes, Table A.1 of
+      `info/OECD-Report_List.pdf`) → convert HS2007→HS1992 (`info/HS 2007-to-HS1992 .xls`)
+      → **244 unique HS92 green products** (52 flagged renewable via the REP medium, a
+      provisional proxy). All 244 present in the Atlas data. Output
+      `data/tidy/green_products_hs6.csv` (+ `green_products_cleg_hs2007.csv` provenance).
+      NOTE: this is the OECD CLEG, close to but not identical with Mealy & Teytelboym's
+      293-code union — swap in the authors' list when they reply for exact comparability.
 - [ ] Compute, following `GreenComplexity.pdf` §3.4–3.7, on the **global** country set:
   - RCA (Balassa), binary M matrix (RCA>1)
   - ECI, PCI (standardised)
