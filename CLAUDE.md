@@ -46,8 +46,13 @@ Numbered pipeline (run in order from the project root; see README):
   scores, the go/no-go independence check, and the 2-D quadrant map (`plots/typology_map.*`,
   `data/tidy/taxonomy_scores.csv`). Blocks: vulnerability = carbon/energy intensity (per
   value added) + fossil share; potential = green patents + GCI + GCP.
-- `R/05_clustering.R` — clustering robustness layer (Ward, dendrogram, alluvial vs.
-  growth-model groups, membership); helpers in `R/functions/clustering_helpers.R`.
+- `R/05_clustering.R` — clustering robustness layer (Ward on the six block variables,
+  dendrogram, alluvial vs. growth-model groups, membership); helpers in
+  `R/functions/clustering_helpers.R`.
+- `R/06_validation.R` — Phase 5: external validity of the scores (renewable share, GDP
+  growth; partial correlations net of GDP p.c.) and comparison with the Gräbner et al.
+  growth-model / geographic groups (group means, quadrant contingency, Cramér's V,
+  alluvial). Writes `validation_*.csv` and `plots/validation_*`.
 - `R/dependencies.R` — installs required packages; notes on pinning with renv (Phase 0).
 
 Supporting:

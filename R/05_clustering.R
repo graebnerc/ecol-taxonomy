@@ -25,12 +25,12 @@ source(here("R/functions/clustering_helpers.R"))
 
 indicators <- as_tibble(fread(here("data/tidy/taxonomy_indicators.csv")))
 
-# Variable set for the canonical clustering (matches the legacy pipeline).
-# Phase 3 revisits this selection.
+# Cluster on the same six block variables used for the 2-D typology, so the
+# data-driven clusters are directly comparable to the vulnerability x potential
+# quadrants (robustness layer for 04_typology.R).
 ANALYSIS_VARS <- c(
-  "GWP_trade_normed", "GWP_normed", "ValueAdded_normed",
-  "EnergyProduction_normed", "EnergyConsumption_normed",
-  "EnergyExports_normed", "GreenPatents_normed"
+  "CarbonIntensity_normed", "EnergyIntensity_normed", "ShareFossils_normed",
+  "GreenPatents_normed", "GCI", "GCP"
 )
 K <- 4
 

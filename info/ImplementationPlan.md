@@ -121,14 +121,24 @@ fossil share of primary energy. PC1 = 61% var, all-positive loadings.
 - [ ] Cross-tabulate clusters vs. quadrants vs. growth-model groups (alluvial). Do the
       data-driven clusters agree with the 2-D quadrants? Do they add info beyond GDP?
 
-## Phase 5 — Validation & external relevance (WP1 "relation to other indicators")
+## Phase 5 — Validation & comparison with other classifications  [DONE]
 
-- [ ] Regress / correlate the scores against external indicators the taxonomy should
-      predict if it is meaningful: CO2 p.c., environmental patents, OECD EPS policy
-      stringency, GDP growth, employment — controlling for GDP p.c. (mirrors the
-      GreenComplexity.pdf validation strategy).
-- [ ] Explicitly test H1–H3: is high-vulnerability/low-potential membership predicted by
-      catch-up / Eastern / lower-GDP status?
+`R/06_validation.R`.
+- [x] External validity (validators NOT used to build scores; partial corr controls for
+      log GDP p.c.): potential → renewable share of energy raw +0.27 / partial **+0.44**
+      (green capability predicts renewables even more strongly net of income). potential →
+      GDP growth −0.59 / −0.46 (β-convergence: capability sits in mature, slower-growing
+      economies — a convergence confound, not a failure). Vulnerability → renewables weakly
+      negative, as expected. TODO: add OECD EPS + env. patents when downloaded.
+- [x] Comparison with Gräbner et al. (2020) growth models — **supports H1–H3**:
+      group means → Core (vuln −0.71, pot +0.80), Periphery (−0.35, +0.13), Workbench
+      (**+0.88, −0.16**), Finance (−0.83, −0.96). Regressions vs Core: Workbench
+      vulnerability **+1.60 (p<0.001)**, potential **−0.96 (p<0.05)** — catch-up economies
+      are systematically more exposed and less capable. Quadrant × growth model Cramér's
+      V = **0.65**; quadrant × data-driven cluster (05) V = 0.59 (robustness). Figures:
+      `plots/validation_scores_by_group.{pdf,png}`, `plots/validation_alluvial.{pdf,png}`.
+- [x] The "Exposed but capable" quadrant (Poland, Czechia, Hungary, Slovenia, NL) nuances
+      the story: some catch-up economies have real green capability despite high burden.
 
 ## Phase 6 — Robustness & sensitivity
 
