@@ -28,6 +28,7 @@ library(here)
 suppressMessages({
   library(data.table); library(dplyr); library(countrycode)
 })
+source(here("R/config.R"))
 source(here("R/country_classification.R"))
 
 PANEL  <- here("data/tidy/full_taxonomy_data.csv")
@@ -79,10 +80,24 @@ merged <- merge(old[, ..keep], new, by = c("country", "year"), all = TRUE)
 setcolorder(merged, names(old))
 setorder(merged, country, year)
 
+o_lo <- min(old[!is.na(GWP_pba)]$year);    o_hi <- max(old[!is.na(GWP_pba)]$year)
+n_lo <- min(merged[!is.na(GWP_pba)]$year); n_hi <- max(merged[!is.na(GWP_pba)]$year)
 cat(sprintf("\nPanel: %d -> %d rows; EXIOBASE coverage %d-%d -> %d-%d\n",
-            nrow(old), nrow(merged),
-            min(old[!is.na(GWP_pba)]$year), max(old[!is.na(GWP_pba)]$year),
-            min(merged[!is.na(GWP_pba)]$year), max(merged[!is.na(GWP_pba)]$year)))
+            nrow(old), nrow(merged), o_lo, o_hi, n_lo, n_hi))
+
+# The new extract deliberately covers only the years the pipeline can use
+# (R/get_data_exiobase.R: YEARS <- 2013:2024). Everything earlier therefore LOSES
+# its footprint values rather than keeping the old vintage -- mixing two EXIOBASE
+# releases inside one column would be worse than a documented gap. Say so loudly.
+if (n_lo > o_lo)
+  warning(sprintf(paste0(
+    "EXIOBASE footprint years %d-%d are dropped (old extract had them, the new ",
+    "one starts at %d).\n  Nothing in the 01-07 pipeline uses pre-%d data ",
+    "(reference window %d-%d, robustness windows within %d-%d), but if you ever ",
+    "need the long panel, widen YEARS in R/get_data_exiobase.R and re-run ",
+    "(~2.5 min per year)."),
+    o_lo, n_lo - 1L, n_lo, n_lo, REF_FIRST_YEAR, REF_LAST_YEAR, n_lo, n_hi),
+    call. = FALSE)
 
 # Non-EXIOBASE columns must be untouched on the rows that already existed.
 chk <- merge(old[, ..keep], merged[, ..keep], by = c("country", "year"),

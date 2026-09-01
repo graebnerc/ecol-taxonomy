@@ -42,8 +42,15 @@
 #   N2O are INCLUDED. Set VARIANTS = TRUE to print alternative baskets and their
 #   world totals.
 #
-# Writes data/tidy/exiobase_totals.csv and data/tidy/exiobase_bilateral.csv.
-# Restartable: years already present in the output are skipped unless FORCE.
+# NOWCAST YEARS. 2023 and 2024 are EXIOBASE nowcasts: the core tables, air
+# emissions and factor inputs are there, but the employment, energy and water
+# extensions are NOT. Employment_pba is therefore NA for those years (nothing in
+# the 01-07 pipeline uses it). Treat 2023-2024 as provisional when choosing a
+# reference window - they are extrapolated, not observed.
+#
+# Writes data/tidy/exiobase_totals.csv and data/tidy/exiobase_bilateral.csv, plus
+# one file per year under data/raw/exiobase/derived/ (gitignored).
+# Restartable: a year whose per-year files exist is skipped unless FORCE.
 
 here::i_am("R/get_data_exiobase.R")
 library(here)
@@ -223,11 +230,23 @@ extract_year <- function(year) {
   va <- rowsum(as.matrix(colSums(VAl$m[vi, , drop = FALSE])),
                group = origin, reorder = FALSE)
 
-  EMl <- read_labelled(file.path(tmp, "employment/F.txt"), 1L)
-  ei <- grep("^Employment people:", EMl$rows[[1]])
-  stopifnot("employment rows not found" = length(ei) > 0)
-  emp <- rowsum(as.matrix(colSums(EMl$m[ei, , drop = FALSE])),
-                group = origin, reorder = FALSE)
+  # EXIOBASE's most recent years are NOWCASTS: 2023 and 2024 ship the core
+  # tables, air emissions and factor inputs, but NOT the employment, energy or
+  # water extensions. Employment is carried in the panel but used by nothing in
+  # the 01-07 pipeline, so its absence must not abort the year - it becomes NA
+  # and the gap is reported.
+  emp_path <- file.path(tmp, "employment/F.txt")
+  if (file.exists(emp_path)) {
+    EMl <- read_labelled(emp_path, 1L)
+    ei <- grep("^Employment people:", EMl$rows[[1]])
+    stopifnot("employment rows not found" = length(ei) > 0)
+    emp <- rowsum(as.matrix(colSums(EMl$m[ei, , drop = FALSE])),
+                  group = origin, reorder = FALSE)
+    emp <- as.numeric(emp[regions, ])
+  } else {
+    cat("    employment extension absent (nowcast year) -> Employment_pba = NA\n")
+    emp <- NA_real_
+  }
 
   pba <- rowSums(E); cba <- colSums(E)
   totals <- data.table(
@@ -236,7 +255,7 @@ extract_year <- function(year) {
     GWP_Imports = cba - diag(E),
     GWP_Exports = pba - diag(E),
     ValueAdded_pba = as.numeric(va[regions, ]),
-    Employment_pba = as.numeric(emp[regions, ]))
+    Employment_pba = emp)
 
   # Identity checks -- these must hold by construction; fail loudly if not.
   stopifnot(
@@ -257,25 +276,41 @@ extract_year <- function(year) {
 }
 
 # --- run ---------------------------------------------------------------------
+# Per-year outputs are written as soon as each year is computed. A failure in a
+# later year therefore costs that year only, not the whole run -- which is not
+# hypothetical: the first attempt died on 2023 (missing employment extension)
+# and threw away ten completed years because it only wrote at the end.
 
-done <- integer(0)
-if (!FORCE && file.exists(OUT_TOT)) done <- unique(fread(OUT_TOT)$year)
-todo <- setdiff(YEARS, done)
-todo <- todo[file.exists(file.path(ZIP_DIR, sprintf("IOT_%d_pxp.zip", todo)))]
+DERIVED <- file.path(ZIP_DIR, "derived")
+dir.create(DERIVED, showWarnings = FALSE, recursive = TRUE)
+year_files <- function(y) list(
+  tot = file.path(DERIVED, sprintf("%d_totals.csv", y)),
+  bil = file.path(DERIVED, sprintf("%d_bilateral.csv", y)))
 
-if (!length(todo)) {
-  message("Nothing to do: all requested years already extracted.")
-} else {
+todo <- YEARS[file.exists(file.path(ZIP_DIR, sprintf("IOT_%d_pxp.zip", YEARS)))]
+if (!FORCE) todo <- todo[!vapply(todo, function(y) {
+  f <- year_files(y); file.exists(f$tot) && file.exists(f$bil) }, logical(1))]
+
+if (length(todo)) {
   cat(sprintf("Extracting %d year(s): %s\n", length(todo),
               paste(todo, collapse = ", ")))
-  res <- lapply(todo, extract_year)
-  tot <- rbindlist(lapply(res, `[[`, "totals"))
-  bil <- rbindlist(lapply(res, `[[`, "bilateral"))
-  if (!FORCE && file.exists(OUT_TOT)) {
-    tot <- rbind(fread(OUT_TOT), tot); bil <- rbind(fread(OUT_BIL), bil)
+  for (y in todo) {
+    r <- extract_year(y)
+    f <- year_files(y)
+    fwrite(r$totals, f$tot); fwrite(r$bilateral, f$bil)
   }
-  setorder(tot, year, region); setorder(bil, year, origin, destination)
-  fwrite(tot, OUT_TOT); fwrite(bil, OUT_BIL)
-  message(sprintf("Wrote exiobase_totals.csv (%d rows) and exiobase_bilateral.csv (%d rows).",
-                  nrow(tot), nrow(bil)))
+} else {
+  message("All requested years already extracted; re-combining.")
 }
+
+have <- YEARS[vapply(YEARS, function(y) {
+  f <- year_files(y); file.exists(f$tot) && file.exists(f$bil) }, logical(1))]
+stopifnot("no years extracted" = length(have) > 0)
+tot <- rbindlist(lapply(have, function(y) fread(year_files(y)$tot)))
+bil <- rbindlist(lapply(have, function(y) fread(year_files(y)$bil)))
+setorder(tot, year, region); setorder(bil, year, origin, destination)
+fwrite(tot, OUT_TOT); fwrite(bil, OUT_BIL)
+missing <- setdiff(YEARS, have)
+message(sprintf("Wrote exiobase_totals.csv (%d rows) and exiobase_bilateral.csv (%d rows); years %s%s.",
+                nrow(tot), nrow(bil), paste(range(have), collapse = "-"),
+                if (length(missing)) paste0(" | MISSING: ", paste(missing, collapse = ", ")) else ""))
