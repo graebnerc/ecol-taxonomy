@@ -152,14 +152,18 @@ if (tidy_eurostat_energy_balance_s){
 }
 
 # Data from EXIOBASE --------
-# This data is prepared from the raw IO tables using the script:
-#  TXNY-paper_gwp_balance.py
-exiobase_base <- fread(here("data/tidy/TXNY_GWP_Trade.csv")) %>% 
-  as_tibble(.) %>% 
-  select(-V1) %>% 
-  rename(country=Country) %>% 
-  filter(!country %in% c("WA", "WE", "WL", "WM")) %>% # Remove RoW regions
-  mutate(country=countrycode(country, "iso2c", "iso3c"))
+# Computed IN-REPO by R/get_data_exiobase.R from the official EXIOBASE 3.10.2
+# IOT archives (Zenodo record 20051562). This replaces the former dependency on
+# an external Python script (TXNY-paper_gwp_balance.py) living in another
+# project, which info/AuditReport_2026-07-14.md flagged as unreproducible.
+# The superseded extract is kept as data/tidy/TXNY_GWP_Trade.csv for provenance.
+exiobase_base <- fread(here("data/tidy/exiobase_totals.csv")) %>%
+  as_tibble(.) %>%
+  rename(country=region) %>%
+  filter(!country %in% c("WA", "WE", "WF", "WL", "WM")) %>% # Remove RoW regions
+  mutate(country=countrycode(country, "iso2c", "iso3c")) %>%
+  select(country, year, GWP_Imports, GWP_Exports, Employment_pba,
+         GWP_pba, ValueAdded_pba)
 
 # Green patents --------
 # Definition of green patents: EPO tag for green patents
