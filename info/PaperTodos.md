@@ -358,6 +358,77 @@ between two accountings, **not** as a transfer between two groups.
   invariance (0.98 / 2-of-27) stated *first* so the layer reads as a finding
   rather than as a defensive concession.
 
+## Bilateral offshoring: the mechanism claim is REFUTED (LOGGED, 2026-09-01)
+
+The open follow-up under § Offshoring ("scope bilateral EXIOBASE flows") is
+**done**. `R/get_data_exiobase.R` now computes the full 49x49 origin x
+destination matrix, and `R/appendix_offshoring_origins.R` tests the claim.
+
+**Result: only 9.2% of the Core's embodied GHG imports originate in the
+Workbench East; 71.3% come from outside the EU entirely** (EU-27 overall: 73.2%
+extra-EU; China 15.5% of Core imports, other non-EU 34.2%, RoW aggregates 21.6%).
+
+So *"the core's clean profile rests on offshoring to the European East, and that
+transfer is the mechanism of polarization"* **cannot be claimed**. The core
+offshores to the world, not to its own periphery.
+
+The direction, however, holds: the Workbench East is a **net** embodied-emission
+exporter to every other EU bloc (+39.9 Mt/yr to Core, +26.3 to Periphery, +3.5 to
+Finance). It is simply an order of magnitude too small to be the mechanism --
+39.9 Mt against 788 Mt of Core embodied imports, about 5%.
+
+**Framing to use:** keep the burden-vs-responsibility asymmetry as the finding
+(it is robust); state the intra-EU transfer as present, in the predicted
+direction, and small. The stronger defensible claim is that the Workbench East's
+high burden is overwhelmingly its OWN carbon-intensive, low-value-added
+production rather than production for the West -- which makes the polarization
+**structural rather than a transfer**, and arguably harder to fix.
+
+- [x] Bilateral flows obtained and tested.
+- [ ] Rewrite the offshoring paragraph to the framing above before drafting.
+
+## Data vintage: rebuilt on EXIOBASE 3.10.2 (LOGGED, 2026-09-01)
+
+The footprint layer is now computed in-repo from the official Zenodo archives
+(`R/get_data_exiobase.R`), closing the external-Python-script dependency the July
+audit flagged. Full detail in `info/Report_2026-09-01_data-rebuild.md`.
+
+**The vintage change moves 0 of 27 countries.** 3.10.2 puts EU production
+emissions ~18% higher and value added ~3.5% lower (carbon intensity ~25% higher
+in level), but cross-country Spearman is 0.97-0.99 and the map is unchanged;
+vulnerability Pearson 0.997. Diagnostics: cor(vuln,pot) -0.58,
+R2(vuln~logGDP) 0.28, R2(pot~logGDP) 0.33.
+
+- [ ] **Report this in the paper as a robustness result**: the typology is
+  invariant to the MRIO release across an 18% revision of the emission accounts.
+  Referees ask about MRIO choice; this answers it.
+
+## Reference window and the patent measure (OPEN DECISION, 2026-09-01)
+
+EXIOBASE no longer caps the window; **green patents do**, via EPO grant lag
+(`sql/get_green_patents.sql` filters `granted='Y'` and counts by filing year).
+
+Applications and grants rank EU-27 countries essentially identically (Spearman
+0.988-0.994 across three series) and substituting either moves **0/27**, while
+applications stay complete to 2021 vs 2018 for grants. Rebuilding the whole
+typology on a **2017-2021** window costs **2/27** (Ireland, Slovakia -- both
+already borderline), with rank correlations 0.99; R2(pot~logGDP) falls 0.33 ->
+0.21.
+
+Caveat: EXIOBASE 2023 and 2024 are NOWCASTS and their emissions are broken
+(`CO2 - combustion - air` identically zero, world PBA 12 Gt instead of 46), so
+the last complete year is 2022 whatever PATSTAT returns.
+
+- [ ] **Decision: switch the patent variable to applications?** Free by the
+  evidence; changes what the innovation dimension measures.
+- [ ] **Decision: move the window to 2017-2021?** Costs 2/27; moves every
+  headline number.
+- [ ] Defect to quantify: the v1 PATSTAT query lacks `COUNT(DISTINCT ...)` and
+  over-counts by (CPC symbols x same-country applicants), differentially across
+  countries. `sql/get_green_patents_v2.sql` fixes it and is ready to run.
+- [ ] Still open: `appln_auth='EP'` excludes national offices, plausibly
+  understating the small and eastern states in the low-potential tail.
+
 ## 4. Alternative emissions data source (Eurostat instead of EXIOBASE)
 
 **Feedback:** Can I get the trade-embodied / production emissions from a source

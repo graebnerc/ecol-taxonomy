@@ -86,9 +86,24 @@ Numbered pipeline (run in order from the project root; see README):
 Supporting:
 
 - `R/get_data.R` — builds `data/tidy/full_taxonomy_data.csv` from Eurostat energy
-  balances (`nrg_bal_c`, `nrg_bal_s`), World Bank population, EXIOBASE footprints
-  (`TXNY_GWP_Trade.csv`, produced by an external Python script in another project), and
+  balances (`nrg_bal_c`, `nrg_bal_s`), World Bank population, EXIOBASE footprints and
   PATSTAT green patents (see `sql/`). Downloads are gated by `if` flags near the top.
+- `R/get_data_exiobase.R` — computes the EXIOBASE layer **in-repo** from the official
+  IOT archives (EXIOBASE 3.10.2, Zenodo record 20051562; fetched by
+  `data/raw/exiobase/fetch.sh`, gitignored). Replaces the former external Python script.
+  Writes `exiobase_totals.csv` (per-region GWP_pba/Imports/Exports, value added,
+  employment) and `exiobase_bilateral.csv` (the 49×49 origin×destination embodied-GHG
+  matrix). Restartable per year. **2023–2024 are nowcasts with broken emissions**
+  (`CO2 - combustion - air` identically zero) — flagged `emissions_complete = FALSE`
+  and dropped downstream; the last complete year is 2022.
+- `R/update_panel_exiobase.R` — swaps only the five EXIOBASE columns into the panel,
+  asserting every other column is unchanged.
+- `R/get_data_patents_oecd.R` / `R/get_data_patents_patstat.R` — the green-patent
+  measures. The headline variable (EPO **grants** by filing year) is grant-lag
+  truncated from 2019, which is what caps the reference window; OECD ENV-TECH supplies
+  an **applications** counterpart, and `sql/get_green_patents_v2.sql` (ready to run,
+  data not yet retrieved) supplies the like-for-like PATSTAT version and fixes a
+  double-counting defect in `sql/get_green_patents.sql`.
 - `R/get_data_extra.R` — builds the external-validator panel `data/tidy/new_data.csv`
   (GDP PPP/real + `renew_share_overall`), one row per country-year. `DOWNLOAD = TRUE`
   rebuilds from WDI + Eurostat `nrg_ind_ren`; `DOWNLOAD = FALSE` (default) reproduces it
