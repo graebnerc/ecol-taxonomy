@@ -1,0 +1,341 @@
+---
+title: "EU-27 Green-Transition Typology: Design & Results"
+subtitle: "Vulnerability × Potential map — self-contained reproduction for review"
+format:
+  html:
+    number-sections: true
+    toc: true
+    embed-resources: true
+execute:
+  warning: false
+  message: false
+  echo: false
+---
+
+```{r setup}
+here::i_am("quarto/TypologyDesign.qmd")
+library(here)
+library(data.table)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(ggrepel)
+library(ggalluvial)
+library(countrycode)
+library(knitr)
+source(here("R/config.R"))
+source(here("R/country_classification.R"))
+source(here("R/functions/typology.R"))
+
+ind <- as_tibble(fread(here("data/tidy/taxonomy_indicators.csv")))
+ind$iso3  <- countrycode(ind$country, "country.name", "iso3c")
+ind$group <- get_country_classification(ind$iso3, "jee")
+lg <- log(ind$GDP_normed)
+
+r2 <- function(y) summary(lm(y ~ lg))$r.squared
+eta2 <- function(y) summary(lm(y ~ factor(ind$group)))$r.squared
+
+# Four-dimension (structured) scores
+vuln <- axis_score(ind, INTENSITY_VARS,  "CarbonIntensity_normed", FOSSIL_VAR)
+pot  <- axis_score(ind, COMPLEXITY_VARS, "GCI",                    INNOV_VAR)
+scores <- tibble(country = ind$country, group = ind$group,
+                 vulnerability = vuln$score, potential = pot$score,
+                 intensity = vuln$twin, fossil = vuln$solo,
+                 complexity = pot$twin, innovation = pot$solo) |>
+  mutate(quadrant = assign_quadrant(vulnerability, potential, "short"))
+
+# Flat single-PCA per block (previous headline), for comparison
+flat <- tibble(country = ind$country,
+               vulnerability = block_score(ind, VULN_VARS, "ShareFossils_normed")$score,
+               potential     = block_score(ind, POT_VARS,  "GCI")$score) |>
+  mutate(quadrant = assign_quadrant(vulnerability, potential, "short"))
+```
+
+# Research question & motivation
+
+- **Project (WP1, OPUS "Green transition & economic polarization in Europe").**
+  Build a national taxonomy of the EU-27 that captures how well-placed each Member
+  State is for the green transition, and ask whether the transition risks
+  **reinforcing existing core–periphery polarization**.
+- **Design (proposal Fig. 1).** Two *vulnerabilities* (transition burden) and two
+  *potentials* (green capability), placed on a 2-D **vulnerability × potential
+  map** with four quadrants (Winners / Exposed / Low-stakes / At risk).
+- **Guiding requirements for the axes:**
+  - Each axis must be **distinct** from the other and **not merely a proxy for GDP
+    per capita** — but income relevance is *expected and welcome*, not something to
+    engineer away.
+  - The axes must **differentiate** countries (a visible growth-model story), else
+    there is nothing to build a narrative on.
+  - No **double-counting**: two near-identical indicators should not silently
+    dominate a block.
+
+# Method
+
+## Indicators (six, two per dimension)
+
+- **Vulnerability**
+  - *Emission intensity of production* — **carbon intensity** (GHG / value added)
+    and **energy intensity** (final energy / value added).
+  - *Fossil dependency* — **fossil share of gross available energy** (demand side).
+- **Potential**
+  - *Green economic complexity* — **GCI** (current green export complexity) and
+    **GCP** (connectedness / potential to diversify into green products).
+  - *Green innovation* — **green patents** per capita.
+
+## Fossil share: demand-side, not production-side
+
+- The fossil share is measured on **gross available energy** (what a country
+  *consumes*), replacing the earlier *fossil share of primary production* (what it
+  *extracts*). The two barely agree (r = 0.34).
+
+```{r fossil-compare}
+fc <- ind |>
+  transmute(country,
+            `fossil (production)` = round(ShareFossilsProd_normed, 2),
+            `fossil (gross avail.)` = round(ShareFossils_normed, 2)) |>
+  filter(country %in% c("Malta","Luxembourg","Estonia","Ireland","Germany","Denmark"))
+kable(fc, caption = "Production- vs demand-based fossil share (selected).")
+```
+
+- The production measure is **0 for every non-producer** (Malta, Luxembourg,
+  Baltics) and even mis-codes oil-shale Estonia — an artifact. The demand measure
+  captures actual fossil **dependence** and has full EU-27 coverage.
+
+## Scoring: two-part axes (twin sub-index + standalone)
+
+- Within each block the two intensity / two complexity indicators are **strongly
+  correlated** — they are two facets of *one* construct, not independent variables.
+
+```{r within-block-cor}
+wb <- tibble(
+  pair = c("carbon intensity ↔ energy intensity", "GCI ↔ GCP",
+           "intensity twins ↔ fossil", "complexity twins ↔ patents"),
+  correlation = round(c(
+    cor(ind$CarbonIntensity_normed, ind$EnergyIntensity_normed),
+    cor(ind$GCI, ind$GCP),
+    cor(vuln$twin, vuln$solo),
+    cor(pot$twin, pot$solo)), 2))
+kable(wb, caption = "Within-block correlations: the twins cohere; the standalone is distinct.")
+```
+
+- So each axis is built in two steps: **(1)** reduce the correlated twin pair to a
+  single sub-index (first principal component); **(2)** combine that sub-index with
+  the standalone indicator at **equal weight** (standardised mean). This treats the
+  two parts as **co-equal conceptual dimensions**, so neither the twin pair
+  (2 indicators) nor the standalone (1 indicator) dominates by count.
+- Contrast with a **flat PCA** over all three variables per block: there the
+  correlated twins dominate PC1 and the standalone loads only ~0.14–0.28, i.e. is
+  almost ignored.
+
+# Results
+
+## Axes are distinct, differentiating, and income-balanced
+
+```{r gonogo}
+gg <- tibble(
+  metric = c("cor(vulnerability, potential)",
+             "R²  vulnerability ~ log GDP p.c.",
+             "R²  potential ~ log GDP p.c.",
+             "eta²  vulnerability ~ growth model",
+             "eta²  potential ~ growth model"),
+  value = round(c(cor(scores$vulnerability, scores$potential),
+                  r2(scores$vulnerability), r2(scores$potential),
+                  eta2(scores$vulnerability), eta2(scores$potential)), 2))
+kable(gg, caption = "Go/no-go and differentiation diagnostics (structured axes).")
+```
+
+- **Distinct axes:** cor(vulnerability, potential) = −0.57 — related (high burden
+  tends to pair with low capability) but far from ±1, so not one axis in disguise.
+- **Income present but balanced:** both R²(~log GDP) are moderate (0.25 / 0.33).
+  Income matters in *both* blocks, dominates *neither*. This is by design: within
+  each block one part is income-linked and one income-neutral, on opposite
+  diagonals (intensity & patents track GDP; fossil & complexity do not).
+- **Differentiation:** eta² (variance explained by growth model) is high on both
+  axes — the core–periphery structure is clearly visible.
+
+## The typology map
+
+```{r map, fig.width=9, fig.height=6.5}
+mx <- median(scores$vulnerability); my <- median(scores$potential)
+ggplot(scores, aes(vulnerability, potential, colour = group)) +
+  geom_hline(yintercept = my, linetype = 2, colour = "grey70") +
+  geom_vline(xintercept = mx, linetype = 2, colour = "grey70") +
+  geom_point(size = 2.4) +
+  ggrepel::geom_text_repel(aes(label = country), size = 3, max.overlaps = 20) +
+  labs(x = "Vulnerability  (transition burden) →",
+       y = "Potential  (green capability) →", colour = "Growth model") +
+  theme_minimal()
+```
+
+```{r quadrant-table}
+scores |> arrange(quadrant, country) |>
+  group_by(Quadrant = quadrant) |>
+  summarise(Countries = paste(country, collapse = ", "), .groups = "drop") |>
+  kable(caption = "Quadrant membership (structured axes).")
+```
+
+# Validation
+
+```{r validation-data}
+nd <- as_tibble(fread(here("data/tidy/new_data.csv")))
+val <- nd |>
+  filter(year >= REF_FIRST_YEAR, year <= REF_LAST_YEAR) |>
+  group_by(iso3 = iso3c) |>
+  summarise(
+    renew_share = mean(renew_share_overall, na.rm = TRUE),
+    gdp_growth  = (GDP_real[year == REF_LAST_YEAR] / GDP_real[year == REF_FIRST_YEAR])^
+                    (1 / (REF_LAST_YEAR - REF_FIRST_YEAR)) - 1,
+    loggdp_pc   = log(mean(GDP_ppp, na.rm = TRUE)),
+    .groups = "drop")
+eps <- fread(here("info/OECD-EPS-Index.csv"))[
+  CLIM_POL == "EPS" & TIME_PERIOD >= REF_FIRST_YEAR & TIME_PERIOD <= REF_LAST_YEAR &
+    !is.na(OBS_VALUE), .(eps = mean(OBS_VALUE)), by = .(iso3 = REF_AREA)]
+dat <- scores |> mutate(iso3 = countrycode(country, "country.name", "iso3c")) |>
+  left_join(val, by = "iso3") |> left_join(as_tibble(eps), by = "iso3")
+
+partial <- function(x, y, z) {
+  ok <- complete.cases(x, y, z); x <- x[ok]; y <- y[ok]; z <- z[ok]
+  rxy <- cor(x, y); rxz <- cor(x, z); ryz <- cor(y, z)
+  (rxy - rxz * ryz) / sqrt((1 - rxz^2) * (1 - ryz^2))
+}
+```
+
+## External validity: do the axes predict what they should? {#sec-extval}
+
+The scores are validated against outcomes **not used to build them**, controlling
+for income (partial correlation net of log GDP p.c.): the overall **renewable
+share** (Eurostat SHARES REN), **real GDP growth** over the window, and the OECD
+**Environmental Policy Stringency** index (EPS, 20/27 countries).
+
+```{r extval}
+vt <- expand_grid(score = c("vulnerability", "potential"),
+                  outcome = c("renew_share", "gdp_growth", "eps")) |>
+  rowwise() |>
+  mutate(raw_cor     = round(cor(dat[[score]], dat[[outcome]], use = "complete.obs"), 2),
+         partial_cor = round(partial(dat[[score]], dat[[outcome]], dat$loggdp_pc), 2)) |>
+  ungroup()
+kable(vt, caption = "Correlation of each axis with external validators (partial = net of log GDP p.c.).")
+```
+
+- **Expected signs hold:** *potential* is positively associated with the renewable
+  share, growth and policy stringency; *vulnerability* negatively — and the
+  associations survive controlling for income.
+- **Circularity flag:** fossil dependency is ~half of vulnerability and the fossil
+  share is ~ (1 − renewable share), so `vulnerability ~ renewable share` is
+  **partly mechanical** — read it as descriptive. Renewable share remains a clean
+  validator for *potential* (which contains no fossil term).
+
+## Relation to the development-model classification {#sec-devmodel}
+
+The central polarization question is how the green-transition typology relates to
+the **Gräbner et al. (2020)** European growth-model classification: **Core**
+(DE, AT, BE, DK, FI, SE), **Finance** (LU, NL, MT, IE), **Periphery**
+(FR, GR, IT, PT, ES, CY), **Workbench** (the eastern catch-up economies).
+
+```{r devmodel-means}
+dat |> group_by(`Growth model` = group) |>
+  summarise(n = n(),
+            vulnerability = round(mean(vulnerability), 2),
+            potential     = round(mean(potential), 2), .groups = "drop") |>
+  arrange(desc(potential)) |>
+  kable(caption = "Mean axis scores by growth-model group.")
+```
+
+```{r devmodel-contingency}
+tab <- table(Quadrant = dat$quadrant, `Growth model` = dat$group)
+cram_v <- function(tab) {
+  n <- sum(tab); r <- nrow(tab); k <- ncol(tab)
+  chi <- suppressWarnings(chisq.test(tab)$statistic)
+  sqrt((as.numeric(chi) / n) / (min(r, k) - 1))
+}
+kable(as.data.frame.matrix(tab),
+      caption = sprintf("Quadrant × growth model (Cramér's V = %.2f; descriptive, n = 27).",
+                        cram_v(tab)))
+```
+
+```{r devmodel-alluvial, fig.width=7, fig.height=5}
+al <- dat |>
+  transmute(country, `Growth model` = as.character(group), Quadrant = quadrant) |>
+  pivot_longer(-country, names_to = "axis", values_to = "code") |>
+  mutate(axis = factor(axis, levels = c("Growth model", "Quadrant")))
+ggplot(al, aes(x = axis, stratum = code, alluvium = country, fill = code, label = code)) +
+  ggalluvial::geom_flow(stat = "alluvium", lode.guidance = "frontback", color = "darkgray") +
+  ggalluvial::geom_stratum() + geom_text(stat = "stratum", size = 2.6) +
+  labs(x = NULL, y = NULL) +
+  theme_void() + theme(legend.position = "none")
+```
+
+- **The typology tracks the development model, but does not reproduce it**
+  (Cramér's V moderate, not 1): growth model and transition quadrant are clearly
+  associated, yet the mapping is many-to-many.
+- **Core → mostly Winners; Workbench → mostly At risk** — the transition risks
+  **reinforcing** the existing core–periphery divide (the polarization hypothesis).
+- **But the typology adds resolution the development model lacks:**
+  - *Finance* splits — clean, high-innovation **Luxembourg → Winners** vs.
+    fossil-dependent, low-complexity **Malta / Ireland → At risk**.
+  - *Periphery* splits — larger economies (IT, ES) sit near *Winners* while
+    **Portugal** drops toward *Low-stakes*.
+  - Within *Workbench*, coal-heavy **Poland / Czechia** are *Exposed* (real burden)
+    while cleaner **Slovakia** is *Low-stakes* — a distinction the single
+    development-model label hides.
+
+# Robustness
+
+## Stability to the aggregation choice {#sec-robust-agg}
+
+The headline combines each block as a twin sub-index + standalone. As an
+alternative, each block can be reduced by a **single PCA over all three
+variables** (which lets the correlated twins dominate). The map is **stable** to
+this choice:
+
+```{r reclass}
+cmp <- flat |> transmute(country, `single PCA` = quadrant) |>
+  left_join(scores |> transmute(country, group, structured = quadrant), by = "country") |>
+  filter(`single PCA` != structured) |>
+  arrange(group, country) |>
+  select(country, group, `single PCA`, structured)
+kable(cmp, caption = sprintf("Countries differing between single-PCA blocks and the structured axes (%d of 27).",
+                             nrow(cmp)))
+```
+
+- Only **`r nrow(cmp)` of 27** countries differ, so the classification is not an
+  artifact of the aggregation rule.
+- The differences are interpretable: the structured axes give the **standalone**
+  dimensions real weight, so high-innovation economies (Luxembourg, Slovenia,
+  Finland) and fossil-dependent ones (Malta, Ireland) are placed on their own
+  merits rather than being absorbed by the correlated twins.
+- Further checks in `07_robustness.R`, all against the structured headline, are
+  reassuring: the twin sub-index as a mean instead of PC1 (0/27), robust scaling
+  (2/27), ECI for GCI (0/27), renewable-only GCI (2/27), indicator-window shifts
+  (0/27) and single-country drops (1/26). The map moves most under the two genuine
+  measurement choices — flat aggregation (8/27) and the production-based fossil
+  share (8/27) — which is why both are argued for explicitly in the Method.
+
+# Interpretation
+
+- **The transition risks reinforcing polarization — this is the headline finding.**
+  Core economies cluster in *Winners*, the Workbench East in *At risk*: those least
+  equipped for the transition (low green capability) also carry a real transition
+  burden. Green-transition standing and development-model position are strongly
+  associated.
+- **…but the typology is a refinement of the development model, not a relabelling.**
+  The association is moderate (Cramér's V < 1), and the map resolves *within-group*
+  heterogeneity the single development-model label hides: Finance splits
+  (Luxembourg vs Malta/Ireland), Periphery splits (IT/ES vs Portugal), and the
+  Workbench separates coal-burdened (PL, CZ) from lower-stakes (SK) economies.
+- **The taxonomy is not "just income."** Both axes carry a *moderate, balanced*
+  income signal (R² 0.25 / 0.33) — present by design, dominating neither — and they
+  are clearly distinct (cor −0.57), so the map is not a GDP ranking in disguise.
+- **Each block measures two genuine dimensions.** A coherent two-indicator construct
+  (emission intensity; green complexity) is combined at equal weight with a distinct
+  standalone (fossil dependency; green innovation). This gives fossil dependency and
+  innovation full standing, which is what places Malta/Ireland (fossil-locked, low
+  complexity) in *At risk* and the innovation leaders in *Winners*.
+- **Caveats to keep in view.**
+  - Fossil dependency is ~half of vulnerability and the fossil share is ~ (1 −
+    renewable share), so the renewable-share validator is partly circular *for
+    vulnerability* (r = −0.46) — read it as descriptive there; it stays a clean
+    validator for *potential*, alongside GDP growth and policy stringency.
+  - Quadrants come from median splits; countries near an axis median are
+    convention-sensitive (flagged as borderline in `04_typology.R`).
+```
