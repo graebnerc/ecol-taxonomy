@@ -67,8 +67,15 @@ Numbered pipeline (run in order from the project root; see README):
 - `R/07_robustness.R` — Phase 6 (section A): per-year vs pooled complexity, score-spec
   sensitivity **against the structured headline** (flat single-PCA blocks, twin mean vs PCA,
   robust scaling, twin:standalone part weight, GCI vs ECI, renewable-only GCI, production-
-  based fossil), cluster-number diagnostics (silhouette/gap), outlier drops, and the full-
-  typology indicator-window shift (2013–2017 / 2015–2019). Writes `robustness_specs.csv`.
+  based fossil, consumption-based carbon accounting), cluster-number diagnostics
+  (silhouette/gap), outlier drops, and the full-typology indicator-window shift
+  (2013–2017 / 2015–2019). Writes `robustness_specs.csv`.
+- `R/appendix_*.R` — standalone scripts outside the audited `01`–`07` pipeline. Design
+  support (`structure_map` flat vs two-part axes, `decomposed_map`, `pc1_cos2`,
+  `quadrant_profiles` = the classification table + per-quadrant descriptives,
+  `burden_responsibility` = the production-vs-consumption footprint layer) and
+  exploratory extensions (`window_coverage`, `capability_trajectory`,
+  `vulnerability_drift`, `forward_validation`).
 - `R/functions/typology.R` — shared scoring helpers (`scale_mat`, `block_score`,
   `axis_score`, `assign_quadrant`) used by `04` and `07`. `axis_score` builds the two-part
   (twin sub-index + standalone) axes; the four dimensions live in `R/config.R`
@@ -111,7 +118,12 @@ Supporting:
 
 Panel, country (ISO3) × year, EU-27. Notable columns:
 - `GWP_Imports`, `GWP_Exports` — consumption-side emissions embodied in trade (EXIOBASE, GWP).
+  **Country totals only — no origin dimension**, so they cannot show *where* a country's
+  embodied imports come from (see `info/PaperTodos.md` § Offshoring).
 - `GWP_pba` — production-based GHG emissions; `ValueAdded_pba`, `Employment_pba` — sectoral totals.
+  The headline carbon variable is production-based on purpose (adjustment *burden*); the
+  consumption-based counterparts `CarbonIntensityCBA_normed` / `GWP_cba_normed` measure
+  *responsibility* and are used for robustness and the interpretive layer, not the axis.
 - `PrimaryEnergyProduction`, `FinalEnergyConsumption`, `EnergyExports`/`Imports`/`NetTrade` (GWh, Eurostat).
 - `population` (1000s), `GreenPatents_n`, `ShareRenewables_PrimEnProd`, `ShareFossils_PrimEnProd`.
 - `new_data.csv` adds `GDP_ppp`, `GDP_real`, `ShareFossils_GrossAvEn`, and the overall

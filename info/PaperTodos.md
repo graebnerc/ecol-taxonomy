@@ -61,13 +61,16 @@ split by **households / industry / transport / services** — no new download.
   it looks clean partly because it offshores emissions.
 
 **Implications / TODO:**
-- [ ] Add a descriptive script (e.g. `R/appendix_country_profiles.R`): sectoral
-  energy split (household vs. business) + production- vs. consumption-based
-  emissions for a handful of flagged countries.
+- [x] Production- vs. consumption-based emissions for the flagged countries →
+  **done** in `R/appendix_burden_responsibility.R` (see § Offshoring below);
+  Malta's ratio is 3.11, Luxembourg's 1.91.
+- [ ] Still open: the *sectoral energy split* (household vs. business, available
+  in Eurostat `nrg_bal_c` without a new download) for the same countries.
 - [x] Expose/replace the "ShareFossils of *primary production*" weakness →
   **done**: substituted for the demand-side gross-available-energy share. Full
   comparison and justification logged in **§ Fossil-share measure** below.
-- [ ] Write the Malta / Luxembourg offshoring vignette.
+- [ ] Write the Malta / Luxembourg offshoring vignette (numbers now in
+  `data/tidy/burden_responsibility.csv`).
 
 ## Fossil-share measure: substitution decision (LOGGED, implemented)
 
@@ -253,6 +256,107 @@ income no longer the sole driver of vulnerability.
   renewable-deployment trajectory to validate vulnerability. (06 comment updated.)
 - [ ] Prose + Fig. 1: present the taxonomy as four dimensions (2 per block), each
   block a twin sub-index + standalone; explain the balanced-income diagonal.
+
+## Offshoring: burden vs. responsibility (LOGGED, implemented)
+
+**Question raised:** the headline carbon variable is *production*-based
+(`GWP_pba / ValueAdded_pba`), yet the low-vulnerability countries are exactly the
+ones with large net embodied-emission imports. A referee can say the Winners look
+clean only because the East makes their goods — which would **invert** the
+polarization story into "the core exports its burden". Can offshoring instead be
+framed as a *finding* that is part of the model?
+
+**Answer: yes — but only the responsibility version of it.** Three results.
+
+### 1. The vulnerability axis is near-invariant to the accounting choice
+
+Swapping `CarbonIntensity_normed` for its consumption-based counterpart
+`CarbonIntensityCBA_normed` = (GWP_pba + imports − exports) / value added:
+
+| | production-based | consumption-based |
+|---|---|---|
+| Spearman(vuln) vs baseline | — | **0.98** |
+| R²(vuln ~ log GDP p.c.) | 0.25 | 0.25 |
+| eta²(vuln ~ growth model) | 0.37 | 0.41 |
+| quadrant changes | — | **2/27** (Ireland, Slovakia) |
+
+So the map is **not** an artifact of production-based accounting. This is the
+answer to the objection, and it is what *licenses* the finding below: had the map
+flipped, offshoring would be a confound and an accounting would have to be chosen
+and defended. It does not, so the offshoring layer can be presented as substance
+without destabilising the headline.
+
+### 2. The offshoring correction is real and systematic — just not decisive
+
+| Quadrant | int. PBA | int. CBA | rise | t/cap PBA | t/cap CBA | rise |
+|---|---|---|---|---|---|---|
+| Winners | 207 | 295 | **+43%** | 8.0 | **11.8** | **+48%** |
+| Exposed | 560 | 565 | +6% | 10.2 | 10.8 | +6% |
+| Low-stakes | 349 | 486 | +38% | 5.7 | 7.9 | +38% |
+| At risk | 560 | 598 | +7% | 8.4 | 9.4 | +11% |
+
+(intensity in g CO₂e per EUR value added.) By growth model the rise is Core +38%,
+**Finance +70%**, Periphery +7%, Workbench +7%. The Winners↔At-risk intensity gap
+narrows from **2.7× to 2.0×** — about a quarter of it closes — and the ordering
+never changes. Largest offshoring ratios (CBA/PBA footprint): Malta 3.11,
+Luxembourg 1.91, Sweden 1.84, Belgium 1.69, Italy 1.61, France 1.56.
+
+### 3. The quotable number is a LEVEL, not an intensity
+
+In **production** terms Winners and At-risk countries emit about the same per
+capita (8.0 vs 8.4 t). In **consumption** terms it reverses: **11.8 vs 9.4 t**.
+The two facts are compatible precisely because one is an intensity (per unit of
+value added, where the denominator absorbs the offshoring) and one is a level.
+
+### The framing: burden vs. responsibility
+
+Two different concepts, each with its proper instrument:
+
+- **Vulnerability = adjustment burden** — what a country must physically retool
+  (plants, workers, energy system). Properly **production**-based, per unit of
+  value added. Germany's transition task does not include decarbonising Polish
+  steel. This stays the headline axis.
+- **Consumption footprint = responsibility** — whose final demand the emissions
+  serve. Properly **consumption**-based, per capita. An interpretive layer.
+
+The **finding is the asymmetry**: the core has low burden *and* high
+responsibility; the Workbench East has high burden *and* low responsibility. That
+sharpens polarization rather than undercutting it — the East bears the adjustment
+cost of consumption occurring in the West.
+
+Net embodied imports p.c. is deliberately **not** promoted to an axis variable:
+it correlates **+0.71** with log GDP p.c., so it would reimport exactly the income
+confound the per-value-added intensities remove (same argument that kept fossil
+consumption p.c. out).
+
+### The claim that CANNOT be made yet
+
+The **mechanism** version — *the core offshores to the European periphery, and
+that is how polarization is produced* — is **not verifiable with the data in the
+repo**. `data/tidy/TXNY_GWP_Trade.csv` carries only country **totals** of embodied
+imports/exports; there is no origin dimension. If Germany's embodied imports come
+mainly from China rather than Poland, this is a Europe-vs-rest-of-world story, not
+an intra-European one. Until bilateral flows exist, phrase it as an asymmetry
+between two accountings, **not** as a transfer between two groups.
+
+**Implementation (done):**
+- [x] `R/functions/indicators.R`: added `CarbonIntensityCBA_normed` and
+  `GWP_cba_normed`; rebuilt `taxonomy_indicators.csv` (pre-existing values
+  bit-identical, two columns added).
+- [x] `07_robustness.R`: spec "carbon: consumption-based (CBA)" → 0.98 / 2-of-27.
+- [x] `R/appendix_burden_responsibility.R` → `data/tidy/burden_responsibility.csv`,
+  `plots/burden_responsibility.{png,pdf}` (paired production→consumption footprint
+  per capita, faceted by quadrant). Also delivers the Malta/Luxembourg vignette
+  numbers owed under item 2.
+
+**Open follow-ups:**
+- [ ] **Scope bilateral EXIOBASE flows.** The external Python script that produced
+  `TXNY_GWP_Trade.csv` would need to emit origin×destination embodied GWP. This
+  single addition converts a descriptive asymmetry into an actual mechanism and is
+  the highest-value remaining data task.
+- [ ] Write the burden-vs-responsibility paragraph into the paper, with the
+  invariance (0.98 / 2-of-27) stated *first* so the layer reads as a finding
+  rather than as a defensive concession.
 
 ## 4. Alternative emissions data source (Eurostat instead of EXIOBASE)
 

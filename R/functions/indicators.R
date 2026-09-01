@@ -37,6 +37,17 @@ build_indicator_table <- function(base_data, extra_data,
       # isation), near-orthogonal to EnergyIntensity and far less income-loaded;
       # used in the decomposed-vulnerability robustness spec (see info/PaperTodos.md).
       CarbonPerEnergy_normed   = GWP_pba / FinalEnergyConsumption,         # GHG per unit final energy
+      # Consumption-based (footprint) counterparts of the two carbon variables.
+      # GWP_cba = production + net embodied imports, i.e. the emissions serving
+      # domestic final demand. The headline vulnerability axis stays PRODUCTION-
+      # based on purpose: it measures the domestic ADJUSTMENT BURDEN (the plants,
+      # workers and energy system a country must itself retool), not consumption
+      # RESPONSIBILITY. The CBA pair supports (a) the accounting-choice robustness
+      # spec in 07 and (b) the burden-vs-responsibility layer in
+      # R/appendix_burden_responsibility.R. See info/PaperTodos.md item 4.
+      GWP_cba                  = GWP_pba + GWP_Imports - GWP_Exports,      # (intermediate)
+      CarbonIntensityCBA_normed = GWP_cba / ValueAdded_pba,                # footprint GHG per unit value added
+      GWP_cba_normed           = GWP_cba / population,                     # footprint GHG p.c.
       # Fossil share of PRODUCTION kept only as a context/robustness variable:
       # it measures fossil *extraction*, not *dependence*, so it is 0 for every
       # non-producer (Malta, Luxembourg, the Baltics - and even oil-shale Estonia

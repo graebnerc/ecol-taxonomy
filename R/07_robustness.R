@@ -3,8 +3,9 @@
 # 1. Complexity: per-year GCI/ECI vs the pooled 2014-2018 cross-section.
 # 2. Typology scores: alternative specifications vs the STRUCTURED headline
 #    (flat single-PCA blocks, mean vs PCA, robust scaling, twin:standalone weight,
-#    ECI vs GCI, renewable-only GCI, production-based fossil) -> rank correlation
-#    with the baseline and number of countries changing quadrant.
+#    ECI vs GCI, renewable-only GCI, production-based fossil, consumption-based
+#    carbon accounting) -> rank correlation with the baseline and number of
+#    countries changing quadrant.
 # 3. Clustering: silhouette + gap statistic for the number of clusters.
 # 4. Outlier sensitivity: drop Luxembourg / Malta and re-map.
 # 5. Indicator-window shift: rebuild the FULL typology (complexity re-pooled +
@@ -102,7 +103,14 @@ specs <- list(
   "complexity: renewable-only GCI"     = score_spec(ind, complexity = c("GCI_ren", "GCP")),
   # Fossil standalone: old production-based share (0 for every non-producer) vs
   # the headline demand-based share (info/PaperTodos.md - Fossil-share measure).
-  "fossil: production-based share"     = score_spec(ind, fossil = "ShareFossilsProd_normed")
+  "fossil: production-based share"     = score_spec(ind, fossil = "ShareFossilsProd_normed"),
+  # Emissions ACCOUNTING: swap the production-based carbon intensity for its
+  # consumption-based (footprint) counterpart. Tests the offshoring objection --
+  # that the low-vulnerability countries look clean only because they import
+  # embodied emissions. See info/PaperTodos.md item 4 and
+  # R/appendix_burden_responsibility.R.
+  "carbon: consumption-based (CBA)"    = score_spec(
+    ind, intensity = c("CarbonIntensityCBA_normed", "EnergyIntensity_normed"))
 )
 rob <- lapply(names(specs), function(nm) {
   s <- specs[[nm]]; q <- assign_quadrant(s$vuln, s$pot, "short")

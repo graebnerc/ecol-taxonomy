@@ -6,5 +6,6 @@ part weights 2:1 (twin:standalone),0.93,0.97,4
 complexity: ECI replaces GCI,1,0.94,0
 complexity: renewable-only GCI,1,0.97,2
 fossil: production-based share,0.72,1,8
+carbon: consumption-based (CBA),0.98,1,2
 window shift 2013-2017,1,1,0
 window shift 2015-2019,1,0.99,0
