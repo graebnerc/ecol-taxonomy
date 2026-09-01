@@ -32,7 +32,17 @@ build_indicator_table <- function(base_data, extra_data,
       # --- Vulnerability block (intensity/mix; income-independent) ---------
       CarbonIntensity_normed   = GWP_pba / ValueAdded_pba,                 # GHG per unit value added
       EnergyIntensity_normed   = FinalEnergyConsumption / ValueAdded_pba,  # energy per unit value added
-      ShareFossils_normed      = ShareFossils_PrimEnProd,                  # fossil share of primary production
+      # Decomposition of CarbonIntensity: GHG/VA = (GHG/energy) x (energy/VA).
+      # CarbonPerEnergy is the carbon content of energy (fuel mix / decarbon-
+      # isation), near-orthogonal to EnergyIntensity and far less income-loaded;
+      # used in the decomposed-vulnerability robustness spec (see info/PaperTodos.md).
+      CarbonPerEnergy_normed   = GWP_pba / FinalEnergyConsumption,         # GHG per unit final energy
+      # Fossil share of PRODUCTION kept only as a context/robustness variable:
+      # it measures fossil *extraction*, not *dependence*, so it is 0 for every
+      # non-producer (Malta, Luxembourg, the Baltics - and even oil-shale Estonia
+      # is mis-coded 0). The headline ShareFossils_normed below uses the demand-
+      # side gross-available-energy share instead (see info/PaperTodos.md item 3).
+      ShareFossilsProd_normed  = ShareFossils_PrimEnProd,                  # fossil share of primary production (context only)
       # --- Other energy/emissions indicators (context, robustness) --------
       GWP_trade_normed         = (GWP_Imports - GWP_Exports) / population, # net embodied-GWP imports p.c.
       GWP_normed               = GWP_pba / population,                     # production-based GHG p.c.
@@ -48,6 +58,17 @@ build_indicator_table <- function(base_data, extra_data,
 
   if (has_gdp) {
     dat <- dplyr::mutate(dat, GDP_normed = GDP_ppp / population)          # GDP (PPP) p.c.
+  }
+
+  # Headline fossil-share vulnerability: demand-side (fossil share of gross
+  # available energy, Eurostat, in %). Measures how fossil-based the energy a
+  # country actually *consumes* is - the transition-relevant carbon lock-in -
+  # and has full EU-27 coverage. Falls back to the production-based share if the
+  # extra panel is absent (extra_data = NULL).
+  if ("ShareFossils_GrossAvEn" %in% names(dat)) {
+    dat <- dplyr::mutate(dat, ShareFossils_normed = ShareFossils_GrossAvEn / 100)
+  } else {
+    dat <- dplyr::mutate(dat, ShareFossils_normed = ShareFossilsProd_normed)
   }
 
   dat |>

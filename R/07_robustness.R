@@ -1,9 +1,10 @@
 # 07 - Robustness & sensitivity (Phase 6, section A: self-contained checks).
 #
 # 1. Complexity: per-year GCI/ECI vs the pooled 2014-2018 cross-section.
-# 2. Typology scores: alternative specifications (PCA vs mean, robust scaling,
-#    GCI vs ECI, dropping vulnerability variables, renewable-only GCI) -> rank
-#    correlation with the baseline and number of countries changing quadrant.
+# 2. Typology scores: alternative specifications vs the STRUCTURED headline
+#    (flat single-PCA blocks, mean vs PCA, robust scaling, twin:standalone weight,
+#    ECI vs GCI, renewable-only GCI, production-based fossil) -> rank correlation
+#    with the baseline and number of countries changing quadrant.
 # 3. Clustering: silhouette + gap statistic for the number of clusters.
 # 4. Outlier sensitivity: drop Luxembourg / Malta and re-map.
 # 5. Indicator-window shift: rebuild the FULL typology (complexity re-pooled +
@@ -66,21 +67,42 @@ gci_ren <- green_indicators(rca0$M, ci0$PCI, renew_codes)[, c("iso3", "GCI")]
 names(gci_ren)[2] <- "GCI_ren"
 ind <- left_join(ind, gci_ren, by = "iso3")
 
-score_spec <- function(df, vuln_vars, pot_vars, method = "pca", scale = "z") {
-  v <- block_score(df, vuln_vars, "ShareFossils_normed", method, scale)$score
-  p <- block_score(df, pot_vars, if ("GCI" %in% pot_vars) "GCI" else "GCI_ren", method, scale)$score
+# Structured scoring - matches the 04 headline: each block = a twin sub-index
+# (PC1 of two correlated indicators) + a standalone, combined at weight
+# w_twin:(1-w_twin). agg = "flat" instead collapses each block to a single PCA
+# over all three variables (the alternative aggregation, reported as robustness).
+score_spec <- function(df,
+                       intensity = INTENSITY_VARS, fossil = FOSSIL_VAR,
+                       complexity = COMPLEXITY_VARS, innov = INNOV_VAR,
+                       method = "pca", scale = "z", agg = "structured", w_twin = 0.5) {
+  cplx_anchor <- if ("GCI" %in% complexity) "GCI" else complexity[1]
+  if (agg == "flat") {
+    v <- block_score(df, c(intensity, fossil), intensity[1],  method, scale)$score
+    p <- block_score(df, c(innov, complexity), cplx_anchor,   method, scale)$score
+  } else {
+    v <- axis_score(df, intensity,  intensity[1], fossil, method, scale, w_twin)$score
+    p <- axis_score(df, complexity, cplx_anchor,  innov,  method, scale, w_twin)$score
+  }
   data.frame(vuln = v, pot = p)
 }
-base <- score_spec(ind, VULN_VARS, POT_VARS)
+base <- score_spec(ind)
 base_q <- assign_quadrant(base$vuln, base$pot, "short")
 
 specs <- list(
-  "simple mean (not PCA)"      = score_spec(ind, VULN_VARS, POT_VARS, method = "mean"),
-  "robust (median/MAD) scaling" = score_spec(ind, VULN_VARS, POT_VARS, scale = "robust"),
-  "potential: ECI replaces GCI" = score_spec(ind, VULN_VARS, c("GreenPatents_normed", "ECI", "GCP")),
-  "potential: renewable-only GCI" = score_spec(ind, VULN_VARS, c("GreenPatents_normed", "GCI_ren", "GCP")),
-  "vuln: drop fossil share"    = score_spec(ind, c("CarbonIntensity_normed", "EnergyIntensity_normed"), POT_VARS),
-  "vuln: drop carbon intensity" = score_spec(ind, c("EnergyIntensity_normed", "ShareFossils_normed"), POT_VARS)
+  # Aggregation: single PCA per block (the correlated twins dominate) vs the
+  # structured twin-sub-index + standalone. The key structural robustness check.
+  "flat blocks (single PCA)"           = score_spec(ind, agg = "flat"),
+  # Twin sub-index built as a simple standardised mean rather than PC1.
+  "twin sub-index: mean not PCA"       = score_spec(ind, method = "mean"),
+  "robust (median/MAD) scaling"        = score_spec(ind, scale = "robust"),
+  # Part weighting: give the two-indicator twin sub-index twice the standalone.
+  "part weights 2:1 (twin:standalone)" = score_spec(ind, w_twin = 2 / 3),
+  # Complexity twins: general ECI, or renewable-only GCI, instead of green GCI.
+  "complexity: ECI replaces GCI"       = score_spec(ind, complexity = c("ECI", "GCP")),
+  "complexity: renewable-only GCI"     = score_spec(ind, complexity = c("GCI_ren", "GCP")),
+  # Fossil standalone: old production-based share (0 for every non-producer) vs
+  # the headline demand-based share (info/PaperTodos.md - Fossil-share measure).
+  "fossil: production-based share"     = score_spec(ind, fossil = "ShareFossilsProd_normed")
 )
 rob <- lapply(names(specs), function(nm) {
   s <- specs[[nm]]; q <- assign_quadrant(s$vuln, s$pot, "short")
@@ -92,6 +114,20 @@ rob <- lapply(names(specs), function(nm) {
 print(rob, row.names = FALSE)
 cat("(cor = Spearman rank corr vs baseline; quad_changes out of 27 countries)\n")
 # robustness_specs.csv is written at the end, after the window-shift rows (section 5).
+
+# --- Income relevance of the axes (feedback item 1) ---------------------------
+# Income is expected to matter, but should not dominate or be confined to one
+# block. Report R^2 on log GDP p.c. for both axes under the structured headline
+# and, for contrast, under the flat single-PCA aggregation. See info/PaperTodos.md.
+cat("\n----- Income relevance of the axes (R^2 ~ log GDP p.c.) -----\n")
+loggdp <- log(ind$GDP_normed)
+r2f <- function(v) summary(lm(v ~ loggdp))$r.squared
+flat_s <- score_spec(ind, agg = "flat")
+cat(sprintf("  structured  vulnerability R^2 = %.2f | potential R^2 = %.2f\n",
+            r2f(base$vuln), r2f(base$pot)))
+cat(sprintf("  flat blocks vulnerability R^2 = %.2f | potential R^2 = %.2f\n",
+            r2f(flat_s$vuln), r2f(flat_s$pot)))
+cat("  (structured: income present but balanced across both blocks.)\n")
 
 # --- Median-tie convention sensitivity (finding A1) ---------------------------
 # assign_quadrant() uses `>=` (ties go to the high side). With n = 27 one country
@@ -121,7 +157,7 @@ for (thr in c(2.5e9, 1e10)) {
   gi  <- compute_complexity(pooled_exp, min_export = thr)
   m   <- match(ind$iso3, gi$iso3)
   ind_t <- ind; ind_t$GCI <- gi$GCI[m]; ind_t$GCP <- gi$GCP[m]
-  s   <- score_spec(ind_t, VULN_VARS, POT_VARS)
+  s   <- score_spec(ind_t)
   q   <- assign_quadrant(s$vuln, s$pot, "short")
   cat(sprintf("  threshold %.1e: cor_pot %.2f (Spearman vs baseline), %d/27 quadrant changes\n",
               thr, cor(base$pot, s$pot, method = "spearman"), sum(q != base_q)))
@@ -147,7 +183,7 @@ cat(sprintf("Gap statistic (Tibshirani SE rule) suggests k = %d\n", kgap))
 cat("\n===== 4. Outlier sensitivity (re-map without a country) =====\n")
 for (drop in c("Luxembourg", "Malta")) {
   sub <- ind[ind$country != drop, ]
-  s <- score_spec(sub, VULN_VARS, POT_VARS)
+  s <- score_spec(sub)
   q <- assign_quadrant(s$vuln, s$pot, "short")
   base_sub <- base_q[ind$country != drop]
   cat(sprintf("Drop %-11s -> %d/%d remaining countries change quadrant\n",
@@ -174,7 +210,7 @@ shift_spec <- function(w1, w2) {
   ind_w$GCI <- gi$GCI[m]; ind_w$GCP <- gi$GCP[m]
   stopifnot("EU country lost from complexity in shifted window" = !anyNA(ind_w$GCI))
   ind_w <- ind_w[match(ind$country, ind_w$country), ]   # align to baseline order
-  score_spec(ind_w, VULN_VARS, POT_VARS)
+  score_spec(ind_w)
 }
 win_rows <- lapply(list(c(REF_FIRST_YEAR - 1, REF_LAST_YEAR - 1),
                         c(REF_FIRST_YEAR + 1, REF_LAST_YEAR + 1)), function(w) {

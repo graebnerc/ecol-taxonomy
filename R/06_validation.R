@@ -5,6 +5,14 @@
 #     used to build the scores: the overall renewable share (Eurostat SHARES REN,
 #     column renew_share_overall) and real GDP growth over the window (both
 #     offline, from new_data.csv; built by R/get_data_extra.R).
+#     CIRCULARITY NOTE: the headline vulnerability (04, four-dimension structure)
+#     gives fossil dependency ~half the weight, and the demand-side fossil share is
+#     ~ 1 - renewable share (r = -0.72 at variable level). So renew_share is now
+#     PARTLY CIRCULAR for vulnerability (cor(vulnerability, renew_share) = -0.46):
+#     read it as descriptive, not as external validation. It stays a LEGITIMATE
+#     validator for POTENTIAL (complexity + patents contain no fossil term;
+#     cor = +0.25). For vulnerability, lean on gdp_growth and EPS, or a renewable-
+#     DEPLOYMENT trajectory (see info/PaperTodos.md - symmetric structure / item 1).
 # (B) Comparison with the Graebner et al. (2020) growth-model groups (JEE) and
 #     the geographic grouping: group-mean scores, contingency of quadrants, an
 #     alluvial map, and Cramer's V. Also cross-tabs against the data-driven

@@ -1,9 +1,10 @@
 spec,cor_vuln,cor_pot,quad_changes
-simple mean (not PCA),0.99,0.95,2
-robust (median/MAD) scaling,0.95,0.51,8
-potential: ECI replaces GCI,1,0.77,4
-potential: renewable-only GCI,1,0.96,2
-vuln: drop fossil share,0.92,1,2
-vuln: drop carbon intensity,0.9,1,2
-window shift 2013-2017,1,0.99,0
-window shift 2015-2019,1,1,0
+flat blocks (single PCA),0.77,0.91,8
+twin sub-index: mean not PCA,1,1,0
+robust (median/MAD) scaling,0.98,1,2
+part weights 2:1 (twin:standalone),0.93,0.97,4
+complexity: ECI replaces GCI,1,0.94,0
+complexity: renewable-only GCI,1,0.97,2
+fossil: production-based share,0.72,1,8
+window shift 2013-2017,1,1,0
+window shift 2015-2019,1,0.99,0

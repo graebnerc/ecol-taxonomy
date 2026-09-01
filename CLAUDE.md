@@ -2,6 +2,12 @@
 
 Guidance for working in this repository.
 
+> **When working on the paper:** `info/PaperTodos.md` tracks open items from
+> reviewer/presentation feedback that must be folded into the manuscript. Read it
+> before drafting or revising paper text, act on the relevant open items, and keep
+> it in sync — check off items as they are handled and append new implications as
+> they surface.
+
 ## What this project is
 
 Empirical work for **Work Package 1** of the OPUS project *"The green transition and
@@ -46,8 +52,11 @@ Numbered pipeline (run in order from the project root; see README):
   indicator on log GDP p.c.), ranked bar charts. Writes figures + `indicator_*.csv`.
 - `R/04_typology.R` — Phase 3/4 headline: PCA per block → vulnerability & potential PC1
   scores, the go/no-go independence check, and the 2-D quadrant map (`plots/typology_map.*`,
-  `data/tidy/taxonomy_scores.csv`). Blocks: vulnerability = carbon/energy intensity (per
-  value added) + fossil share; potential = green patents + GCI + GCP.
+  `data/tidy/taxonomy_scores.csv`). **Four-dimension structure** (`axis_score`): each block
+  is a two-indicator *twin sub-index* + a *standalone*, combined at equal weight —
+  vulnerability = emission intensity (carbon + energy, per value added) + fossil dependency
+  (demand-side); potential = green complexity (GCI + GCP) + green innovation (patents).
+  Rationale/derivation in `info/PaperTodos.md`.
 - `R/05_clustering.R` — clustering robustness layer (Ward on the six block variables,
   dendrogram, alluvial vs. growth-model groups, membership); helpers in
   `R/functions/clustering_helpers.R`.
@@ -56,12 +65,15 @@ Numbered pipeline (run in order from the project root; see README):
   growth-model / geographic groups (group means, quadrant contingency, Cramér's V,
   alluvial). Writes `validation_*.csv` and `plots/validation_*`.
 - `R/07_robustness.R` — Phase 6 (section A): per-year vs pooled complexity, score-spec
-  sensitivity (PCA vs mean, scaling, GCI vs ECI, renewable-only GCI, dropping vulnerability
-  vars), cluster-number diagnostics (silhouette/gap), outlier drops, and the full-typology
-  indicator-window shift (2013–2017 / 2015–2019). Writes `robustness_specs.csv`.
+  sensitivity **against the structured headline** (flat single-PCA blocks, twin mean vs PCA,
+  robust scaling, twin:standalone part weight, GCI vs ECI, renewable-only GCI, production-
+  based fossil), cluster-number diagnostics (silhouette/gap), outlier drops, and the full-
+  typology indicator-window shift (2013–2017 / 2015–2019). Writes `robustness_specs.csv`.
 - `R/functions/typology.R` — shared scoring helpers (`scale_mat`, `block_score`,
-  `assign_quadrant`) used by `04` and `07`. Block variable sets live in `R/config.R`
-  (`VULN_VARS`, `POT_VARS`).
+  `axis_score`, `assign_quadrant`) used by `04` and `07`. `axis_score` builds the two-part
+  (twin sub-index + standalone) axes; the four dimensions live in `R/config.R`
+  (`INTENSITY_VARS`, `FOSSIL_VAR`, `COMPLEXITY_VARS`, `INNOV_VAR`; `VULN_VARS`/`POT_VARS`
+  are kept as flat lists for the robustness specs).
 - `R/dependencies.R` — installs required packages; notes on pinning with renv (Phase 0).
 
 Supporting:

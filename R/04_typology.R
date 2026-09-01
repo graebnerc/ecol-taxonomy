@@ -21,21 +21,29 @@ ind <- as_tibble(fread(here("data/tidy/taxonomy_indicators.csv")))
 ind$group <- get_country_classification(
   countrycode::countrycode(ind$country, "country.name", "iso3c"), "jee")
 
-# Blocks are defined in config.R (VULN_VARS, POT_VARS) and map to Fig. 1.
-vuln <- block_score(ind, VULN_VARS, anchor = "ShareFossils_normed")
-pot  <- block_score(ind, POT_VARS,  anchor = "GCI")
+# Four-dimension structure (config.R, Fig. 1): each block = a two-indicator twin
+# sub-index + one standalone indicator, combined with equal weight.
+vuln <- axis_score(ind, INTENSITY_VARS,  "CarbonIntensity_normed", FOSSIL_VAR)
+pot  <- axis_score(ind, COMPLEXITY_VARS, "GCI",                    INNOV_VAR)
 
-cat("\n--- Vulnerability block: PC1 loadings (var explained = ",
-    sprintf("%.0f%%)", 100 * vuln$var_explained), "\n", sep = "")
-print(round(vuln$loadings, 3))
-cat("\n--- Potential block: PC1 loadings (var explained = ",
-    sprintf("%.0f%%)", 100 * pot$var_explained), "\n", sep = "")
-print(round(pot$loadings, 3))
+cat("\n--- Vulnerability = intensity sub-index (+ fossil dependency) ---\n")
+cat(sprintf("intensity twins PC1 loadings (var explained = %.0f%%):\n",
+            100 * vuln$twin_var_explained))
+print(round(vuln$twin_loadings, 3))
+cat(sprintf("axis = mean[z(intensity), z(fossil)] | cor(intensity, fossil) = %+.2f\n",
+            cor(vuln$twin, vuln$solo)))
+cat("\n--- Potential = complexity sub-index (+ green innovation) ---\n")
+cat(sprintf("complexity twins PC1 loadings (var explained = %.0f%%):\n",
+            100 * pot$twin_var_explained))
+print(round(pot$twin_loadings, 3))
+cat(sprintf("axis = mean[z(complexity), z(patents)] | cor(complexity, patents) = %+.2f\n",
+            cor(pot$twin, pot$solo)))
 
 scores <- ind |>
   transmute(country, group,
-            vulnerability = vuln$score,
-            potential     = pot$score)
+            vulnerability = vuln$score, potential = pot$score,
+            intensity  = vuln$twin, fossil     = vuln$solo,   # vulnerability parts
+            complexity = pot$twin,  innovation = pot$solo)    # potential parts
 
 # --- Phase 3 GO/NO-GO check ---------------------------------------------------
 loggdp <- log(ind$GDP_normed)
