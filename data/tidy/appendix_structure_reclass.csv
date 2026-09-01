@@ -1,0 +1,28 @@
+country,group,flat,structured,moved
+Finland,Core,Exposed,Winners,  <-- moved
+Ireland,Finance,Low-stakes,At risk,  <-- moved
+Luxembourg,Finance,Low-stakes,Winners,  <-- moved
+Malta,Finance,Low-stakes,At risk,  <-- moved
+Netherlands,Finance,Winners,Exposed,  <-- moved
+Portugal,Periphery,Winners,Low-stakes,  <-- moved
+Slovakia,Workbench,At risk,Low-stakes,  <-- moved
+Slovenia,Workbench,Exposed,Winners,  <-- moved
+Austria,Core,Winners,Winners,""
+Belgium,Core,Winners,Winners,""
+Denmark,Core,Winners,Winners,""
+Germany,Core,Winners,Winners,""
+Sweden,Core,Winners,Winners,""
+Cyprus,Periphery,At risk,At risk,""
+France,Periphery,Winners,Winners,""
+Greece,Periphery,At risk,At risk,""
+Italy,Periphery,Winners,Winners,""
+Spain,Periphery,Winners,Winners,""
+Bulgaria,Workbench,At risk,At risk,""
+Croatia,Workbench,At risk,At risk,""
+Czechia,Workbench,Exposed,Exposed,""
+Estonia,Workbench,At risk,At risk,""
+Hungary,Workbench,At risk,At risk,""
+Latvia,Workbench,At risk,At risk,""
+Lithuania,Workbench,At risk,At risk,""
+Poland,Workbench,Exposed,Exposed,""
+Romania,Workbench,At risk,At risk,""

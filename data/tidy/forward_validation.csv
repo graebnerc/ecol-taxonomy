@@ -1,0 +1,5 @@
+predictor,outcome,label,raw_cor,partial_cor_net_gdp
+potential,d_renew,potential -> renewable progress,-0.01,-0.12
+vulnerability,d_renew,vulnerability -> renewable progress,-0.39,-0.22
+potential,gdp_growth,potential -> GDP growth,-0.7,-0.7
+vulnerability,gdp_growth,vulnerability -> GDP growth,0.04,-0.03

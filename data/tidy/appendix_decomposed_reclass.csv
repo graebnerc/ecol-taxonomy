@@ -1,0 +1,28 @@
+country,group,headline,decomposed,moved
+Denmark,Core,Winners,Exposed,  <-- moved
+Finland,Core,Exposed,Winners,  <-- moved
+Germany,Core,Winners,Exposed,  <-- moved
+Ireland,Finance,Low-stakes,At risk,  <-- moved
+Luxembourg,Finance,Low-stakes,At risk,  <-- moved
+Malta,Finance,Low-stakes,At risk,  <-- moved
+Netherlands,Finance,Winners,Exposed,  <-- moved
+Italy,Periphery,Winners,Exposed,  <-- moved
+Portugal,Periphery,Winners,Exposed,  <-- moved
+Spain,Periphery,Winners,Exposed,  <-- moved
+Bulgaria,Workbench,At risk,Low-stakes,  <-- moved
+Croatia,Workbench,At risk,Low-stakes,  <-- moved
+Hungary,Workbench,At risk,Low-stakes,  <-- moved
+Latvia,Workbench,At risk,Low-stakes,  <-- moved
+Lithuania,Workbench,At risk,Low-stakes,  <-- moved
+Romania,Workbench,At risk,Low-stakes,  <-- moved
+Slovakia,Workbench,At risk,Low-stakes,  <-- moved
+Slovenia,Workbench,Exposed,Winners,  <-- moved
+Austria,Core,Winners,Winners,""
+Belgium,Core,Winners,Winners,""
+Sweden,Core,Winners,Winners,""
+Cyprus,Periphery,At risk,At risk,""
+France,Periphery,Winners,Winners,""
+Greece,Periphery,At risk,At risk,""
+Czechia,Workbench,Exposed,Exposed,""
+Estonia,Workbench,At risk,At risk,""
+Poland,Workbench,Exposed,Exposed,""
