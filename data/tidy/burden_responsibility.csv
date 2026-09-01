@@ -1,28 +1,28 @@
 country,group,quadrant,burden_pc,resp_pc,net_imp_pc,offshoring,int_pba,int_cba
-Luxembourg,Finance,Winners,14.59,27.91,13.32,1.91,156,298
-Sweden,Core,Winners,4.77,8.77,3.99,1.84,103,189
-Belgium,Core,Winners,7.75,13.1,5.35,1.69,204,345
-Italy,Periphery,Winners,5.25,8.46,3.21,1.61,188,303
-France,Periphery,Winners,5.04,7.86,2.82,1.56,150,234
-Austria,Core,Winners,6.8,10.33,3.53,1.52,166,252
-Slovenia,Workbench,Winners,6.53,8.87,2.34,1.36,330,448
-Finland,Core,Winners,10.85,13.19,2.34,1.22,273,332
-Germany,Core,Winners,9.55,11.54,1.98,1.21,250,302
-Denmark,Core,Winners,10.8,12.96,2.16,1.2,219,262
-Spain,Periphery,Winners,5.74,6.84,1.09,1.19,240,285
-Netherlands,Finance,Exposed,10.5,12.71,2.21,1.21,251,303
-Czechia,Workbench,Exposed,10.29,10.43,0.14,1.01,604,613
-Poland,Workbench,Exposed,9.66,9.14,-0.52,0.95,824,780
-Slovakia,Workbench,Low-stakes,6.33,9.41,3.08,1.49,419,624
-Portugal,Periphery,Low-stakes,5.07,6.33,1.27,1.25,278,349
-Malta,Finance,At risk,4.36,13.54,9.19,3.11,199,599
-Lithuania,Workbench,At risk,6,7.56,1.56,1.26,430,545
-Hungary,Workbench,At risk,4.66,5.69,1.02,1.22,384,469
-Latvia,Workbench,At risk,6.24,7.46,1.22,1.19,475,568
-Romania,Workbench,At risk,4.09,4.53,0.44,1.11,466,515
-Croatia,Workbench,At risk,4.79,5.18,0.39,1.08,417,451
-Ireland,Finance,At risk,14.82,15.49,0.67,1.05,266,279
-Greece,Periphery,At risk,14.73,14.26,-0.46,0.97,899,871
-Estonia,Workbench,At risk,15.54,14.6,-0.94,0.94,917,862
-Cyprus,Periphery,At risk,10.68,8.95,-1.73,0.84,695,585
-Bulgaria,Workbench,At risk,6.89,5.68,-1.21,0.82,1009,836
+Sweden,Core,Winners,5.36,9.64,4.28,1.8,121,217
+Luxembourg,Finance,Winners,14.8,24.64,9.84,1.66,161,268
+Belgium,Core,Winners,10.01,15.49,5.49,1.55,274,424
+Italy,Periphery,Winners,6.69,9.64,2.95,1.44,246,355
+Austria,Core,Winners,8.69,12.31,3.63,1.42,221,313
+France,Periphery,Winners,6.75,9.19,2.44,1.36,207,282
+Finland,Core,Winners,11.28,13.8,2.52,1.22,303,370
+Slovenia,Workbench,Winners,8.11,9.91,1.79,1.22,446,545
+Spain,Periphery,Winners,7.18,8.39,1.21,1.17,307,359
+Germany,Core,Winners,11.33,13.16,1.83,1.16,305,354
+Denmark,Core,Winners,14.36,12.9,-1.45,0.9,301,271
+Netherlands,Finance,Exposed,12.18,15.63,3.45,1.28,301,386
+Czechia,Workbench,Exposed,11.58,11.49,-0.09,0.99,721,710
+Poland,Workbench,Exposed,10.02,9.27,-0.75,0.93,895,828
+Slovakia,Workbench,Low-stakes,7.01,9.46,2.45,1.35,500,676
+Portugal,Periphery,Low-stakes,6.38,7.09,0.71,1.11,371,413
+Malta,Finance,At risk,6.3,12.07,5.77,1.92,285,536
+Latvia,Workbench,At risk,7.04,9.87,2.83,1.4,579,813
+Croatia,Workbench,At risk,5.62,7.75,2.13,1.38,518,709
+Hungary,Workbench,At risk,6.39,7.55,1.16,1.18,589,698
+Lithuania,Workbench,At risk,8.57,9.49,0.93,1.11,639,706
+Cyprus,Periphery,At risk,10.64,11.59,0.95,1.09,759,826
+Ireland,Finance,At risk,15.88,17.33,1.45,1.09,314,342
+Romania,Workbench,At risk,5.16,5.12,-0.04,0.99,630,622
+Greece,Periphery,At risk,14.7,13.35,-1.35,0.91,959,870
+Estonia,Workbench,At risk,13.39,11.71,-1.68,0.87,869,762
+Bulgaria,Workbench,At risk,7.72,5.83,-1.89,0.76,1236,939

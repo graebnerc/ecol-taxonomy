@@ -42,11 +42,15 @@
 #   N2O are INCLUDED. Set VARIANTS = TRUE to print alternative baskets and their
 #   world totals.
 #
-# NOWCAST YEARS. 2023 and 2024 are EXIOBASE nowcasts: the core tables, air
-# emissions and factor inputs are there, but the employment, energy and water
-# extensions are NOT. Employment_pba is therefore NA for those years (nothing in
-# the 01-07 pipeline uses it). Treat 2023-2024 as provisional when choosing a
-# reference window - they are extrapolated, not observed.
+# NOWCAST YEARS -- 2023 AND 2024 ARE NOT USABLE FOR EMISSIONS.
+#   Their archives lack the employment, energy and water extensions (so
+#   Employment_pba is NA, which is harmless -- nothing in 01-07 uses it), but the
+#   real problem is the air emissions: "CO2 - combustion - air", ~28.8 of ~45 Gt,
+#   is identically ZERO in both years while every other stressor looks normal.
+#   World PBA therefore reads ~12 Gt instead of ~46 Gt. Nothing errors -- the
+#   arithmetic is valid, the input is not. Such years are flagged
+#   emissions_complete = FALSE and dropped by R/update_panel_exiobase.R.
+#   The most recent OBSERVED, complete year is therefore 2022.
 #
 # Writes data/tidy/exiobase_totals.csv and data/tidy/exiobase_bilateral.csv, plus
 # one file per year under data/raw/exiobase/derived/ (gitignored).
@@ -204,6 +208,19 @@ extract_year <- function(year) {
   if (!is.null(na_cols))
     stopifnot("an NA emission cell sits on a sector with non-zero output" =
                 all(x[na_cols] == 0))
+  # COMPLETENESS GUARD. In the 2023 and 2024 nowcast archives the single largest
+  # stressor -- "CO2 - combustion - air", ~28.8 of ~45 Gt -- is identically zero
+  # while every other stressor looks normal, so world PBA silently collapses to
+  # ~12 Gt. Nothing errors: the arithmetic is valid, the data is not. Detect it
+  # here and mark the year, rather than relying on someone eyeballing a total.
+  ghg_rows <- Fl$m[match(names(GWP_FACTORS), stressors), , drop = FALSE]
+  zero_stressors <- names(GWP_FACTORS)[rowSums(abs(ghg_rows)) == 0]
+  emissions_complete <- !("CO2 - combustion - air" %in% zero_stressors)
+  if (length(zero_stressors))
+    cat(sprintf("    %d GHG stressor(s) entirely zero: %s\n", length(zero_stressors),
+                paste(zero_stressors, collapse = "; ")))
+  rm(ghg_rows)
+
   f <- characterise(Fl$m, stressors, GWP_FACTORS); rm(Fl); gc(FALSE)
   s <- f / xs
   s[x <= 0] <- 0
@@ -255,7 +272,8 @@ extract_year <- function(year) {
     GWP_Imports = cba - diag(E),
     GWP_Exports = pba - diag(E),
     ValueAdded_pba = as.numeric(va[regions, ]),
-    Employment_pba = emp)
+    Employment_pba = emp,
+    emissions_complete = emissions_complete)
 
   # Identity checks -- these must hold by construction; fail loudly if not.
   stopifnot(
@@ -269,9 +287,10 @@ extract_year <- function(year) {
   setnames(bil, c("origin", "destination", "GWP"))
   bil[, year := year]
 
-  cat(sprintf("  %d: world PBA %.2f Gt | trade %.2f Gt | VA %.1f tn EUR | solve %ds\n",
+  cat(sprintf("  %d: world PBA %.2f Gt | trade %.2f Gt | VA %.1f tn EUR | solve %ds%s\n",
               year, sum(pba) / 1e12, sum(totals$GWP_Exports) / 1e12,
-              sum(totals$ValueAdded_pba) / 1e6, t_solve))
+              sum(totals$ValueAdded_pba) / 1e6, t_solve,
+              if (!emissions_complete) "   *** EMISSIONS INCOMPLETE ***" else ""))
   list(totals = totals, bilateral = bil[, .(year, origin, destination, GWP)])
 }
 
@@ -306,10 +325,31 @@ if (length(todo)) {
 have <- YEARS[vapply(YEARS, function(y) {
   f <- year_files(y); file.exists(f$tot) && file.exists(f$bil) }, logical(1))]
 stopifnot("no years extracted" = length(have) > 0)
-tot <- rbindlist(lapply(have, function(y) fread(year_files(y)$tot)))
-bil <- rbindlist(lapply(have, function(y) fread(year_files(y)$bil)))
+# fill = TRUE: per-year files written before the completeness flag existed do
+# not carry the column.
+tot <- rbindlist(lapply(have, function(y) fread(year_files(y)$tot)), fill = TRUE)
+bil <- rbindlist(lapply(have, function(y) fread(year_files(y)$bil)), fill = TRUE)
+
+# Second, independent completeness check, derived from the assembled totals
+# rather than from the stressor rows: a year whose world PBA is far below the
+# median across years is not credible whatever the per-year flag says. This
+# catches partial-emission archives even if the dominant stressor is present.
+if (!("emissions_complete" %in% names(tot))) tot[, emissions_complete := NA]
+wp <- tot[, .(world = sum(GWP_pba)), by = year]
+wp[, implausible := world < 0.5 * median(world)]
+tot <- merge(tot, wp[, .(year, implausible)], by = "year")
+tot[, emissions_complete := !implausible & (is.na(emissions_complete) | emissions_complete)]
+tot[, implausible := NULL]
 setorder(tot, year, region); setorder(bil, year, origin, destination)
 fwrite(tot, OUT_TOT); fwrite(bil, OUT_BIL)
+bad <- sort(unique(tot[emissions_complete == FALSE]$year))
+if (length(bad))
+  warning(sprintf(paste0(
+    "Emissions are INCOMPLETE for %s: the dominant stressor 'CO2 - combustion - air'\n",
+    "  is identically zero in those archives, so their GHG totals are ~26%% of the\n",
+    "  true value. They are kept in the file but flagged emissions_complete = FALSE;\n",
+    "  R/update_panel_exiobase.R drops them. Do NOT use them in a reference window."),
+    paste(bad, collapse = ", ")), call. = FALSE)
 missing <- setdiff(YEARS, have)
 message(sprintf("Wrote exiobase_totals.csv (%d rows) and exiobase_bilateral.csv (%d rows); years %s%s.",
                 nrow(tot), nrow(bil), paste(range(have), collapse = "-"),

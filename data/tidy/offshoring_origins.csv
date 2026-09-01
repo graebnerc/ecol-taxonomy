@@ -1,0 +1,29 @@
+destination_group,origin_group,GWP_Gt_per_year
+Core,Core,0.0619
+Workbench,Core,0.0328
+Periphery,Core,0.0689
+Finance,Core,0.023
+Core,Other non-EU,0.2692
+Workbench,Other non-EU,0.1128
+Periphery,Other non-EU,0.2591
+Finance,Other non-EU,0.086
+Core,Workbench,0.0727
+Periphery,Workbench,0.0416
+Workbench,Workbench,0.0499
+Finance,Workbench,0.009
+Core,China,0.1222
+Workbench,China,0.0353
+Periphery,China,0.101
+Finance,China,0.0387
+Core,Periphery,0.0555
+Workbench,Periphery,0.0153
+Periphery,Periphery,0.0641
+Finance,Periphery,0.0112
+Core,Finance,0.0359
+Workbench,Finance,0.0055
+Periphery,Finance,0.0226
+Finance,Finance,0.0038
+Core,Rest of world (aggregates),0.1702
+Workbench,Rest of world (aggregates),0.0705
+Periphery,Rest of world (aggregates),0.2382
+Finance,Rest of world (aggregates),0.0637

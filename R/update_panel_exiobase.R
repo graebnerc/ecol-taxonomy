@@ -49,6 +49,22 @@ if (!file.exists(BACKUP)) file.copy(PANEL, BACKUP)
 
 eu_iso3 <- countrycode(base_countries, "country.name", "iso3c")
 new <- fread(TOTALS)
+
+# Drop years whose emissions are incomplete (see R/get_data_exiobase.R: in the
+# 2023/2024 nowcast archives the dominant stressor is identically zero, so their
+# GHG totals read ~26% of the true value while nothing errors).
+if ("emissions_complete" %in% names(new)) {
+  drop_yrs <- sort(unique(new[emissions_complete == FALSE]$year))
+  if (length(drop_yrs)) {
+    cat(sprintf("Dropping %d year(s) with incomplete emissions: %s\n",
+                length(drop_yrs), paste(drop_yrs, collapse = ", ")))
+    new <- new[emissions_complete == TRUE]
+  }
+  new[, emissions_complete := NULL]
+} else {
+  warning("exiobase_totals.csv has no emissions_complete flag - re-run ",
+          "R/get_data_exiobase.R with FORCE = TRUE.", call. = FALSE)
+}
 new[, country := countrycode(region, "iso2c", "iso3c", warn = FALSE)]
 new <- new[country %in% eu_iso3,
            c("country", "year", EXIO_COLS), with = FALSE]

@@ -1,5 +1,5 @@
 quadrant,n,carbon_int,energy_int,fossil_share,gci,gcp,patents_pc,gdp_pc,net_emb_imports,vulnerability,potential,intensity,fossil,complexity,innovation,growth_models
-Winners,11,207.04,0.87,66.07,2,1.84,26.05,61.8,3.83,-0.84,0.93,-0.72,-0.51,0.64,0.79,"Core, Finance, Periphery, Workbench"
-Exposed,3,559.81,1.32,86.63,1.66,1.86,7.4,48.04,0.61,0.96,0.12,0.56,0.85,0.48,-0.31,"Finance, Workbench"
-Low-stakes,2,348.77,1.19,69.81,1.16,1.17,1.76,35.69,2.17,-0.21,-0.54,-0.04,-0.26,-0.19,-0.64,"Periphery, Workbench"
-At risk,11,559.67,1.33,78.71,0.72,0.63,2.57,38.08,0.92,0.62,-0.86,0.57,0.33,-0.74,-0.59,"Finance, Periphery, Workbench"
+Winners,11,262.96,0.91,66.07,2,1.84,26.05,61.8,3.14,-0.86,0.93,-0.73,-0.51,0.64,0.79,"Core, Finance, Periphery, Workbench"
+Exposed,3,638.86,1.38,86.63,1.66,1.86,7.4,48.04,0.87,0.92,0.12,0.48,0.85,0.48,-0.31,"Finance, Workbench"
+Low-stakes,2,435.64,1.27,69.81,1.16,1.17,1.76,35.69,1.58,-0.2,-0.54,-0.02,-0.26,-0.19,-0.64,"Periphery, Workbench"
+At risk,11,670.6,1.43,78.71,0.72,0.63,2.57,38.08,0.93,0.64,-0.86,0.6,0.33,-0.74,-0.59,"Finance, Periphery, Workbench"
