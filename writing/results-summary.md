@@ -119,37 +119,61 @@ coal-heavy Poland and Czechia are *Exposed but capable* while Slovenia is a
 Winner. **Lead with the mismatches, not the diagonal** — they are what income
 cannot explain, and Luxembourg vs Ireland/Malta are all rich.
 
-### Important caveat on how far this differentiates
+### How far does this actually differentiate? Less than four groups
 
-Differences from Core, with **permutation p-values** (20,000 shuffles of the
-group labels). These replace the OLS p-values used earlier: with n = 27 and
-Finance at n = 4, the t-distribution is not credible, and reporting it while the
-contingency table below uses a Monte-Carlo Fisher test *because* n is small would
-be internally inconsistent. OLS values are shown for comparison — they were
-optimistic.
+The temptation is to read the map as four growth models facing four different
+transition situations. **It does not support that**, and the claim needs stating
+precisely because it is easy to overreach.
 
-| vs Core | difference | p (permutation) | p (OLS) |
-|---|---:|---:|---:|
-| **potential** — Workbench | −1.56 | **0.0007** | 0.0010 |
-| potential — Finance | −1.52 | **0.0132** | 0.0085 |
-| potential — Periphery | −1.37 | **0.0150** | 0.0082 |
-| **vulnerability** — Workbench | +1.63 | **0.0003** | 0.0007 |
-| vulnerability — Finance | +1.12 | 0.0839 | 0.0466 |
-| vulnerability — Periphery | +1.07 | 0.0628 | 0.0351 |
+**Differences are in the mean z-scored axis scores by growth-model group**
+(n = Core 6, Finance 4, Periphery 6, Workbench 11) — nothing else.
 
-Two things follow, and the second is new:
+**The direct test.** Does a four-group model explain more than a **Core-vs-rest
+binary**? Permutation test shuffling labels within the non-Core set only:
 
-1. The pattern is **Core vs everyone else**, not a four-way gradient. A claim that
-   "different growth models face *different* transition challenges" (plural,
-   differentiated) is **not supported**.
-2. **On vulnerability, only the Workbench difference survives a proper test.**
-   Finance and Periphery drop to p ≈ 0.06–0.08 under permutation, having looked
-   significant at 5% under OLS. Do not report those two as significant.
+| axis | R² binary | R² four-group | F | p |
+|---|---:|---:|---:|---:|
+| vulnerability | 0.34 | 0.40 | 1.15 | 0.34 |
+| potential | 0.40 | 0.41 | 0.11 | 0.88 |
 
-The **narrow claim — the catch-up East is both more vulnerable and less capable
-than the Core — is strongly supported** and holds up on its own: tested as a
-single Workbench-vs-Core comparison, potential p = 0.0004 and vulnerability
-p = 0.0003. This constrains the framing decision; see `open-questions.md` §1.
+The four-way split adds nothing. So write "Core versus the rest", not "four
+growth models face different challenges".
+
+**But only the Workbench contrast is solid.** Pairwise permutation tests, using
+only the two groups involved:
+
+| axis | Finance − Core | Periphery − Core | Workbench − Core |
+|---|---|---|---|
+| vulnerability | +1.12 (p = .048) | +1.07 (p = .110) | **+1.63 (p = .0002)** |
+| potential | −1.52 (p = .071) | −1.37 (p = .053) | **−1.56 (p = .0002)** |
+
+These are more conservative than the vs-Core values in the table above, which
+shuffle all 27 labels and so borrow strength from groups outside the comparison.
+**Quote the pairwise values for any two-group claim.** Finance and Periphery
+differ from Core in the same direction and by a similar magnitude, but only at
+p ≈ .05–.11.
+
+**The caveat that must not be dropped.** "The non-Core groups are
+indistinguishable" is **a limit of resolution, not a finding of similarity**. With
+a within-group residual sd of 0.82 z, the design has 80% power only for
+differences of:
+
+| pair | detectable difference |
+|---|---:|
+| Finance vs Periphery (n = 4, 6) | ≥ 1.72 z |
+| Finance vs Workbench (n = 4, 11) | ≥ 1.50 z |
+| Periphery vs Workbench (n = 6, 11) | ≥ 1.26 z |
+
+The observed non-Core spreads are **0.57 z** (vulnerability) and **0.20 z**
+(potential) — two to three times below what could be detected. Never write that
+the non-Core groups *are alike*; write that any difference between them is below
+what n = 27 can resolve.
+
+**What this means for the framing decision.** The narrow claim — the catch-up
+East is both more vulnerable and less capable than the Core — is exactly the one
+the data supports, on both axes, at p = .0002. The broad claim that different
+growth models face *different* transition challenges is not supported. See
+`open-questions.md` §1.
 
 ## 6. External validity
 

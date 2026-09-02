@@ -28,11 +28,15 @@ The only articulation that exists anywhere is a speaker note:
 | vulnerability | +1.1 (p=.047) | +1.1 (p=.035) | +1.6 (p=.0007) |
 
 - **Narrow hypothesis** — *the catch-up East is both more vulnerable and less
-  capable than the Core* → **strongly supported**. Would make a clean H1–H3 test.
+  capable than the Core* → **strongly supported**, p = .0002 on both axes in a
+  pairwise permutation test. Would make a clean H1–H3 test.
 - **Broad hypothesis** — *different growth models face different transition
-  challenges* (plural, differentiated) → **not supported**. Finance and Periphery
-  are statistically indistinguishable from Workbench on both axes. The pattern is
-  Core vs everyone else.
+  challenges* (plural, differentiated) → **not supported**. A four-group model
+  does not beat a Core-vs-rest binary (F = 1.15 and 0.11, p = .34 and .88).
+  Note this is a limit of *resolution*: the design could only detect non-Core
+  differences ≥ 1.26–1.72 z and the observed spreads are 0.20–0.57 z. So the
+  broad claim is unsupported, not refuted — but unsupported is enough reason not
+  to make it.
 
 So the real question is not "descriptive or test" in the abstract. It is whether
 the hypothesis worth testing is the narrow one the data supports, or the broad

@@ -135,8 +135,52 @@ cat("\n(p_perm = permutation test, 20000 shuffles of the group labels;",
 perm_pot  <- report_group("potential", "Potential")
 perm_vuln <- report_group("vulnerability", "Vulnerability")
 
+# IS THE FOUR-GROUP STRUCTURE REAL, or is it just Core vs everyone else?
+# Tested directly rather than inferred from overlapping coefficients: does a
+# 4-group model explain more than a Core/non-Core binary? The permutation version
+# shuffles labels WITHIN the non-Core set only, so it tests exactly the question
+# "do the three non-Core groups differ from each other" while holding the Core
+# contrast fixed.
+cat("\n--- Does the 4-group split beat a Core-vs-rest binary? ---\n")
+for (v in c("vulnerability", "potential")) {
+  y <- dat[[v]]; g <- as.character(dat$group)
+  m2 <- lm(y ~ I(g == "Core")); m4 <- lm(y ~ factor(g))
+  f_obs <- anova(m2, m4)$F[2]
+  nc <- which(g != "Core"); set.seed(7)
+  cnt <- sum(replicate(2000L, {
+    gp <- g; gp[nc] <- sample(gp[nc])
+    f <- anova(lm(y ~ I(gp == "Core")), lm(y ~ factor(gp)))$F[2]
+    !is.na(f) && f >= f_obs }))
+  cat(sprintf("  %-14s R2 %.2f -> %.2f | F = %.2f, permutation p = %.3f\n",
+              v, summary(m2)$r.squared, summary(m4)$r.squared,
+              f_obs, (cnt + 1) / 2001))
+}
+cat("  (high p = the four-way split adds nothing over Core-vs-rest)\n")
+
+# POWER. "The non-Core groups are indistinguishable" must not be read as "they are
+# alike": with these group sizes it may simply be undetectable. Report the
+# smallest difference the design could catch, so absence of evidence is not
+# mistaken for evidence of absence.
+cat("\n--- What could this design actually detect? ---\n")
+sdw <- summary(lm(dat$vulnerability ~ dat$group))$sigma
+ns  <- table(dat$group)
+for (pr in list(c("Finance","Periphery"), c("Finance","Workbench"),
+                c("Periphery","Workbench"))) {
+  nh <- 2 / (1/ns[[pr[1]]] + 1/ns[[pr[2]]])
+  mdd <- power.t.test(n = nh, sd = sdw, sig.level = 0.05, power = 0.80)$delta
+  cat(sprintf("  %-10s vs %-10s (n=%d,%d): 80%% power only for differences >= %.2f z\n",
+              pr[1], pr[2], ns[[pr[1]]], ns[[pr[2]]], mdd))
+}
+cat(sprintf("  Observed non-Core spread: vulnerability %.2f z, potential %.2f z\n",
+            diff(range(tapply(dat$vulnerability, dat$group, mean)[c("Finance","Periphery","Workbench")])),
+            diff(range(tapply(dat$potential, dat$group, mean)[c("Finance","Periphery","Workbench")]))))
+cat("  => any non-Core difference is below what n = 27 can resolve.\n")
+
 # The comparison that actually carries the polarization claim, tested directly:
-# Workbench vs Core, one difference rather than three.
+# Workbench vs Core, one difference rather than three. NB this PAIRWISE test uses
+# only the two groups involved; the vs-Core p-values above shuffle all 27 labels
+# and so borrow strength from groups outside the comparison. The pairwise version
+# is the conservative one and is what should be quoted for a two-group claim.
 wb_test <- function(var) {
   y <- dat[[var]]; g <- as.character(dat$group)
   k <- g %in% c("Core", "Workbench")
