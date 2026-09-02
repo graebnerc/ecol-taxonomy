@@ -158,7 +158,9 @@ Supporting:
 - `sql/get_green_patents_v3_all_offices.sql` — robustness query without the EPO-only
   restriction (`appln_auth = 'EP'`), returning EPO-only and all-offices counts side by
   side so the two cannot drift apart. Consumed by `R/appendix_patent_offices.R`, which
-  asserts the EPO columns reproduce v2 exactly before comparing. **Not yet run.**
+  asserts the EPO columns reproduce v2 exactly before comparing (350 country-years,
+  0 mismatched). **Run 2026-09-02: 0/27 quadrant changes**, though the underlying bias
+  is real (EPO share 12.8% Workbench vs 21.2% Core).
 - **PATSTAT query results live in `sql/`, beside the query that produced them**
   (`sql/get_green_patents_v2.csv`, and `_v3.csv` when it exists). `data/raw/*` is
   gitignored because it holds large re-downloadable sources; a PATSTAT extract is the
@@ -236,9 +238,9 @@ precisely why the two-part construction is argued for rather than asserted.
 2. GCI wording — it correlates ~0.998 with a plain green-product count, so it is green
    *diversity* rather than sophistication. A referee will check.
 3. Target journal, and whether to make a policy ask.
-4. Optional checks that each close a referee line: EORA on the 2014–2017 window (isolates
-   MRIO choice from window choice), a patent run without the EPO-only restriction, sectoral
-   energy splits for the flagged countries.
+4. Optional: a Eurostat-native emissions source (AEA, FIGARO, OECD TeCO₂) as a second
+   check. Everything else is closed — EORA (0/27), the all-offices patent run (0/27), and
+   the sectoral energy split (a negative: demand composition does not explain the map).
 
 **A note on how this pipeline fails.** Three times in two days it returned *plausible
 numbers* rather than an error: EXIOBASE nowcast years with a zeroed dominant stressor, an

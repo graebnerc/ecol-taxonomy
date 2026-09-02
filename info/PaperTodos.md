@@ -473,8 +473,18 @@ the last complete year is 2022 whatever PATSTAT returns.
 - [ ] Defect to quantify: the v1 PATSTAT query lacks `COUNT(DISTINCT ...)` and
   over-counts by (CPC symbols x same-country applicants), differentially across
   countries. `sql/get_green_patents_v2.sql` fixes it and is ready to run.
-- [ ] Still open: `appln_auth='EP'` excludes national offices, plausibly
-  understating the small and eastern states in the low-potential tail.
+- [x] **RESOLVED 2026-09-02: `appln_auth='EP'` restriction tested.** The bias is
+  real and systematic -- mean EPO share of all green filings is 12.8% for the
+  Workbench against 21.2% for the Core (Romania 3.9%, Czechia 8.5%, Poland 8.7%
+  vs Denmark 27.4%), i.e. Core applicants use the EPO at ~1.7x the Workbench
+  rate. But it does not change the map: Spearman 0.967 on patents p.c., 0.991 on
+  the potential axis, **0/27 quadrant changes**. The restriction understates the
+  periphery in LEVELS without disturbing the RANKING, which is all the axis uses.
+  Report as conceded-and-quantified, not dismissed. Keep EPO as the headline: an
+  EPO filing confers European-wide protection, which is the concept the axis
+  wants. NB Slovenia is 2nd-highest (25.9%) and Luxembourg/Ireland are among the
+  lowest despite being rich, so the gradient tracks firm structure as much as
+  geography -- do not call it a simple core-periphery effect.
 
 ## 4. Alternative emissions data source (Eurostat instead of EXIOBASE)
 

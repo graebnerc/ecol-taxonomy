@@ -104,23 +104,18 @@ on EPS despite its 20/27 coverage) or state plainly that it is descriptive there
 
 ## 9. Open analyses that would strengthen the paper
 
-Not blocking, but each closes a line a referee could open.
+All the robustness items are now closed except one optional source check. Each
+closed item is left here with its result, because the paper should report that
+these were tested rather than silently omit them.
 
 - ~~**EORA cross-check.**~~ **DONE — 0/27** (see `results-summary.md` §8b,
   `evidence/eora_crosscheck.csv`). MRIO choice can now be dismissed in a
   sentence, with the EORA data-quality caveat reported.
-- **National patent offices — PREPARED, needs one PATSTAT run.** The query
-  (`sql/get_green_patents_v3_all_offices.sql`) and its analysis script are ready;
-  the query returns EPO-only and all-offices counts side by side from a single
-  scan. This is the last open robustness item, and it is the one most likely to
-  matter: the v1→v2 correction showed how sensitive periphery counts are to query
-  details. If the two series diverge, the divergence is the finding — do not
-  resolve it by adopting whichever series is friendlier.
-- ~~**Country drill-downs.**~~ **DONE** (see `results-summary.md` §8c,
-  `evidence/country_profiles.csv`, `evidence/energy_by_sector.csv`,
-  `figures/country_profiles.png`). Result is a negative — demand composition does
-  not explain the map — plus the Malta/Luxembourg vignette. Decide whether the
-  negative is worth reporting; it pre-empts an obvious referee question.
+- ~~**National patent offices.**~~ **DONE — 0/27** (see `results-summary.md` §8d,
+  `evidence/patent_offices.csv`, `figures/patent_offices.png`). The bias is real
+  and systematic (EPO share: Workbench 12.8% vs Core 21.2%) but does not move any
+  country's quadrant. Present it as conceded-and-quantified rather than
+  dismissed.
 - **Eurostat alternative to EXIOBASE** (AEA `env_ac_ainah_r2`, FIGARO, OECD
   TeCO₂) as a second emissions source. Different system boundaries, so treat
   agreement as a robustness check, not a drop-in swap.

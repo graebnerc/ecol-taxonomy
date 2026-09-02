@@ -294,6 +294,53 @@ It does supply the **Malta / Luxembourg vignette**:
 Both look cleaner in production terms than they are in consumption terms, which
 is the burden-vs-responsibility point at country level.
 
+## 8d. The EPO-only restriction: the bias is real, and it does not bite
+
+The patent variable counts EPO filings only (`appln_auth = 'EP'`). The worry was
+that applicants in smaller and eastern member states file domestically instead,
+so an EPO-only count would understate exactly the low-potential tail the
+polarization finding rests on. Tested by re-running the query without the office
+filter, returning both counts from one scan.
+
+**The bias is real and systematic**, in precisely the predicted direction — EPO
+share of all green filings, reference window:
+
+| growth model | mean EPO share |
+|---|---:|
+| Workbench | **12.8%** |
+| Periphery | 18.0% |
+| Finance | 19.0% |
+| Core | **21.2%** |
+
+Extremes: Romania 3.9%, Czechia 8.5%, Poland 8.7%, Bulgaria and Slovakia 9.1%
+against Denmark 27.4%, Slovenia 25.9%, Sweden and the Netherlands 22.4%. Core
+applicants use the EPO at roughly **1.7×** the rate of Workbench applicants.
+
+**But it does not change the map:**
+
+| | |
+|---|---:|
+| Spearman(patents p.c., EPO vs all offices) | **0.967** |
+| Spearman(potential axis) | **0.991** |
+| **quadrant changes** | **0 / 27** |
+
+So the restriction understates the periphery in *levels* without disturbing the
+*ranking*, which is all the axis uses. This is the strongest form the answer
+could take: the objection is conceded as real, quantified, and then shown not to
+matter. Report it that way rather than dismissing the concern.
+
+**Two nuances that complicate a clean East/West reading.** Slovenia has the
+second-highest EPO share (25.9%), and Luxembourg (15.6%) and Ireland (16.2%) are
+among the lowest despite being rich — plausibly because their applicants are
+foreign-owned multinationals filing through other routes. The gradient tracks
+firm structure as much as geography, so do not describe it as a simple
+core-periphery effect.
+
+**Keep EPO as the headline measure.** An EPO filing confers European-wide
+protection, which is the concept the potential axis wants; all-offices counts mix
+objects of different standing. The all-offices series is the robustness check,
+not a better measure.
+
 ## 9. A correction that strengthens the story
 
 The original PATSTAT query lacked `COUNT(DISTINCT ...)`, counting each
@@ -320,12 +367,8 @@ moves the result in the direction *less* convenient for a sceptic.
 - **Green list** is the OECD CLEG 244 codes, not Mealy & Teytelboym's 293.
   Renewable-only GCI correlates 0.96 with the full version, so the gap is
   footnote-sized.
-- **Patents count EPO filings only** (`appln_auth = 'EP'`), excluding national
-  offices — which plausibly understates exactly the small and eastern states in
-  the low-potential tail. The check is prepared but **not yet run** (it needs a
-  PATSTAT query); until it is, this stays an acknowledged limitation rather than
-  a resolved one. Note an EPO filing confers European-wide protection, which is
-  the concept the axis wants, so all-offices counts would be a robustness check
-  rather than a better measure.
+- **Patents count EPO filings only** (`appln_auth = 'EP'`). This understates the
+  eastern states in levels — measured, and real — but changes no country's
+  quadrant. Resolved; see §8d.
 - **EXIOBASE 2023–2024 are unusable** (dominant stressor identically zero), so no
   window may end after 2022.
