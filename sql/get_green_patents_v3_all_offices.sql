@@ -2,22 +2,21 @@
 ================================================================================
 Green patents WITHOUT the EPO-only restriction -- robustness run.
 
-  THIS QUERY IS RUN IN A DIFFERENT REPO / SESSION, so the export lands wherever
-  you run it. Write it to a plain filename in the current directory:
+  HOW TO USE THIS FILE
+  --------------------
+  1. Copy this .sql to the repo where you have PATSTAT access, and run it there.
+  2. Save the result as a CSV in that repo -- any filename containing "v3",
+     "all-offices" or "allauth" is fine.
+  3. Copy that CSV back into the ecol-taxonomy repo, into sql/  (preferred: it is
+     then version-controlled beside this query; data/raw/ is gitignored). data/,
+     data/raw/ and data/tidy/ are also searched.
+  4. Run:  Rscript R/appendix_patent_offices.R
 
-      get_green_patents_v3.csv
+  The script finds the file by pattern, so the exact name does not matter. It
+  validates the extract, cross-checks it against the v2 series, re-scores the map,
+  and exits cleanly with instructions if it finds nothing.
 
-  THEN, from the ecol-taxonomy repo root, point the ingestion at it:
-
-      Rscript R/appendix_patent_offices.R /path/to/get_green_patents_v3.csv
-
-  The script reads it, copies it to sql/get_green_patents_v3.csv so the result is
-  version-controlled beside this query, validates it, cross-checks it against the
-  v2 extract, and re-scores the map. With no argument it looks in
-  sql/, data/raw/ and data/tidy/ and exits cleanly with instructions if it finds
-  nothing.
-
-WHY THE RESULT IS KEPT IN sql/. data/raw/ is gitignored because it holds large
+WHY sql/ RATHER THAN data/raw/. data/raw/ is gitignored, because it holds large
 re-downloadable sources (EXIOBASE, Atlas, EORA). A PATSTAT extract is the
 opposite kind of object: small, and NOT reproducible by anyone without database
 access. Keeping it beside the query that produced it means the result is
@@ -25,18 +24,18 @@ version-controlled together with its provenance, and a co-author who cannot reac
 PATSTAT can still re-run the analysis.
 
 --------------------------------------------------------------------------------
-EXPORTING TO CSV
+EXPORTING TO CSV (in the repo where you run this)
 --------------------------------------------------------------------------------
-All paths below are relative to WHERE YOU RUN THE QUERY, not to this repo. If
-your client cannot write files, just save the result grid by hand -- the
-ingestion only needs a CSV with a header row.
+Paths below are relative to wherever you run the query. If your client cannot
+write files, just save the result grid by hand -- the ingestion only needs a CSV
+with a header row.
 
-psql (client-side write; works with ordinary user rights):
+psql (client-side write; ordinary user rights are enough):
 
     \copy ( <paste the query, without its trailing semicolon> ) \
       TO 'get_green_patents_v3.csv' WITH (FORMAT csv, HEADER true)
 
-  or, pointing at this file wherever you have it:
+  or, running this file directly:
 
     psql -d patstat -v ON_ERROR_STOP=1 --csv \
       -f get_green_patents_v3_all_offices.sql \
@@ -165,10 +164,9 @@ Only worth running if the main query shows a divergence between the EPO-only and
 all-offices rankings. It names the authorities behind it, which is what turns
 "the ranking changes" into an explanation. Cheap once restricted as below.
 
-Export it the same way, then pass it as a SECOND argument:
-  Rscript R/appendix_patent_offices.R <main.csv> <by_office.csv>
-It is copied to sql/get_green_patents_v3_by_office.csv and the top offices
-per country are reported.
+Export it the same way and copy it back alongside the main CSV -- any filename
+containing "by_office" is picked up automatically, and the top offices per
+country are reported.
 ================================================================================
 
 SELECT

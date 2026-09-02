@@ -1,13 +1,16 @@
 # Appendix - does the EPO-only restriction bias the potential axis?
 #
-# READY TO RUN before the data exists. The query is run wherever you have PATSTAT
-# access, which is a different repo, so pass the exported file's path:
+# READY TO RUN before the data exists.
 #
-#     Rscript R/appendix_patent_offices.R /path/to/get_green_patents_v3.csv
+# Workflow: copy sql/get_green_patents_v3_all_offices.sql to the repo where you
+# have PATSTAT access, run it, save the CSV, then copy that CSV back into this
+# repo -- into sql/ (preferred; data/raw/ is gitignored) -- and run:
 #
-# The script archives it into sql/ (beside the query, and unlike data/raw/ not
-# gitignored), then validates and analyses it. With no argument it looks in sql/,
-# data/raw/ and data/tidy/.
+#     Rscript R/appendix_patent_offices.R
+#
+# The script searches sql/, data/, data/raw/ and data/tidy/ for a .csv whose name
+# contains "v3", "all-offices" or "allauth", so the exact filename does not
+# matter. A path can also be passed explicitly as an argument.
 #
 # With the file absent it prints instructions and exits 0 without changing
 # anything.
@@ -41,46 +44,55 @@ source(here("R/functions/typology.R"))
 # Accept either the documented path or the query's own filename dropped into
 # data/raw/ -- the latter is what you get by saving the SQL result directly, and
 # is what happened with the v2 extract.
-# The query is run in a different repo/session, so the extract lands wherever it
-# was run. Accept an explicit path as the first argument and ARCHIVE it into
-# sql/ -- data/raw/ is gitignored, and a PATSTAT extract is small but NOT
-# reproducible without database access, so it belongs in version control beside
-# the query that produced it.
+# FINDING THE EXTRACT. The query is run in a different repo, so the workflow is:
+# copy the .sql there, run it, save the CSV, then copy that CSV back into this
+# repo -- into sql/ (preferred: version-controlled beside the query, and unlike
+# data/raw/ not gitignored) or any of the data folders.
 #
-#   Rscript R/appendix_patent_offices.R /path/to/get_green_patents_v3.csv
-#   Rscript R/appendix_patent_offices.R <main.csv> <by_office.csv>   (optional)
+# Rather than demand an exact filename, search the plausible directories for
+# anything that looks like this extract. A path may also be passed explicitly as
+# the first argument.
 args <- commandArgs(trailingOnly = TRUE)
-ARCHIVE <- here("sql/get_green_patents_v3.csv")
+
+find_extract <- function(pattern, label) {
+  dirs <- here(c("sql", "data", "data/raw", "data/tidy"))
+  hits <- unlist(lapply(dirs[dir.exists(dirs)], function(d)
+    list.files(d, pattern = pattern, full.names = TRUE, ignore.case = TRUE)))
+  hits <- hits[file.exists(hits)]
+  if (!length(hits)) return(NA_character_)
+  if (length(hits) > 1L) {
+    hits <- hits[order(file.mtime(hits), decreasing = TRUE)]
+    message("Several candidate ", label, " files found; using the newest:\n  ",
+            paste(hits, collapse = "\n  "))
+  }
+  hits[1]
+}
+
+# "v3", "all offices" or "allauth" in the name, .csv extension.
+V3_PAT <- "(v3|all.?off|allauth).*\\.csv$"
 
 if (length(args) >= 1L) {
-  src <- normalizePath(args[1], mustWork = FALSE)
-  if (!file.exists(src))
-    stop("no file at the path given: ", src)
-  if (normalizePath(ARCHIVE, mustWork = FALSE) != src) {
-    file.copy(src, ARCHIVE, overwrite = TRUE)
-    message("Archived ", src, "\n      -> ", ARCHIVE,
-            "\n      (commit it: the extract cannot be regenerated without PATSTAT)")
-  }
-  RAW <- ARCHIVE
+  RAW <- normalizePath(args[1], mustWork = FALSE)
+  if (!file.exists(RAW)) stop("no file at the path given: ", RAW)
 } else {
-  CANDIDATES <- c(ARCHIVE,
-                  here("data/tidy/patstat_green-patents_allauth.csv"),
-                  here("data/raw/get_green_patents_v3.csv"),
-                  here("data/raw/patstat_green-patents_allauth.csv"))
-  RAW <- CANDIDATES[file.exists(CANDIDATES)][1]
+  RAW <- find_extract(V3_PAT, "all-offices extract")
 }
 
 if (is.na(RAW)) {
   message(
     "\n", strrep("-", 74), "\n",
-    "All-offices PATSTAT extract not found. Looked for:\n",
-    paste0("  ", CANDIDATES, collapse = "\n"), "\n\n",
-    "To produce it:\n",
-    "  1. run sql/get_green_patents_v3_all_offices.sql against PATSTAT\n",
-    "     (wherever you have database access -- see that file's header)\n",
-    "  2. export it to a plain get_green_patents_v3.csv in that directory\n",
-    "  3. point this script at it; it archives the file into sql/ for you:\n",
-    "       Rscript R/appendix_patent_offices.R /path/to/get_green_patents_v3.csv\n\n",
+    "All-offices PATSTAT extract not found.\n\n",
+    "Searched sql/, data/, data/raw/ and data/tidy/ for a .csv whose name\n",
+    "contains 'v3', 'all-offices' or 'allauth'.\n\n",
+    "Workflow:\n",
+    "  1. copy sql/get_green_patents_v3_all_offices.sql to the repo where you\n",
+    "     have PATSTAT access, and run it there\n",
+    "  2. save the result as a CSV (any name containing 'v3' is fine)\n",
+    "  3. copy that CSV into this repo, into sql/  (preferred -- it is then\n",
+    "     version-controlled beside the query; data/raw/ is gitignored)\n",
+    "  4. re-run: Rscript R/appendix_patent_offices.R\n\n",
+    "Or point at it directly:\n",
+    "  Rscript R/appendix_patent_offices.R /path/to/the.csv\n\n",
     "Nothing was changed. The headline keeps the EPO-only measure, which is the\n",
     "intended concept -- this script only tests whether the ranking depends on it.\n",
     strrep("-", 74))
@@ -186,19 +198,12 @@ if (length(moved)) {
 }
 
 # --- Optional: which offices account for the non-EPO filings? ----------------
-BYOFF_ARCHIVE <- here("sql/get_green_patents_v3_by_office.csv")
-if (length(args) >= 2L) {
-  src2 <- normalizePath(args[2], mustWork = FALSE)
-  if (!file.exists(src2)) stop("no file at the second path given: ", src2)
-  if (normalizePath(BYOFF_ARCHIVE, mustWork = FALSE) != src2) {
-    file.copy(src2, BYOFF_ARCHIVE, overwrite = TRUE)
-    message("Archived by-office extract -> ", BYOFF_ARCHIVE)
-  }
-  BYOFF <- BYOFF_ARCHIVE
-} else {
-  BYOFF <- c(BYOFF_ARCHIVE, here("data/raw/get_green_patents_v3_by_office.csv"))
-  BYOFF <- BYOFF[file.exists(BYOFF)][1]
-}
+BYOFF <- if (length(args) >= 2L) {
+  b <- normalizePath(args[2], mustWork = FALSE)
+  if (!file.exists(b)) stop("no file at the second path given: ", b)
+  b
+} else find_extract("by.?office.*\\.csv$", "by-office extract")
+
 if (!is.na(BYOFF)) {
   bo <- fread(BYOFF)
   bo[, iso3 := countrycode(country, "iso2c", "iso3c", warn = FALSE)]
