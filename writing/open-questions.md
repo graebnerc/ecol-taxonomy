@@ -77,23 +77,25 @@ So they do not reopen mid-draft:
 - reference window — **2017–2021**
 - green list — **OECD CLEG 244 codes**, footnote the 293-code alternative
 
-## 6. Unbalanced quadrants — is the median split the right device?
+## 6. ~~Unbalanced quadrants — is the median split the right device?~~ RESOLVED
 
-Quadrants are 11/11/3/2. Because the axes correlate −0.55 the off-diagonal cells
-are thin, five countries carry the interesting story, and Low-stakes (Ireland,
-Portugal) reads more like a residual than a type. Four countries are borderline.
+Tested (see `results-summary.md` §8f, `evidence/quadrant_stability.csv`). The map
+is effectively deterministic: 25 of 27 countries hold their quadrant in ≥99.7% of
+year-bootstrap resamples. **Quadrants can be presented as types**, provided the
+three-country boundary neighbourhood (Ireland, Slovakia, Slovenia) is named and
+the two-country Low-stakes cell is not used to carry an argument.
 
-Consider whether to present the map continuously with quadrants as exposition
-only, rather than treating the four cells as types. This is a presentational
-decision with substantive consequences for how much weight the quadrant labels
-can bear.
+## 7. Slovenia — fragile to the SAMPLE, not to the data
 
-## 7. Slovenia is fragile and load-bearing
+Slovenia is the single Workbench country among the Winners, so it carries weight
+in the "the map is not just the growth model" argument. The bootstrap refines
+what its fragility actually is: it is **100% stable** under year resampling but
+moves in **12 of 27** leave-one-out runs. It sits close to a threshold rather
+than having noisy inputs.
 
-Slovenia is the single Workbench country in the Winners cell, so it carries
-disproportionate weight in the "the map is not just the growth model" argument —
-and it is borderline, landing there mainly by sitting just below the vulnerability
-median. It needs its own sentence, or a referee will make it one.
+That is a milder caveat than "Slovenia is unstable", and it should be written
+that way: its position is well-measured, but near a boundary whose location
+depends on the other 26 members.
 
 ## 8. Validator circularity for vulnerability
 

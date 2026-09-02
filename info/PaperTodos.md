@@ -502,6 +502,33 @@ the last complete year is 2022 whatever PATSTAT returns.
   lowest despite being rich, so the gradient tracks firm structure as much as
   geography -- do not call it a simple core-periphery effect.
 
+## Quadrant stability: the map holds (LOGGED, 2026-09-02)
+
+`R/appendix_quadrant_stability.R` tests how much weight the four cells can bear,
+two ways.
+
+**Year bootstrap** (2000 resamples of the five window years, with replacement):
+**25 of 27 countries hold their quadrant in >=99.7% of resamples**; median
+stability 100%. Only Ireland (62.5%, alternative At risk) and Slovakia (62.5%,
+alternative Low-stakes) are genuinely uncertain -- and they are each other's
+mirror across the same boundary. By cell: Winners 100%, Exposed 100%, At risk
+96.6%, **Low-stakes 81.1%**.
+
+**Leave-one-out** (medians are computed on the sample, so dropping a country
+moves the thresholds): 25 of 27 drops move at least one other country, but the
+mean is 1.33 of 26 and the movers are almost always the same three -- Ireland,
+Slovakia, Slovenia.
+
+- [ ] **Presentational decision, now informed:** quadrants CAN be presented as
+  types. Name the three-country boundary neighbourhood explicitly and do not
+  build an argument on the two-country Low-stakes cell.
+- [x] **Slovenia caveat corrected.** It is 100% stable to years but moves in
+  12/27 leave-one-out runs -- fragile to the SAMPLE, not to the data. Write it as
+  "well-measured but near a boundary whose location depends on the other 26",
+  not as "unstable".
+- [x] Noted: the `boundary` flag (|score - median| < 0.10) slightly over-warns --
+  it flags Latvia, which is 99.7% stable. Prefer the bootstrap numbers.
+
 ## 4. Alternative emissions data source (Eurostat instead of EXIOBASE)
 
 **Feedback:** Can I get the trade-embodied / production emissions from a source

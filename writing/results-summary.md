@@ -87,10 +87,11 @@ Axes are distinct: cor(vulnerability, potential) = **−0.55** — related, but 
 from ±1, so not one axis in disguise.
 
 **Note the quadrants are unbalanced (11/11/3/2).** Because the axes correlate
-−0.55, the off-diagonal cells are thin. Five countries carry the whole
-"interesting" story and two of them sit in a Low-stakes cell that is closer to a
-residual than a type. This is a real limitation, not a presentational one — see
-`open-questions.md`.
+−0.55, the off-diagonal cells are thin, and five countries carry most of the
+"interesting" story. But the assignments are firm: bootstrapping the window years
+leaves 25 of 27 countries in place in ≥99.7% of resamples, with only Ireland and
+Slovakia genuinely uncertain (§8f). The thin **Low-stakes** cell is the one not to
+lean on.
 
 ## 5. The polarization result
 
@@ -403,6 +404,52 @@ survive a referee who logs the patent variable.
 *Useful side effect:* the skew prompted a new robustness spec — the innovation
 standalone on a log scale — which moves **0/27**. So the headline is safe from
 the transform question too.
+
+## 8f. How much weight can the quadrant labels bear? Quite a lot
+
+Quadrants come from median splits, so before treating the four cells as *types*
+the paper should say how often a country would actually land in its cell. Tested
+two ways, because they are different questions.
+
+**Which years?** Resampling the five window years with replacement (2,000
+draws), **25 of 27 countries sit in their assigned quadrant in ≥99.7% of
+resamples**. Median stability is 100%. Only two move:
+
+| country | assigned | % in assigned | alternative |
+|---|---|---:|---|
+| **Ireland** | Low-stakes | **62.5%** | At risk (37.5%) |
+| **Slovakia** | At risk | **62.5%** | Low-stakes (37.5%) |
+
+They are each other's mirror — the same Low-stakes/At-risk boundary, swapping
+places. By cell: Winners 100%, Exposed 100%, At risk 96.6%, **Low-stakes 81.1%**.
+
+**Which countries?** The medians are computed on the sample, so dropping a
+country moves the thresholds for everyone else. Across all 27 leave-one-out
+runs, 25 drops move at least one other country, but the mean is only **1.33 of
+26**, and the movers are almost always the same three: **Ireland, Slovakia,
+Slovenia**. The worst cases move three countries (dropping Cyprus, Finland,
+Malta or Sweden).
+
+**What this means for presentation.** The map is effectively deterministic apart
+from a **three-country boundary neighbourhood**. So the quadrants *can* be
+presented as types — but name that neighbourhood explicitly rather than letting a
+referee find it.
+
+Three specifics worth carrying into the text:
+
+- **The Low-stakes cell is the weak one.** It has n = 2 and one of its two
+  members is close to a coin flip. Do not build an argument on it as a type.
+- **Slovenia's fragility is about the sample, not the data.** It is 100% stable
+  under the year bootstrap but moves in 12 of 27 leave-one-out runs. It sits near
+  a threshold rather than having noisy inputs — which is a different, and milder,
+  caveat than the one I would previously have written.
+- **The borderline flag slightly over-warns.** It flags Ireland, Latvia, Slovakia
+  and Slovenia; Latvia is in fact 99.7% stable. Prefer these bootstrap numbers to
+  the flag when describing fragility.
+
+*Caveat:* GCI and GCP are pooled over the whole window and held fixed here, so
+this slightly understates instability. `07_robustness.R` shows per-year GCI
+correlates 0.97–1.00 with the pooled version, so the understatement is small.
 
 ## 9. A correction that strengthens the story
 

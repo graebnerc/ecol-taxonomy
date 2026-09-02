@@ -1,0 +1,28 @@
+country,headline_quadrant,pct_in_headline,modal_quadrant,alt_quadrant,pct_alt,group,borderline
+Ireland,Low-stakes,62.5,Low-stakes,At risk,37.5,Finance,TRUE
+Slovakia,At risk,62.5,At risk,Low-stakes,37.5,Workbench,TRUE
+Latvia,At risk,99.7,At risk,Low-stakes,0.3,Workbench,TRUE
+Portugal,Low-stakes,99.7,Low-stakes,At risk,0.3,Periphery,FALSE
+Austria,Winners,100,Winners,Exposed,0,Core,FALSE
+Belgium,Winners,100,Winners,Exposed,0,Core,FALSE
+Bulgaria,At risk,100,At risk,Winners,0,Workbench,FALSE
+Croatia,At risk,100,At risk,Winners,0,Workbench,FALSE
+Cyprus,At risk,100,At risk,Winners,0,Periphery,FALSE
+Czechia,Exposed,100,Exposed,Winners,0,Workbench,FALSE
+Denmark,Winners,100,Winners,Exposed,0,Core,FALSE
+Estonia,At risk,100,At risk,Winners,0,Workbench,FALSE
+Finland,Winners,100,Winners,Exposed,0,Core,FALSE
+France,Winners,100,Winners,Exposed,0,Periphery,FALSE
+Germany,Winners,100,Winners,Exposed,0,Core,FALSE
+Greece,At risk,100,At risk,Winners,0,Periphery,FALSE
+Hungary,At risk,100,At risk,Winners,0,Workbench,FALSE
+Italy,Winners,100,Winners,Exposed,0,Periphery,FALSE
+Lithuania,At risk,100,At risk,Winners,0,Workbench,FALSE
+Luxembourg,Winners,100,Winners,Exposed,0,Finance,FALSE
+Malta,At risk,100,At risk,Winners,0,Finance,FALSE
+Netherlands,Exposed,100,Exposed,Winners,0,Finance,FALSE
+Poland,Exposed,100,Exposed,Winners,0,Workbench,FALSE
+Romania,At risk,100,At risk,Winners,0,Workbench,FALSE
+Slovenia,Winners,100,Winners,Exposed,0,Workbench,TRUE
+Spain,Winners,100,Winners,Exposed,0,Periphery,FALSE
+Sweden,Winners,100,Winners,Exposed,0,Core,FALSE
