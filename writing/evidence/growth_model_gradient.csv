@@ -1,0 +1,5 @@
+growth_model,gap_pct,int_pba_g_per_eur,net_export_to_EU_Mt,net_pct_of_own_pba,gap_pct_country_mean,int_country_mean
+Finance,38,232,17.7,6.5,74,199
+Periphery,28,240,-47.5,-3.5,18,411
+Core,27,233,-48.9,-4.1,35,221
+Workbench,1,609,78.7,9.3,10,550

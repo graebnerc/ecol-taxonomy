@@ -131,6 +131,12 @@ Supporting:
 - `plots/` — current pipeline figures only (stale exploration plots are in `_archive/plots/`).
 - `info/` — proposal, Mealy & Teytelboym green-complexity paper, OECD CLEG + HS concordance,
   OECD EPS, and the implementation plan.
+- `writing/` — **self-contained pack for drafting the paper**, so a writing assistant can
+  work with access to this directory alone. Hand-written narrative
+  (`results-summary.md`, `open-questions.md`, `README.md`) plus generated `evidence/`
+  (result tables + `numbers.md`) and `figures/`; drafts go in `writing/output/`.
+  Regenerate the generated parts with `Rscript R/build_writing_pack.R` after ANY
+  pipeline change — otherwise the pack silently goes stale.
 - `_archive/` — superseded scripts/plots/report/notes, reference only (see `_archive/README.md`).
 
 ## Key data columns (`data/tidy/full_taxonomy_data.csv`)
