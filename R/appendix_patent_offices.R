@@ -2,7 +2,7 @@
 #
 # READY TO RUN before the data exists. Run
 # sql/get_green_patents_v3_all_offices.sql against a current PATSTAT edition,
-# save as data/tidy/patstat_green-patents_allauth.csv, then:
+# save as data/raw/get_green_patents_v3.csv, then:
 #
 #     Rscript R/appendix_patent_offices.R
 #
@@ -35,14 +35,21 @@ source(here("R/config.R"))
 source(here("R/country_classification.R"))
 source(here("R/functions/typology.R"))
 
-RAW <- here("data/tidy/patstat_green-patents_allauth.csv")
-if (!file.exists(RAW)) {
+# Accept either the documented path or the query's own filename dropped into
+# data/raw/ -- the latter is what you get by saving the SQL result directly, and
+# is what happened with the v2 extract.
+CANDIDATES <- c(here("data/tidy/patstat_green-patents_allauth.csv"),
+                here("data/raw/get_green_patents_v3.csv"),
+                here("data/raw/patstat_green-patents_allauth.csv"))
+RAW <- CANDIDATES[file.exists(CANDIDATES)][1]
+if (is.na(RAW)) {
   message(
     "\n", strrep("-", 74), "\n",
-    "All-offices PATSTAT extract not found:\n  ", RAW, "\n\n",
+    "All-offices PATSTAT extract not found. Looked for:\n",
+    paste0("  ", CANDIDATES, collapse = "\n"), "\n\n",
     "To produce it:\n",
     "  1. run sql/get_green_patents_v3_all_offices.sql against PATSTAT\n",
-    "  2. save the result at the path above (CSV, header row included)\n",
+    "  2. save the result as data/raw/get_green_patents_v3.csv\n",
     "  3. re-run: Rscript R/appendix_patent_offices.R\n\n",
     "Nothing was changed. The headline keeps the EPO-only measure, which is the\n",
     "intended concept -- this script only tests whether the ranking depends on it.\n",
@@ -50,6 +57,7 @@ if (!file.exists(RAW)) {
   quit(save = "no", status = 0)
 }
 
+message("Reading ", RAW)
 pat <- fread(RAW)
 need <- c("year", "country", "n_applications_all", "n_applications_ep")
 missing <- setdiff(need, names(pat))
@@ -62,6 +70,40 @@ stopifnot(
   "duplicate year x country rows" = !anyDuplicated(pat[, .(year, country)]),
   "EPO count exceeds all-offices count somewhere" =
     all(pat$n_applications_ep <= pat$n_applications_all))
+
+# THE CORRECTNESS CHECK. n_applications_ep must reproduce the v2 series exactly:
+# same database, same CPC filter, same applicant rule, same DISTINCT. If it does
+# not, this query differs from v2 in some way and the comparison is void -- fail
+# rather than quietly compare two things that are not comparable.
+V2 <- here("data/tidy/green_patents_panel.csv")
+if (file.exists(V2)) {
+  v2 <- fread(V2)[, .(country = iso2, year, ep_v2 = applications)]
+  j <- merge(pat[, .(country, year, ep_v3 = n_applications_ep)], v2,
+             by = c("country", "year"))
+  if (!nrow(j)) {
+    warning("no overlap with the v2 extract - cannot verify the EPO columns",
+            call. = FALSE)
+  } else {
+    bad <- j[ep_v3 != ep_v2]
+    cat(sprintf("\nEPO cross-check against v2: %d overlapping country-years, %d mismatched.\n",
+                nrow(j), nrow(bad)))
+    if (nrow(bad)) {
+      print(head(bad[order(-abs(ep_v3 - ep_v2))], 10))
+      stop("n_applications_ep does not reproduce the v2 series. The two queries ",
+           "differ (country list? year range? applicant rule? CPC match?), so the ",
+           "EPO-vs-all-offices comparison would not be like-for-like.")
+    }
+    cat("  EPO columns reproduce v2 exactly - the comparison is like-for-like.\n")
+  }
+} else {
+  warning("v2 panel absent - the EPO columns could not be verified against it.",
+          call. = FALSE)
+}
+
+# The query may be run in year batches if it is slow; report what arrived rather
+# than assuming the full range.
+cat(sprintf("Coverage: %d-%d, %d countries.\n",
+            min(pat$year), max(pat$year), uniqueN(pat$country)))
 
 ind <- as_tibble(fread(here("data/tidy/taxonomy_indicators.csv")))
 ind$iso3 <- countrycode(ind$country, "country.name", "iso3c")
@@ -89,6 +131,7 @@ print(kable(w2[, .(n = .N, mean_ep_share = round(mean(ep_share), 1)), by = group
 d <- as.data.table(ind)
 d <- merge(d, w2[, .(iso3, all_pm, ep_pm)], by = "iso3")
 score <- function(dd, innov) {
+  dd <- as.data.frame(dd)          # axis_score indexes df[, vars]; data.table differs
   v <- axis_score(dd, INTENSITY_VARS, "CarbonIntensity_normed", FOSSIL_VAR)$score
   p <- axis_score(dd, COMPLEXITY_VARS, "GCI", innov)$score
   list(v = v, p = p, q = assign_quadrant(v, p, "short"))
@@ -110,6 +153,22 @@ if (length(moved)) {
                          all_offices = alt$q[base$q != alt$q]), format = "pipe"))
   cat("\n  NOTE: if countries move, the divergence IS the finding -- discuss it,\n",
       "  do not resolve it by adopting whichever series is friendlier.\n", sep = "")
+}
+
+# --- Optional: which offices account for the non-EPO filings? ----------------
+BYOFF <- here("data/raw/get_green_patents_v3_by_office.csv")
+if (file.exists(BYOFF)) {
+  bo <- fread(BYOFF)
+  bo[, iso3 := countrycode(country, "iso2c", "iso3c", warn = FALSE)]
+  bo <- merge(bo, w2[, .(iso3, cname = country, group)], by = "iso3")
+  bo[, share := 100 * n_applications / sum(n_applications), by = iso3]
+  cat("\n## Top filing offices per country (non-EPO only, reference window)\n\n")
+  print(kable(bo[office != "EP"][order(iso3, -share)][, head(.SD, 2), by = iso3][
+    , .(country = cname, group, office, n_applications, share = round(share, 1))],
+    format = "pipe"))
+} else {
+  message("\n(Optional by-office breakdown absent; see the second query in ",
+          "sql/get_green_patents_v3_all_offices.sql if the ranking diverges.)")
 }
 
 out <- w2[, .(country, group, applications_all = all, applications_epo = ep,
