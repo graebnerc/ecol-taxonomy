@@ -4,7 +4,7 @@
 # 2. Typology scores: alternative specifications vs the STRUCTURED headline
 #    (flat single-PCA blocks, mean vs PCA, robust scaling, twin:standalone weight,
 #    ECI vs GCI, renewable-only GCI, production-based fossil, consumption-based
-#    carbon accounting, patent grants vs applications) -> rank correlation with the baseline and number of
+#    carbon accounting, patent grants vs applications, patents on a log scale) -> rank correlation with the baseline and number of
 #    countries changing quadrant.
 # 3. Clustering: silhouette + gap statistic for the number of clusters.
 # 4. Outlier sensitivity: drop Luxembourg / Malta and re-map.
@@ -68,6 +68,9 @@ ci0  <- complexity_indices(rca0$M)
 gci_ren <- green_indicators(rca0$M, ci0$PCI, renew_codes)[, c("iso3", "GCI")]
 names(gci_ren)[2] <- "GCI_ren"
 ind <- left_join(ind, gci_ren, by = "iso3")
+# log1p, not log: a country with zero green patents in the window is legitimate
+# (the PATSTAT GROUP BY emits no row), and log(0) would drop it.
+ind$GreenPatentsLog_normed <- log1p(ind$GreenPatents_normed)
 
 # Structured scoring - matches the 04 headline: each block = a twin sub-index
 # (PC1 of two correlated indicators) + a standalone, combined at weight
@@ -118,7 +121,16 @@ specs <- list(
   # so this spec is BOTH the measure check and an explicit demonstration of what
   # the truncation costs. See R/appendix_patent_options.R.
   "patents: grants not applications"   = score_spec(
-    ind, innov = "GreenPatentsGrants_normed")
+    ind, innov = "GreenPatentsGrants_normed"),
+  # Innovation standalone on a LOG scale. axis_score z-scores the standalone
+  # UNTRANSFORMED, and green patents per capita are heavily right-skewed
+  # (skew ~2.0 in the reference window; the top country is ~19x the median), so
+  # a handful of high-patenting states dominate the standardised variable. This
+  # is not hypothetical: R/appendix_capability_convergence.R shows that R2 of
+  # the raw standalone on log GDP moves with the skew while the log-scale R2
+  # barely does. Testing the transform directly.
+  "patents: log scale"                 = score_spec(
+    ind, innov = "GreenPatentsLog_normed")
 )
 rob <- lapply(names(specs), function(nm) {
   s <- specs[[nm]]; q <- assign_quadrant(s$vuln, s$pot, "short")

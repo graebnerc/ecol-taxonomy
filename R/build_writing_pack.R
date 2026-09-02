@@ -52,7 +52,9 @@ copy_tables <- c(
   "country_profiles.csv"       = "country_profiles.csv",
   "energy_by_sector.csv"       = "energy_by_sector.csv",
   "eora_crosscheck.csv"        = "eora_crosscheck.csv",
-  "patent_offices.csv"         = "patent_offices.csv")
+  "patent_offices.csv"         = "patent_offices.csv",
+  "capability_convergence.csv" = "capability_convergence.csv",
+  "validation_group_tests.csv" = "validation_group_tests.csv")
 copied <- character(0)
 for (src in names(copy_tables)) {
   from <- here("data/tidy", src)
@@ -70,7 +72,8 @@ copy_figs <- c("typology_map.png", "quadrant_profiles.png",
                "burden_responsibility.png", "offshoring_origins.png",
                "window_options.png", "patent_options.png",
                "appendix_structure_map.png", "descriptives_correlations.png",
-               "country_profiles.png", "eora_crosscheck.png", "patent_offices.png")
+               "country_profiles.png", "eora_crosscheck.png", "patent_offices.png",
+               "capability_convergence.png")
 figs <- character(0)
 for (f in copy_figs) {
   from <- here("plots", f)

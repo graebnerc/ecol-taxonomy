@@ -36,6 +36,15 @@ inconsistency.
 - [ ] Lean on the **partial correlations** in `06_validation.R` (net of log GDP
   p.c.) to show vulnerability carries signal *beyond* income — not a mere GDP
   proxy.
+- [x] **Inference register fixed 2026-09-02.** `06_validation.R` reported group
+  differences with OLS p-values while the contingency table used a Monte-Carlo
+  Fisher test *because* n = 27 is small — inconsistent. Group differences are now
+  PERMUTATION tests (20,000 shuffles; OLS shown alongside for comparison). This
+  MATTERS: on vulnerability, Finance (p .047 -> .084) and Periphery (.035 ->
+  .063) lose significance at 5%, while Workbench holds (.0007 -> .0003). Only the
+  Workbench-vs-Core vulnerability difference should be reported as significant.
+  The headline comparison tested on its own: potential p = .0004, vulnerability
+  p = .0003.
 - [ ] Tie to item 3: much of vulnerability's income-loading comes from the
   *choice* of variables (both per-value-added). Decomposition (item 3) isolates
   a near-income-neutral component. Report the improved R² once decomposed spec
@@ -421,13 +430,20 @@ countries. Grants-vs-applications is 0/27 even inside 2017-2021 where grants are
 severely truncated -- the truncation is proportional across countries, which is a
 stronger version of the licensing result than the 2014-2018 comparison.
 
-- [ ] **Substantive finding to follow up:** R2(potential ~ log GDP) falls
-  monotonically as the window moves forward -- 0.37 (2014-17), 0.33 (2014-18),
-  0.21 (2017-21), 0.19 (2019-21), 0.18 (2020-22). Green capability is becoming
-  LESS income-dependent over time. That is direct evidence on whether the
-  catch-up East is closing the green-capability gap and deserves its own
-  analysis, not a footnote. Cross-check against
-  `R/appendix_capability_trajectory.R`.
+- [x] **FOLLOWED UP 2026-09-02 -- and it is NOT a finding.**
+  `R/appendix_capability_convergence.R` decomposes the falling R2 (0.45 in
+  2012-16 to 0.21 in 2017-21 on rolling 5-year windows, patent measure held
+  fixed). It does not survive: (1) complexity was NEVER income-linked (R2 = 0.02
+  throughout), so nothing converged there; (2) the entire fall is in the patent
+  component and is mostly a SKEW artifact -- the standalone enters the axis
+  untransformed, skew rises 1.43 -> 1.98, and log-scale R2 falls only 0.77 ->
+  0.68 against 0.73 -> 0.46 raw; (3) the genuine signal is +0.09 z for the
+  Workbench over five years, cor(baseline income, change) = -0.42, on windows
+  overlapping by four of five years. Recommendation: at most one sentence that
+  green complexity shows no income gradient in any window -- a robustness point
+  about GCI, not a convergence result.
+- [x] Side effect: the skew prompted a new `07` spec, "patents: log scale" --
+  moves 0/27, so the headline is safe from the transform question too.
 - [x] **EORA comparison prepared:** `2014-2017` is built on both patent measures
   in `R/appendix_window_options.R`. Holding the WINDOW identical to the EORA
   coverage isolates the MRIO table choice from the window choice. Half the

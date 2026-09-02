@@ -1,0 +1,7 @@
+score,group,diff_vs_Core,p_perm,p_ols
+potential,Finance,-1.52,0.0132,0.0085
+potential,Periphery,-1.37,0.015,0.0082
+potential,Workbench,-1.56,7e-04,0.001
+vulnerability,Finance,1.12,0.0839,0.0466
+vulnerability,Periphery,1.07,0.0628,0.0351
+vulnerability,Workbench,1.63,3e-04,7e-04

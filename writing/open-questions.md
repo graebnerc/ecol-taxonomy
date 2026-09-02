@@ -120,15 +120,21 @@ these were tested rather than silently omit them.
   TeCO₂) as a second emissions source. Different system boundaries, so treat
   agreement as a robustness check, not a drop-in swap.
 
-## 10. A finding that has not been followed up
+## 10. ~~A finding that has not been followed up~~ — followed up, and it is not a finding
 
-**R²(potential ~ log GDP p.c.) falls monotonically as the window moves forward:**
-0.37 (2014–17) → 0.33 (2014–18) → 0.21 (2017–21) → 0.19 (2019–21) → 0.18
-(2020–22).
+R²(potential ~ log GDP p.c.) falls 0.45 → 0.21 across rolling windows, which
+looked like green capability decoupling from income. **Decomposition kills it**
+(see `results-summary.md` §8e):
 
-Green capability is becoming **less income-dependent over time**. That is direct
-evidence on whether the catch-up East is closing the green-capability gap, and it
-is currently sitting in a robustness table rather than being analysed. It may
-deserve to be a result in its own right — possibly a second contribution
-alongside the typology. Worth cross-checking against the capability-trajectory
-analysis before making anything of it.
+- complexity was never income-linked (R² 0.02 throughout), so nothing converged;
+- the whole fall is in the patent component, and is mostly a skew artifact — on a
+  log scale R² falls only 0.77 → 0.68 against 0.73 → 0.46 raw, while skew rises
+  1.43 → 1.98;
+- the real convergence signal is +0.09 z for the Workbench over five years, on
+  heavily overlapping windows.
+
+**Decision needed:** whether to mention it at all. My recommendation is one
+sentence noting that green complexity shows no income gradient in any window — a
+robustness point about GCI, not a convergence result — and nothing more. You said
+you wanted it available but not as a headline; on this evidence it should not be a
+section either.

@@ -8,5 +8,6 @@ complexity: renewable-only GCI,1,0.97,4
 fossil: production-based share,0.7,1,4
 carbon: consumption-based (CBA),0.98,1,0
 patents: grants not applications,1,1,0
+patents: log scale,1,0.97,0
 window shift 2016-2020,1,0.99,2
 window shift 2018-2022,0.99,0.99,0

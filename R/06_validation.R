@@ -90,12 +90,67 @@ grp_tbl <- dat |>
 print(as.data.frame(grp_tbl), row.names = FALSE, digits = 2)
 
 # H2/H3 test: are catch-up (Workbench) economies systematically lower-potential /
-# higher-vulnerability than Core? (regression on group, Core = reference)
+# higher-vulnerability than Core?
+#
+# INFERENCE. Reported as PERMUTATION p-values, not OLS ones. With n = 27 and
+# groups as small as Finance (n = 4), the t-distribution behind
+# summary(lm(...))$coefficients is not credible -- and reporting it here while the
+# contingency table below deliberately uses a Monte-Carlo Fisher test *because* n
+# is small would be internally inconsistent. The permutation test makes no
+# distributional assumption: it shuffles the group labels and asks how often a
+# difference from Core at least this large arises by chance. OLS estimates are
+# still shown (they are just group-mean differences), and the OLS p-value is
+# printed alongside so the two can be compared.
 dat$group <- relevel(factor(dat$group), ref = "Core")
-cat("\n--- potential ~ growth-model group (ref = Core) ---\n")
-print(summary(lm(potential ~ group, dat))$coefficients[, c(1, 4)], digits = 2)
-cat("\n--- vulnerability ~ growth-model group (ref = Core) ---\n")
-print(summary(lm(vulnerability ~ group, dat))$coefficients[, c(1, 4)], digits = 2)
+
+perm_vs_ref <- function(y, g, ref = "Core", B = 20000L, seed = 42L) {
+  set.seed(seed)
+  g <- as.character(g)
+  others <- setdiff(unique(g), ref)
+  obs <- vapply(others, function(o) mean(y[g == o]) - mean(y[g == ref]), numeric(1))
+  cnt <- setNames(integer(length(others)), others)
+  for (b in seq_len(B)) {
+    gp <- sample(g)
+    d  <- vapply(others, function(o) mean(y[gp == o]) - mean(y[gp == ref]), numeric(1))
+    cnt <- cnt + (abs(d) >= abs(obs))
+  }
+  data.frame(group = others,
+             diff_vs_Core = round(unname(obs), 2),
+             p_perm = round((unname(cnt) + 1) / (B + 1), 4))
+}
+
+report_group <- function(var, label) {
+  y <- dat[[var]]
+  co <- summary(lm(y ~ dat$group))$coefficients
+  ols <- data.frame(group = sub("^dat\\$group", "", rownames(co))[-1],
+                    p_ols = round(co[-1, 4], 4))
+  pr <- perm_vs_ref(y, dat$group)
+  out <- merge(pr, ols, by = "group", all.x = TRUE)
+  cat(sprintf("\n--- %s by growth-model group (differences vs Core) ---\n", label))
+  print(out[order(out$diff_vs_Core), ], row.names = FALSE)
+  invisible(out)
+}
+cat("\n(p_perm = permutation test, 20000 shuffles of the group labels;",
+    "p_ols shown for comparison only.)\n")
+perm_pot  <- report_group("potential", "Potential")
+perm_vuln <- report_group("vulnerability", "Vulnerability")
+
+# The comparison that actually carries the polarization claim, tested directly:
+# Workbench vs Core, one difference rather than three.
+wb_test <- function(var) {
+  y <- dat[[var]]; g <- as.character(dat$group)
+  k <- g %in% c("Core", "Workbench")
+  p <- perm_vs_ref(y[k], g[k], ref = "Core", B = 20000L)
+  sprintf("  %-14s Workbench - Core = %+.2f, permutation p = %.4f",
+          var, p$diff_vs_Core[p$group == "Workbench"],
+          p$p_perm[p$group == "Workbench"])
+}
+cat("\n--- The headline comparison, tested on its own ---\n")
+cat(wb_test("potential"), "\n"); cat(wb_test("vulnerability"), "\n")
+
+fwrite(rbind(cbind(score = "potential", perm_pot),
+             cbind(score = "vulnerability", perm_vuln)),
+       here("data/tidy/validation_group_tests.csv"))
 
 # Contingency of quadrant x growth model + Cramer's V. With n = 27 and a 4x4
 # table every expected count is < 5, so the chi-square p-value is invalid

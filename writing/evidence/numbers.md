@@ -1,6 +1,6 @@
 # Key numbers
 
-*Generated 2026-09-02 from commit 0dc0e23 by R/build_writing_pack.R.*
+*Generated 2026-09-02 from commit c671910 by R/build_writing_pack.R.*
 
 Every figure below is computed from the committed pipeline output. **Use these
 values verbatim; do not recompute, round differently, or estimate.** If a number
@@ -78,6 +78,7 @@ Spearman rank correlation vs the headline; quadrant changes out of 27.
 | fossil: production-based share | 0.70 | 1.00 | 4 |
 | carbon: consumption-based (CBA) | 0.98 | 1.00 | 0 |
 | patents: grants not applications | 1.00 | 1.00 | 0 |
+| patents: log scale | 1.00 | 0.97 | 0 |
 | window shift 2016-2020 | 1.00 | 0.99 | 2 |
 | window shift 2018-2022 | 0.99 | 0.99 | 0 |
 
@@ -98,8 +99,8 @@ Spearman rank correlation vs the headline; quadrant changes out of 27.
 ## Files in this pack
 
 **Tables** (`evidence/`): 
-`scores_by_country.csv`, `indicators_by_country.csv`, `quadrant_classification.csv`, `quadrant_profiles.csv`, `robustness_specs.csv`, `window_options.csv`, `validation_external.csv`, `validation_group_means.csv`, `burden_responsibility.csv`, `offshoring_origins.csv`, `growth_model_gradient.csv`, `patent_options.csv`, `country_profiles.csv`, `energy_by_sector.csv`, `eora_crosscheck.csv`, `patent_offices.csv`
+`scores_by_country.csv`, `indicators_by_country.csv`, `quadrant_classification.csv`, `quadrant_profiles.csv`, `robustness_specs.csv`, `window_options.csv`, `validation_external.csv`, `validation_group_means.csv`, `burden_responsibility.csv`, `offshoring_origins.csv`, `growth_model_gradient.csv`, `patent_options.csv`, `country_profiles.csv`, `energy_by_sector.csv`, `eora_crosscheck.csv`, `patent_offices.csv`, `capability_convergence.csv`, `validation_group_tests.csv`
 
 **Figures** (`figures/`): 
-`typology_map.png`, `quadrant_profiles.png`, `validation_scores_by_group.png`, `validation_alluvial.png`, `burden_responsibility.png`, `offshoring_origins.png`, `window_options.png`, `patent_options.png`, `appendix_structure_map.png`, `country_profiles.png`, `eora_crosscheck.png`, `patent_offices.png`
+`typology_map.png`, `quadrant_profiles.png`, `validation_scores_by_group.png`, `validation_alluvial.png`, `burden_responsibility.png`, `offshoring_origins.png`, `window_options.png`, `patent_options.png`, `appendix_structure_map.png`, `country_profiles.png`, `eora_crosscheck.png`, `patent_offices.png`, `capability_convergence.png`
 

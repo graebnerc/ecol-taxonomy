@@ -120,19 +120,35 @@ cannot explain, and Luxembourg vs Ireland/Malta are all rich.
 
 ### Important caveat on how far this differentiates
 
-Regressed on growth model with Core as reference, **the three non-Core groups are
-statistically indistinguishable from one another**:
+Differences from Core, with **permutation p-values** (20,000 shuffles of the
+group labels). These replace the OLS p-values used earlier: with n = 27 and
+Finance at n = 4, the t-distribution is not credible, and reporting it while the
+contingency table below uses a Monte-Carlo Fisher test *because* n is small would
+be internally inconsistent. OLS values are shown for comparison — they were
+optimistic.
 
-| vs Core | Finance | Periphery | Workbench |
+| vs Core | difference | p (permutation) | p (OLS) |
 |---|---:|---:|---:|
-| potential | −1.5 (p=.009) | −1.4 (p=.008) | −1.6 (p=.001) |
-| vulnerability | +1.1 (p=.047) | +1.1 (p=.035) | +1.6 (p=.0007) |
+| **potential** — Workbench | −1.56 | **0.0007** | 0.0010 |
+| potential — Finance | −1.52 | **0.0132** | 0.0085 |
+| potential — Periphery | −1.37 | **0.0150** | 0.0082 |
+| **vulnerability** — Workbench | +1.63 | **0.0003** | 0.0007 |
+| vulnerability — Finance | +1.12 | 0.0839 | 0.0466 |
+| vulnerability — Periphery | +1.07 | 0.0628 | 0.0351 |
 
-The pattern is **Core vs everyone else**, not a four-way gradient. A claim that
-"different growth models face *different* transition challenges" (plural,
-differentiated) is **not supported**. The narrow claim — the catch-up East is
-both more vulnerable and less capable than the Core — is strongly supported.
-This constrains the framing decision; see `open-questions.md` §1.
+Two things follow, and the second is new:
+
+1. The pattern is **Core vs everyone else**, not a four-way gradient. A claim that
+   "different growth models face *different* transition challenges" (plural,
+   differentiated) is **not supported**.
+2. **On vulnerability, only the Workbench difference survives a proper test.**
+   Finance and Periphery drop to p ≈ 0.06–0.08 under permutation, having looked
+   significant at 5% under OLS. Do not report those two as significant.
+
+The **narrow claim — the catch-up East is both more vulnerable and less capable
+than the Core — is strongly supported** and holds up on its own: tested as a
+single Workbench-vs-Core comparison, potential p = 0.0004 and vulnerability
+p = 0.0003. This constrains the framing decision; see `open-questions.md` §1.
 
 ## 6. External validity
 
@@ -166,6 +182,7 @@ The map is stable to every specification tested (quadrant changes out of 27):
 | complexity: ECI replaces GCI | 1.00 | 0.92 | **0** |
 | carbon: consumption-based accounting | 0.98 | 1.00 | **0** |
 | patents: grants instead of applications | 1.00 | 1.00 | **0** |
+| patents: log scale (skew ≈ 2.0) | 1.00 | 0.97 | **0** |
 | robust (median/MAD) scaling | 0.99 | 1.00 | 2 |
 | part weights 2:1 | 0.95 | 0.98 | 2 |
 | complexity: renewable-only GCI | 1.00 | 0.97 | 4 |
@@ -340,6 +357,52 @@ core-periphery effect.
 protection, which is the concept the potential axis wants; all-offices counts mix
 objects of different standing. The all-offices series is the robustness check,
 not a better measure.
+
+## 8e. Green capability is NOT decoupling from income — the apparent trend is an artifact
+
+R²(potential ~ log GDP p.c.) falls as the window moves forward — 0.45 (2012–16)
+to 0.21 (2017–21) on a rolling 5-year series with the patent measure held fixed.
+Read naively that says green capability is decoupling from income, which would be
+a second result alongside the typology. **It does not survive decomposition.**
+
+| window | potential | complexity twin | innovation | GCI | GCP |
+|---|---:|---:|---:|---:|---:|
+| 2012–2016 | 0.45 | 0.02 | 0.73 | 0.02 | 0.02 |
+| 2014–2018 | 0.35 | 0.01 | 0.63 | 0.01 | 0.01 |
+| 2017–2021 | **0.21** | **0.00** | **0.46** | 0.01 | 0.00 |
+
+Three reasons not to build on it:
+
+1. **Complexity was never income-dependent.** R²(complexity ~ log GDP) is 0.02
+   throughout. There is no convergence there because there was nothing to
+   converge from — this is just a restatement of the known result that GCI is
+   income-neutral.
+2. **The entire fall sits in the patent component, and is mostly distributional.**
+   The innovation standalone enters the axis *untransformed*, and green patents
+   per capita are heavily right-skewed. Across the same windows, skew rises
+   **1.43 → 1.98** (top country ≈ 19× the median), and R² on a **log** scale
+   falls only **0.77 → 0.68** against 0.73 → 0.46 on the raw scale. Most of the
+   apparent decoupling is a few high-patenting countries pulling away and making
+   the untransformed variable more skewed — not poorer members catching up.
+3. **The genuine convergence signal is small.** Between the two non-overlapping
+   endpoint windows the Workbench gains +0.09 z on potential (Core −0.03,
+   Periphery −0.05, Finance −0.14), and cor(baseline log GDP p.c., change in
+   potential) = −0.42 — directionally convergent but modest, on n = 27. EU mean
+   GCI is flat (1.40 → 1.42) and within-EU dispersion barely moves (sd 1.06 →
+   1.02), so neither the EU as a whole nor its spread changed much.
+
+And the rolling windows **overlap by four of five years**, so the six points are
+nowhere near six independent observations; the smooth-looking trend is largely
+that autocorrelation.
+
+**Recommendation: do not present this as a finding.** At most a sentence noting
+that green complexity shows no income gradient in any window, which is a
+robustness point about GCI rather than a result about convergence. It would not
+survive a referee who logs the patent variable.
+
+*Useful side effect:* the skew prompted a new robustness spec — the innovation
+standalone on a log scale — which moves **0/27**. So the headline is safe from
+the transform question too.
 
 ## 9. A correction that strengthens the story
 
