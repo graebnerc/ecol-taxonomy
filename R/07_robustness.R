@@ -1,15 +1,15 @@
 # 07 - Robustness & sensitivity (Phase 6, section A: self-contained checks).
 #
-# 1. Complexity: per-year GCI/ECI vs the pooled 2014-2018 cross-section.
+# 1. Complexity: per-year GCI/ECI vs the pooled reference cross-section.
 # 2. Typology scores: alternative specifications vs the STRUCTURED headline
 #    (flat single-PCA blocks, mean vs PCA, robust scaling, twin:standalone weight,
 #    ECI vs GCI, renewable-only GCI, production-based fossil, consumption-based
-#    carbon accounting) -> rank correlation with the baseline and number of
+#    carbon accounting, patent grants vs applications) -> rank correlation with the baseline and number of
 #    countries changing quadrant.
 # 3. Clustering: silhouette + gap statistic for the number of clusters.
 # 4. Outlier sensitivity: drop Luxembourg / Malta and re-map.
 # 5. Indicator-window shift: rebuild the FULL typology (complexity re-pooled +
-#    indicators re-averaged) on 2013-2017 and 2015-2019.
+#    indicators re-averaged) on the reference window +/- 1 year.
 
 here::i_am("R/07_robustness.R")
 library(here)
@@ -39,9 +39,9 @@ compute_complexity <- function(exp_dt, codes = green_codes, min_export = 5e9) {
 
 # === 1. Per-year complexity vs pooled =========================================
 cat("\n===== 1. Complexity: per-year vs pooled cross-section =====\n")
-byyear_path <- here("data/raw/exports_by_year_1319.rds")
+byyear_path <- here("data/raw/exports_by_year_1224.rds")
 stopifnot(
-  "exports_by_year_1319.rds missing - run 02_complexity.R from the Atlas first (it builds this cache)" =
+  "exports_by_year_1224.rds missing - run 02_complexity.R from the Atlas first (it builds this cache)" =
     file.exists(byyear_path))
 eby <- readRDS(byyear_path)
 pooled <- as_tibble(fread(here("data/tidy/green_complexity_eu.csv")))
@@ -61,7 +61,8 @@ cat(sprintf("EU-27 GCI rank corr (per-year vs pooled): min %.3f, mean %.3f\n",
 # === 2. Typology score specifications =========================================
 cat("\n===== 2. Typology scores: specification sensitivity =====\n")
 # Renewable-only GCI from the pooled matrix, joined to the indicator table.
-pooled_exp <- readRDS(here("data/raw/pooled_exports_1418.rds"))
+pooled_exp <- readRDS(here(sprintf("data/raw/pooled_exports_%02d%02d.rds",
+                                   REF_FIRST_YEAR %% 100, REF_LAST_YEAR %% 100)))
 rca0 <- build_rca_matrix(pooled_exp)
 ci0  <- complexity_indices(rca0$M)
 gci_ren <- green_indicators(rca0$M, ci0$PCI, renew_codes)[, c("iso3", "GCI")]
@@ -110,7 +111,14 @@ specs <- list(
   # embodied emissions. See info/PaperTodos.md item 4 and
   # R/appendix_burden_responsibility.R.
   "carbon: consumption-based (CBA)"    = score_spec(
-    ind, intensity = c("CarbonIntensityCBA_normed", "EnergyIntensity_normed"))
+    ind, intensity = c("CarbonIntensityCBA_normed", "EnergyIntensity_normed")),
+  # Green-innovation measure: the headline is EPO APPLICATIONS (config.R
+  # PATENT_MEASURE), which is what makes the 2017-2021 window reachable. GRANTS
+  # are the pre-2026-09 headline and are grant-lag truncated in this window --
+  # so this spec is BOTH the measure check and an explicit demonstration of what
+  # the truncation costs. See R/appendix_patent_options.R.
+  "patents: grants not applications"   = score_spec(
+    ind, innov = "GreenPatentsGrants_normed")
 )
 rob <- lapply(names(specs), function(nm) {
   s <- specs[[nm]]; q <- assign_quadrant(s$vuln, s$pot, "short")

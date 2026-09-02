@@ -9,6 +9,10 @@
 #'   one row per country-year (see R/get_data_extra.R); pass NULL to skip
 #'   GDP-based indicators.
 #' @param first_year,last_year Reference window (inclusive).
+#' @details The green-patent variable is selected by `PATENT_MEASURE` in
+#'   R/config.R ("applications" or "grants"); both are always built as
+#'   `GreenPatentsApps_normed` / `GreenPatentsGrants_normed` so 07 can test the
+#'   other one without rebuilding the panel.
 #' @return Tibble, one row per country (English country name), with `*_normed`
 #'   indicator columns averaged over the window.
 build_indicator_table <- function(base_data, extra_data,
@@ -59,7 +63,9 @@ build_indicator_table <- function(base_data, extra_data,
       GWP_normed               = GWP_pba / population,                     # production-based GHG p.c.
       EnergyConsumption_normed = FinalEnergyConsumption / population,      # final energy demand p.c.
       # --- Potential block ------------------------------------------------
-      GreenPatents_normed      = GreenPatents_n / (population / 1000000),  # green patents per million
+      # Both patent measures are always built; the headline picks one below.
+      GreenPatentsGrants_normed = GreenPatents_n / (population / 1000000),      # EPO grants per million (grant-lag truncated from 2019)
+      GreenPatentsApps_normed   = GreenPatentsApps_n / (population / 1000000),  # EPO applications per million
       ValueAdded_normed        = ValueAdded_pba / population,              # value added p.c.
       # --- Context / other ------------------------------------------------
       EnergyProduction_normed  = PrimaryEnergyProduction / population,     # primary energy production p.c.
@@ -70,6 +76,12 @@ build_indicator_table <- function(base_data, extra_data,
   if (has_gdp) {
     dat <- dplyr::mutate(dat, GDP_normed = GDP_ppp / population)          # GDP (PPP) p.c.
   }
+
+  # Headline green-innovation variable. `measure` comes from R/config.R
+  # (PATENT_MEASURE); "grants" reproduces the pre-2026-09 headline.
+  measure <- if (exists("PATENT_MEASURE")) PATENT_MEASURE else "grants"
+  dat <- dplyr::mutate(dat, GreenPatents_normed = if (measure == "applications")
+                         GreenPatentsApps_normed else GreenPatentsGrants_normed)
 
   # Headline fossil-share vulnerability: demand-side (fossil share of gross
   # available energy, Eurostat, in %). Measures how fossil-based the energy a

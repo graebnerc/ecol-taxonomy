@@ -8,8 +8,26 @@
 # (EXIOBASE footprints, Eurostat energy balances, PATSTAT green patents,
 # WDI/Eurostat GDP) overlap with good coverage. Sensitivity to this choice is
 # tested in Phase 6.
-REF_FIRST_YEAR <- 2014
-REF_LAST_YEAR  <- 2018
+# CHANGED 2026-09-02 from 2014-2018 to 2017-2021. EXIOBASE 3.10.2 lifted the old
+# cap (value added stopped at 2019); the binding constraint is now the green
+# patent variable, which is why PATENT_MEASURE below matters. 2017-2021 is the
+# most recent window in which every input is observed and complete: EXIOBASE
+# emissions are complete only to 2022 (2023-2024 are nowcasts with a broken
+# dominant stressor) and patent APPLICATIONS only to 2021. Evidence and the cost
+# of the move (2/27 countries, both already borderline) in
+# info/Report_2026-09-01_data-rebuild.md and R/appendix_window_options.R.
+REF_FIRST_YEAR <- 2017
+REF_LAST_YEAR  <- 2021
+
+# Green-patent measure for the headline innovation standalone.
+#   "applications" - EPO filings, complete ~18 months after filing. HEADLINE.
+#   "grants"       - EPO grants by filing year. Grant lag is 3-5+ years, so the
+#                    recent cohorts are severely truncated; kept as a robustness
+#                    spec in 07_robustness.R.
+# The two rank EU-27 countries at Spearman 0.99 and swapping them moves 0/27
+# countries, which is what licenses using applications to reach a recent window
+# (R/appendix_patent_options.R).
+PATENT_MEASURE <- "applications"
 
 # Typology blocks (Fig. 1) ----------------------------------------------------
 # Each of the two blocks is built from TWO conceptual dimensions, combined with

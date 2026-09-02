@@ -116,29 +116,47 @@ score_of <- function(ind) {
 }
 
 # --- Candidate windows --------------------------------------------------------
-# 2014-2018 is the current headline. The others are the most recent windows each
-# patent measure can support without importing truncation.
+# The headline is now 2017-2021 with APPLICATIONS (R/config.R). The rest are
+# robustness checks, each rebuilding the whole typology.
+#
+#   2014-2018  the former headline -- how far the map moved in total
+#   2014-2017  requested: matches the user's EORA coverage, so the SAME window
+#              can be recomputed on a different MRIO and the table choice
+#              isolated from the window choice
+#   2019-2021  most recent 3-year window with every input observed and complete
+#   2020-2022  most recent 3-year window EXIOBASE supports (emissions complete
+#              to 2022); patent applications for 2022 sit at ~73% of their 2018
+#              level, so this one IS partly truncated -- flagged, not hidden
+#   grants variants  the pre-2026-09 measure on the old and new windows
+#
+# EXIOBASE 2023-2024 are excluded everywhere: their dominant stressor is
+# identically zero (see R/get_data_exiobase.R), so no window may end there.
 specs <- list(
-  list(name = "2014-2018 (headline)", y1 = 2014, y2 = 2018, m = "patstat_v1_grants"),
-  list(name = "2014-2018, OECD apps", y1 = 2014, y2 = 2018, m = "oecd_applications"),
-  list(name = "2016-2020, OECD apps", y1 = 2016, y2 = 2020, m = "oecd_applications"),
-  list(name = "2017-2021, OECD apps", y1 = 2017, y2 = 2021, m = "oecd_applications"))
+  list(name = "2017-2021 apps (HEADLINE)", y1 = 2017, y2 = 2021, m = "oecd_applications", note = ""),
+  list(name = "2014-2018 apps (former window)", y1 = 2014, y2 = 2018, m = "oecd_applications", note = ""),
+  list(name = "2014-2018 grants (former headline)", y1 = 2014, y2 = 2018, m = "patstat_v1_grants", note = ""),
+  list(name = "2014-2017 apps (EORA-comparable)", y1 = 2014, y2 = 2017, m = "oecd_applications", note = "matches EORA coverage"),
+  list(name = "2014-2017 grants (EORA-comparable)", y1 = 2014, y2 = 2017, m = "patstat_v1_grants", note = "matches EORA coverage"),
+  list(name = "2019-2021 apps (last 3y, clean)", y1 = 2019, y2 = 2021, m = "oecd_applications", note = ""),
+  list(name = "2020-2022 apps (last 3y, EXIOBASE max)", y1 = 2020, y2 = 2022, m = "oecd_applications", note = "patent apps 2022 ~73% complete"),
+  list(name = "2017-2021 grants (truncated)", y1 = 2017, y2 = 2021, m = "patstat_v1_grants", note = "grants heavily grant-lag truncated"))
 if (HAVE_V2)
   specs <- c(specs, list(
-    list(name = "2018-2022, PATSTAT v2 apps", y1 = 2018, y2 = 2022,
-         m = "patstat_v2_applications"),
-    list(name = "2019-2023, PATSTAT v2 apps", y1 = 2019, y2 = 2023,
-         m = "patstat_v2_applications")))
+    list(name = "2018-2022 PATSTAT v2 apps", y1 = 2018, y2 = 2022,
+         m = "patstat_v2_applications", note = ""),
+    list(name = "2019-2023 PATSTAT v2 apps", y1 = 2019, y2 = 2023,
+         m = "patstat_v2_applications", note = "EXIOBASE 2023 unusable - will fail")))
 
 res <- lapply(specs, function(s) {
   message("  ", s$name)
   sc <- score_of(build_window(s$y1, s$y2, s$m))
-  c(list(name = s$name), sc)
+  c(list(name = s$name, note = s$note), sc)
 })
 base <- res[[1]]
 
 out <- rbindlist(lapply(res, function(r) data.table(
   window = r$name,
+  note = r$note,
   cor_vuln = round(cor(base$v, r$v, method = "spearman"), 2),
   cor_pot  = round(cor(base$p, r$p, method = "spearman"), 2),
   quad_changes = sum(r$q != base$q),
@@ -148,7 +166,8 @@ out <- rbindlist(lapply(res, function(r) data.table(
 
 cat("\n## Reference-window options, full typology rebuilt on each\n\n")
 print(kable(out[, .(window, cor_vuln, cor_pot, quad_changes,
-                    r2_vuln_gdp, r2_pot_gdp, cor_axes)], format = "pipe"))
+                    r2_vuln_gdp, r2_pot_gdp, cor_axes, note)], format = "pipe"))
+cat("\n  Baseline for the comparison = the HEADLINE window (row 1).\n")
 cat("\nCountries moving vs the 2014-2018 headline:\n\n")
 print(kable(out[quad_changes > 0, .(window, moved)], format = "pipe"))
 fwrite(out, here("data/tidy/window_options.csv"))

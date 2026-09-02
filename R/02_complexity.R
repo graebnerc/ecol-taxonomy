@@ -25,8 +25,12 @@ source(here("R/functions/complexity.R"))
 
 atlas_path  <- here("data/raw/atlas_hs92_6d.csv")
 green_path  <- here("data/tidy/green_products_hs6.csv")
-cache_path  <- here("data/raw/pooled_exports_1418.rds")    # gitignored derived cache
-byyear_path <- here("data/raw/exports_by_year_1319.rds")   # gitignored; used by 07
+# Pooled cache is window-specific, so its name carries the window. The by-year
+# cache is WIDE (2012-2024) so any reference window -- and 07's shifted windows,
+# and appendix_window_options.R -- can be re-pooled without another Atlas read.
+cache_path  <- here(sprintf("data/raw/pooled_exports_%02d%02d.rds",
+                            REF_FIRST_YEAR %% 100, REF_LAST_YEAR %% 100))
+byyear_path <- here("data/raw/exports_by_year_1224.rds")
 stopifnot("Green list missing (run build_green_list.R)" = file.exists(green_path))
 
 # --- Load & pool exports over the reference window ---------------------------
@@ -36,10 +40,18 @@ stopifnot("Green list missing (run build_green_list.R)" = file.exists(green_path
 # 2013-2017 / 2015-2019 without another Atlas read. Both caches come from a
 # single Atlas read; the pooled table is the by-year table summed over the
 # reference years, so they are consistent by construction.
-if (file.exists(cache_path) && file.exists(byyear_path)) {
-  message("Loading cached exports (", basename(cache_path), ", ",
-          basename(byyear_path), ") ...")
+if (file.exists(cache_path)) {
+  message("Loading cached pooled exports (", basename(cache_path), ") ...")
   exp_dt <- readRDS(cache_path)
+} else if (file.exists(byyear_path)) {
+  message("Pooling ", REF_FIRST_YEAR, "-", REF_LAST_YEAR, " from ",
+          basename(byyear_path), " ...")
+  eby <- as.data.table(readRDS(byyear_path))
+  stopifnot("by-year cache does not span the reference window" =
+              all(REF_FIRST_YEAR:REF_LAST_YEAR %in% eby$year))
+  exp_dt <- eby[year >= REF_FIRST_YEAR & year <= REF_LAST_YEAR,
+                .(export = sum(export)), by = .(iso3, hs6)]
+  saveRDS(exp_dt, cache_path)
 } else {
   stopifnot("Atlas data missing (see plan Phase 1a)" = file.exists(atlas_path))
   message("Reading Atlas data (first run; will cache pooled + by-year) ...")
@@ -53,7 +65,9 @@ if (file.exists(cache_path) && file.exists(byyear_path)) {
   )
   setnames(atlas, c("iso3", "hs6", "year", "export"))
   atlas[, hs6 := formatC(hs6, width = 6, flag = "0")]
-  eby <- atlas[year >= REF_FIRST_YEAR - 1 & year <= REF_LAST_YEAR + 1 & export > 0,
+  # Cache 2012-2024, not just the window +/- 1, so no later window change needs
+  # another 968MB read.
+  eby <- atlas[year >= 2012 & year <= 2024 & export > 0,
                .(export = sum(export)), by = .(iso3, hs6, year)]
   saveRDS(eby, byyear_path)                                 # per-year cache for 07
   exp_dt <- eby[year >= REF_FIRST_YEAR & year <= REF_LAST_YEAR,
