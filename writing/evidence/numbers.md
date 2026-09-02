@@ -1,6 +1,6 @@
 # Key numbers
 
-*Generated 2026-09-02 from commit 03dff3b by R/build_writing_pack.R.*
+*Generated 2026-09-02 from commit 3958e67 by R/build_writing_pack.R.*
 
 Every figure below is computed from the committed pipeline output. **Use these
 values verbatim; do not recompute, round differently, or estimate.** If a number
