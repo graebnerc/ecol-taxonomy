@@ -48,14 +48,20 @@ copy_tables <- c(
   "burden_responsibility.csv"  = "burden_responsibility.csv",
   "offshoring_origins.csv"     = "offshoring_origins.csv",
   "growth_model_gradient.csv"  = "growth_model_gradient.csv",
-  "patent_options.csv"         = "patent_options.csv")
+  "patent_options.csv"         = "patent_options.csv",
+  "country_profiles.csv"       = "country_profiles.csv",
+  "energy_by_sector.csv"       = "energy_by_sector.csv",
+  "eora_crosscheck.csv"        = "eora_crosscheck.csv",
+  "patent_offices.csv"         = "patent_offices.csv")
 copied <- character(0)
 for (src in names(copy_tables)) {
   from <- here("data/tidy", src)
   if (file.exists(from)) {
     file.copy(from, file.path(EV, copy_tables[[src]]), overwrite = TRUE)
     copied <- c(copied, copy_tables[[src]])
-  } else warning("missing evidence table: ", src, call. = FALSE)
+  } else if (!src %in% c("patent_offices.csv")) {
+    warning("missing evidence table: ", src, call. = FALSE)
+  }
 }
 
 # --- 2. Figures ---------------------------------------------------------------
@@ -63,7 +69,8 @@ copy_figs <- c("typology_map.png", "quadrant_profiles.png",
                "validation_scores_by_group.png", "validation_alluvial.png",
                "burden_responsibility.png", "offshoring_origins.png",
                "window_options.png", "patent_options.png",
-               "appendix_structure_map.png", "descriptives_correlations.png")
+               "appendix_structure_map.png", "descriptives_correlations.png",
+               "country_profiles.png", "eora_crosscheck.png", "patent_offices.png")
 figs <- character(0)
 for (f in copy_figs) {
   from <- here("plots", f)

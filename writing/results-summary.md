@@ -239,6 +239,61 @@ Malta dominate a four-country Finance bloc — do not quote that version without
 saying so. Note also that growth model adds only ~0.05 R² over log GDP p.c. alone
 in explaining this gap, so it should not carry an "it's not just income" argument.
 
+## 8b. Does the MRIO table choice matter? No.
+
+A referee can ask whether the map is an artifact of EXIOBASE, since both
+vulnerability intensities are ratios of EXIOBASE quantities. Two separate tests:
+
+- **Release.** EXIOBASE 3.8.x → 3.10.2, an 18% upward revision of EU production
+  emissions: **0/27**.
+- **Table.** A completely independent MRIO — **EORA26** (different compiler,
+  source data, 26 vs 200 sectors, 190 vs 49 regions) — on the same 2014–2017
+  window, CO2 only on both sides: CO2-intensity Spearman **0.89** across
+  countries, vulnerability-axis Spearman **0.98**, **0/27** quadrant changes.
+
+Holding the window fixed at 2014–2017 is deliberate: it isolates the *table*
+choice from the *window* choice. This is why `evidence/window_options.csv`
+carries a 2014–2017 row.
+
+**One caveat that must be reported if this is used.** The comparison runs on CO2
+only, and that is forced rather than preferred. EORA26's GHG satellite block is
+partly unusable in this release: every fluorinated gas carries ~51,000 Gg
+(SF6 50931, NF3 51500, HFC23 51332 …), near-identical across gases *and* across
+years — placeholder fill, not data. Real global SF6 is ~10 Gg; characterised at
+AR4 GWPs those rows alone give ~8,000 Gt CO₂e, 160× the world total. N₂O is
+inflated ~5×. Only CO₂ is credible (33.3 Gt against a real ~36). EXIOBASE was
+therefore recomputed on a CO₂-only basket for the same years, so the two sides
+differ by *table* and nothing else. That EORA cannot supply a usable multi-gas
+footprint is itself worth a sentence: it is not a drop-in alternative.
+
+## 8c. Country drill-downs: demand composition does not explain the map
+
+The presentation feedback asked whether energy demand in the surprising countries
+is driven by business or households. It was worth checking and the answer is
+negative:
+
+| | Winners | Exposed | Low-stakes | At risk |
+|---|---:|---:|---:|---:|
+| households % of final energy | 24.8 | 27.1 | 22.5 | 28.5 |
+| business % | 42.6 | 45.7 | 41.5 | 37.9 |
+| transport % | 31.8 | 26.9 | 35.5 | 33.1 |
+
+cor(household share, vulnerability) = **+0.16**; business **−0.35**; industry
+**−0.38**. The composition of demand is not what separates the quadrants — report
+this as a negative result rather than omitting it.
+
+It does supply the **Malta / Luxembourg vignette**:
+
+- **Luxembourg** (Winners): produces 12.0 t CO₂e p.c. but *consumes* 26.1 —
+  a ratio of **2.18×**, the highest in the EU. Only **13.9%** of its final energy
+  goes to households, the lowest in the EU, with transport correspondingly
+  inflated — the fuel-tourism artifact, worth naming explicitly.
+- **Malta** (At risk): produces 5.7 t p.c., consumes 11.6 (**2.03×**), on a
+  **96.6%** fossil energy mix.
+
+Both look cleaner in production terms than they are in consumption terms, which
+is the burden-vs-responsibility point at country level.
+
 ## 9. A correction that strengthens the story
 
 The original PATSTAT query lacked `COUNT(DISTINCT ...)`, counting each
@@ -267,6 +322,10 @@ moves the result in the direction *less* convenient for a sceptic.
   footnote-sized.
 - **Patents count EPO filings only** (`appln_auth = 'EP'`), excluding national
   offices — which plausibly understates exactly the small and eastern states in
-  the low-potential tail.
+  the low-potential tail. The check is prepared but **not yet run** (it needs a
+  PATSTAT query); until it is, this stays an acknowledged limitation rather than
+  a resolved one. Note an EPO filing confers European-wide protection, which is
+  the concept the axis wants, so all-offices counts would be a robustness check
+  rather than a better measure.
 - **EXIOBASE 2023–2024 are unusable** (dominant stressor identically zero), so no
   window may end after 2022.

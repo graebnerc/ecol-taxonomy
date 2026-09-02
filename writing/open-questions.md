@@ -106,19 +106,21 @@ on EPS despite its 20/27 coverage) or state plainly that it is descriptive there
 
 Not blocking, but each closes a line a referee could open.
 
-- **EORA cross-check.** `evidence/window_options.csv` contains a **2014–2017**
-  row on both patent measures, built specifically because that matches available
-  EORA coverage. Recomputing it on EORA isolates the **MRIO table choice** from
-  the window choice. Half the comparison already exists: EXIOBASE 3.8 → 3.10.2
-  moved 0/27. If EORA also lands near zero, MRIO choice becomes a one-sentence
-  dismissal.
-- **National patent offices.** The patent query counts EPO filings only
-  (`appln_auth = 'EP'`), which plausibly understates the small and eastern states
-  in the low-potential tail — now more load-bearing since the double-counting
-  correction showed how sensitive periphery counts are to query details.
-- **Country drill-downs.** The sectoral energy split (households vs business,
-  available in Eurostat `nrg_bal_c` without a new download) for the flagged
-  countries — Malta and Luxembourg especially.
+- ~~**EORA cross-check.**~~ **DONE — 0/27** (see `results-summary.md` §8b,
+  `evidence/eora_crosscheck.csv`). MRIO choice can now be dismissed in a
+  sentence, with the EORA data-quality caveat reported.
+- **National patent offices — PREPARED, needs one PATSTAT run.** The query
+  (`sql/get_green_patents_v3_all_offices.sql`) and its analysis script are ready;
+  the query returns EPO-only and all-offices counts side by side from a single
+  scan. This is the last open robustness item, and it is the one most likely to
+  matter: the v1→v2 correction showed how sensitive periphery counts are to query
+  details. If the two series diverge, the divergence is the finding — do not
+  resolve it by adopting whichever series is friendlier.
+- ~~**Country drill-downs.**~~ **DONE** (see `results-summary.md` §8c,
+  `evidence/country_profiles.csv`, `evidence/energy_by_sector.csv`,
+  `figures/country_profiles.png`). Result is a negative — demand composition does
+  not explain the map — plus the Malta/Luxembourg vignette. Decide whether the
+  negative is worth reporting; it pre-empts an obvious referee question.
 - **Eurostat alternative to EXIOBASE** (AEA `env_ac_ainah_r2`, FIGARO, OECD
   TeCO₂) as a second emissions source. Different system boundaries, so treat
   agreement as a robustness check, not a drop-in swap.
