@@ -226,6 +226,38 @@ extreme, but because it is the only internally coherent group.** Worth saying
 directly: it reframes the null result on levels as a statement about precision
 rather than about the world.
 
+### Are the quadrants coherent types? No — and neither are the growth models
+
+If the quadrants are the paper's unit, the same question applies to them. Mean
+within-unit sd across the four components:
+
+| unit | mean within-unit sd |
+|---|---:|
+| quadrants | **0.75** |
+| growth models | **0.72** |
+
+The quadrants are no more internally coherent than the growth models. And inside
+a quadrant the two components of each axis are **negatively** correlated:
+
+| quadrant | n | intensity ↔ fossil | complexity ↔ innovation |
+|---|---:|---:|---:|
+| Winners | 11 | −0.13 | −0.23 |
+| Exposed | 3 | −0.35 | −1.00 |
+| At risk | 11 | **−0.58** | **−0.53** |
+
+Members trade one component off against the other — they share a *score*, not a
+*situation*. The clearest case:
+
+> *At risk* holds **Bulgaria** (emission intensity +2.60, fossil −0.33: dirty
+> production burning its own energy) and **Malta** (intensity −1.19, fossil +1.66:
+> clean production running on imported fossil fuel).
+
+**Implication for how the results are written.** Do not present four types.
+Present the map continuously, use the quadrant labels as exposition, and make the
+four components the interpretive layer — naming the *route* by which each country
+arrives where it sits. This is what the two-part axis construction was for, and it
+is the difference between a typology that classifies and one that explains.
+
 ## 6. External validity
 
 Validated against outcomes not used to build the scores, controlling for income:

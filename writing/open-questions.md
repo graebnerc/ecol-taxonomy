@@ -81,13 +81,42 @@ So they do not reopen mid-draft:
 - reference window — **2017–2021**
 - green list — **OECD CLEG 244 codes**, footnote the 293-code alternative
 
-## 6. ~~Unbalanced quadrants — is the median split the right device?~~ RESOLVED
+## 6. Unit of analysis: quadrants or growth models? (RESOLVED, with a twist)
 
-Tested (see `results-summary.md` §8f, `evidence/quadrant_stability.csv`). The map
-is effectively deterministic: 25 of 27 countries hold their quadrant in ≥99.7% of
-year-bootstrap resamples. **Quadrants can be presented as types**, provided the
-three-country boundary neighbourhood (Ireland, Slovakia, Slovenia) is named and
-the two-country Low-stakes cell is not used to carry an argument.
+**Recommendation: the two-dimensional MAP is the unit; quadrants are exposition;
+growth models are validation.** Not four types, and not a growth-model paper.
+
+**Why quadrants over growth models.** The typology is the contribution; the
+growth-model classification is someone else's. And growth models organise this
+data poorly at the level of means — a four-group model does not beat a
+Core-vs-rest binary (§5). Cramér's V = 0.50 between quadrants and growth models is
+exactly the right relationship for a *validation*: high enough that the typology
+tracks known structure, low enough that it is not redundant. That is an argument
+**for** the typology, not a competing frame. One subsection, not a spine.
+
+**The twist: quadrants are not coherent types either.** Mean within-unit sd across
+the four components is **0.75 for quadrants against 0.72 for growth models** — the
+quadrants are, if anything, marginally *less* coherent. Worse, inside a quadrant
+the components are **negatively correlated**: in *At risk*, intensity ↔ fossil
+r = −0.58 and complexity ↔ innovation r = −0.53. Members trade one off against
+the other, i.e. they share a score, not a situation:
+
+> *At risk* contains **Bulgaria** (emission intensity +2.60, fossil −0.33 — dirty
+> production burning its own energy) and **Malta** (intensity −1.19, fossil +1.66
+> — clean production running on imported fossil fuel). Nothing in common but the
+> label.
+
+**So do not write either classification as a set of types.** Present the map
+continuously, use the quadrants as exposition, and make the **four components the
+interpretive layer** — naming the *route* by which a country arrives where it is.
+That is more informative than either label and it is what the two-part axis design
+was built to support.
+
+**What to keep of the growth-model material:** the validation subsection (V = 0.50,
+Core→Winners, Workbench→At risk), and the composition result — Finance and
+Workbench have identical potential composed oppositely (§5) — which is a genuine
+contribution to the comparative political economy literature and gives the paper a
+foothold there. Secondary result, one or two paragraphs.
 
 ## 7. Slovenia — fragile to the SAMPLE, not to the data
 

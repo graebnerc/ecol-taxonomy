@@ -56,7 +56,8 @@ copy_tables <- c(
   "capability_convergence.csv" = "capability_convergence.csv",
   "validation_group_tests.csv" = "validation_group_tests.csv",
   "quadrant_stability.csv"     = "quadrant_stability.csv",
-  "group_composition.csv"      = "group_composition.csv")
+  "group_composition.csv"      = "group_composition.csv",
+  "quadrant_coherence.csv"     = "quadrant_coherence.csv")
 copied <- character(0)
 for (src in names(copy_tables)) {
   from <- here("data/tidy", src)

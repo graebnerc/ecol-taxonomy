@@ -101,6 +101,48 @@ if (!nrow(mk)) {
 
 fwrite(res, here("data/tidy/group_composition.csv"))
 
+# --- The same question of the QUADRANTS ---------------------------------------
+# If the paper makes quadrants rather than growth models its unit, the same test
+# applies: is each quadrant a coherent TYPE, or do countries arrive there by
+# different routes? Answering this decides whether the four cells can be written
+# as types at all -- a framing question, not a robustness one.
+short_q <- function(x) sub(" \\(.*$", "", sub("Exposed but capable", "Exposed",
+             sub("Low-stakes / low capability", "Low-stakes", x)))
+s[, q := factor(short_q(quadrant),
+                levels = c("Winners", "Exposed", "Low-stakes", "At risk"))]
+P <- c("intensity", "fossil", "complexity", "innovation")
+
+cat("\n\n## Are QUADRANTS more coherent than growth models?\n\n")
+qsd <- s[, c(list(n = .N), lapply(.SD, function(x) round(sd(x), 2))),
+         by = q, .SDcols = P][order(q)]
+print(kable(qsd, format = "pipe"))
+mq <- mean(unlist(s[, lapply(.SD, sd), by = q, .SDcols = P][, -1]))
+mg <- mean(unlist(s[, lapply(.SD, sd), by = group, .SDcols = P][, -1]))
+cat(sprintf("\n  mean within-unit sd: quadrants %.2f | growth models %.2f\n", mq, mg))
+cat("  (similar = the quadrants are no more internally coherent than the growth\n",
+    "   models, so neither classification should be written as a set of types)\n", sep = "")
+
+cat("\n## Do countries reach the same quadrant by OPPOSITE routes?\n\n")
+rt <- rbindlist(lapply(levels(s$q), function(qq) {
+  d <- s[q == qq]; if (nrow(d) < 3) return(NULL)
+  data.table(quadrant = qq, n = nrow(d),
+             r_intensity_fossil = round(cor(d$intensity, d$fossil), 2),
+             r_complexity_innov = round(cor(d$complexity, d$innovation), 2))
+}))
+print(kable(rt, format = "pipe"))
+cat("\n  A NEGATIVE correlation inside a quadrant means members trade one component\n",
+    "  off against the other: they share a score, not a situation.\n", sep = "")
+
+for (qq in c("At risk", "Winners")) {
+  d <- s[q == qq][order(-intensity)]
+  a <- d[1]; b <- d[.N]
+  cat(sprintf("\n  %s -- widest contrast: %s (intensity %+.2f, fossil %+.2f)\n",
+              qq, a$country, a$intensity, a$fossil))
+  cat(sprintf("  %s    vs %s (intensity %+.2f, fossil %+.2f)\n",
+              strrep(" ", nchar(qq)), b$country, b$intensity, b$fossil))
+}
+fwrite(rt, here("data/tidy/quadrant_coherence.csv"))
+
 # --- Figure -------------------------------------------------------------------
 long <- melt(s[, c("country", "group", "intensity", "fossil",
                    "complexity", "innovation"), with = FALSE],
