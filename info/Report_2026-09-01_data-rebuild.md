@@ -1,6 +1,6 @@
 # Report — EXIOBASE 3.10.2 rebuild, patent measure, reference window
 
-**Written:** 2026-09-01 evening · **Updated:** 2026-09-02 with your decisions applied
+**Written:** 2026-09-01 evening · **Updated:** 2026-09-02 with your decisions applied and the PATSTAT v2 extract ingested
 **Branch:** `develop`, 33 commits ahead of `main`, *still unpushed to origin*
 
 **The one-line version:** the headline is now **2017–2021 on patent applications**;
@@ -263,9 +263,83 @@ is a non-issue and can be dismissed in a sentence.
 
 ---
 
+## 6c. PATSTAT v2 ingested — and it carries a finding
+
+Your extract (`data/raw/get_green_patents_v2.csv`) is structurally fine: 1,306
+rows = year × country over 1990–2023 for 44 countries. Two things came out of it.
+
+### It truncates a year earlier than the OECD snapshot
+
+EU-27 applications by filing year:
+
+| filing year | v2 | OECD | ratio |
+|---|---:|---:|---:|
+| 2018 | 6,582 | 6,252 | 1.05 |
+| 2019 | 7,038 | 6,806 | 1.03 |
+| 2020 | 7,330 | 7,167 | 1.02 |
+| **2021** | **5,888** | 7,202 | **0.82** |
+| 2022 | 878 | 4,519 | 0.19 |
+| 2023 | 15 | 1,887 | 0.01 |
+
+That is publication/loading lag in your PATSTAT edition, not a query problem, and
+it is why 2022–2023 look nearly empty. **It does not distort the ranking**:
+Spearman(v2, OECD) = 0.968 at 2021 and **0.995 over the whole 2017–2021 window**.
+
+So the headline now runs on v2 — like-for-like with the grants series, same
+database, same CPC filter, same country attribution — and the switch from the
+OECD stand-in moves **0 of 27** countries (potential Spearman 1.0000, innovation
+0.9963). `R/update_panel_patents.R` prefers v2 automatically.
+
+### The double-counting was worse than estimated, and it is BIASED
+
+Overall inflation **1.67×** — but strongly differential, and in a direction that
+matters for the paper:
+
+| most inflated | ratio | | least inflated | ratio |
+|---|---:|---|---|---:|
+| Slovakia | **2.40×** | | Belgium | 1.55× |
+| Greece | **2.34×** | | Denmark | 1.54× |
+| Hungary | **2.27×** | | Finland | 1.53× |
+| Portugal | **2.06×** | | Netherlands | 1.49× |
+| Poland | **1.94×** | | Lithuania | 1.38× |
+
+The old query systematically **over-counted the eastern and southern periphery
+relative to the core** — the most inflated states are exactly the low-potential
+tail. The previous headline therefore *understated* the core–periphery gap in
+green innovation, and correcting it widens that gap.
+
+**This is a good position to argue from**: the correction moves the result in the
+direction *less* convenient for a sceptic. Say so explicitly in the paper.
+
+Reassuringly the ranking survives: Spearman(v2 grants, v1) = 0.987 on 2014–2018
+despite the 1.67× differential inflation, which is why the old map still stood.
+
+### One judgement call
+
+The completeness check initially **rejected** the swap: Lithuania has no 2021 row.
+Its counts run 1–7 per year throughout, so that is the SQL `GROUP BY` emitting
+nothing for a true zero — the case `get_data.R` already documents for the v1
+series. Rather than loosen the check, absent country-years are now filled as
+zeros *only where a zero is plausible* (country present elsewhere, small counts in
+the window) and error otherwise, with each filled cell reported. It filled exactly
+one: LTU 2021.
+
+### A silent-wrong-answer caught in the window table
+
+The `2019-2023` row was supposed to be impossible and instead produced
+plausible-looking numbers: `build_indicator_table()` averages with
+`na.rm = TRUE`, so a window reaching past the EXIOBASE data silently becomes a
+**shorter window wearing the requested label** (2019–2023 quietly averaging
+2019–2022). `appendix_window_options.R` now requires every year of a window to
+carry complete EXIOBASE data for all 27 states, and the impossible spec is kept
+in the list with the guard exercised so the reason stays visible in the output
+rather than the row just being absent.
+
+---
+
 ## 7. What I need from you
 
-### 7.1 Run the PATSTAT query (~10 minutes)
+### 7.1 ~~Run the PATSTAT query~~ — DONE, ingested, see §6c
 
 ```
 1. run  sql/get_green_patents_v2.sql  against a current PATSTAT edition

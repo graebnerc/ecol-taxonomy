@@ -1,12 +1,12 @@
 spec,cor_vuln,cor_pot,quad_changes
-flat blocks (single PCA),0.71,0.89,8
+flat blocks (single PCA),0.71,0.9,8
 twin sub-index: mean not PCA,1,1,0
 robust (median/MAD) scaling,0.99,1,2
 part weights 2:1 (twin:standalone),0.95,0.98,2
 complexity: ECI replaces GCI,1,0.92,0
-complexity: renewable-only GCI,1,0.96,4
+complexity: renewable-only GCI,1,0.97,4
 fossil: production-based share,0.7,1,4
 carbon: consumption-based (CBA),0.98,1,0
 patents: grants not applications,1,1,0
-window shift 2016-2020,1,1,2
+window shift 2016-2020,1,0.99,2
 window shift 2018-2022,0.99,0.99,0

@@ -90,6 +90,21 @@ compute_gi <- function(exp_dt) {
 }
 
 build_window <- function(y1, y2, meas) {
+  # COVERAGE GUARD. build_indicator_table() averages with na.rm = TRUE, so a
+  # window that reaches past the EXIOBASE data silently becomes a SHORTER window
+  # wearing the requested label -- e.g. 2019-2023 quietly averaging 2019-2022,
+  # because update_panel_exiobase.R drops the broken 2023-2024 nowcasts. That
+  # produces a plausible-looking row that is not what it claims, which is worse
+  # than an error. Require every year of the window to carry EXIOBASE data for
+  # all 27 states.
+  cov <- as.data.table(base_data)[year %between% c(y1, y2) & !is.na(GWP_pba),
+                                  .(n = uniqueN(country)), by = year]
+  have <- cov[n == 27L]$year
+  if (!all(y1:y2 %in% have))
+    stop(sprintf("window %d-%d has no complete EXIOBASE data for: %s\n  (the panel covers %s)",
+                 y1, y2, paste(setdiff(y1:y2, have), collapse = ", "),
+                 paste(range(have), collapse = "-")))
+
   gi <- compute_gi(eby[year %between% c(y1, y2), .(export = sum(export)),
                        by = .(iso3, hs6)])
   ind <- build_indicator_table(base_data, extra_data, first_year = y1, last_year = y2)
@@ -145,13 +160,23 @@ if (HAVE_V2)
     list(name = "2018-2022 PATSTAT v2 apps", y1 = 2018, y2 = 2022,
          m = "patstat_v2_applications", note = ""),
     list(name = "2019-2023 PATSTAT v2 apps", y1 = 2019, y2 = 2023,
-         m = "patstat_v2_applications", note = "EXIOBASE 2023 unusable - will fail")))
+         m = "patstat_v2_applications",
+         note = "EXCLUDED: EXIOBASE 2023 unusable", skip = TRUE)))
 
-res <- lapply(specs, function(s) {
+# A spec marked skip = TRUE is one we know cannot be built; it is kept in the
+# list so the reason is visible in the code rather than silently absent, and the
+# guard above is exercised to prove the reason is real.
+res <- lapply(Filter(function(s) is.null(s$skip), specs), function(s) {
   message("  ", s$name)
   sc <- score_of(build_window(s$y1, s$y2, s$m))
   c(list(name = s$name, note = s$note), sc)
 })
+for (s in Filter(function(s) isTRUE(s$skip), specs)) {
+  msg <- tryCatch({ build_window(s$y1, s$y2, s$m); "UNEXPECTEDLY SUCCEEDED" },
+                  error = function(e) conditionMessage(e))
+  cat(sprintf("\nSkipped %s -- %s\n  guard says: %s\n", s$name, s$note,
+              sub("\n.*", "", msg)))
+}
 base <- res[[1]]
 
 out <- rbindlist(lapply(res, function(r) data.table(

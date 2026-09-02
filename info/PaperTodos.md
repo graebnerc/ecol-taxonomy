@@ -434,6 +434,18 @@ stronger version of the licensing result than the 2014-2018 comparison.
   comparison already exists: EXIOBASE 3.8 -> 3.10.2 (an 18% revision of the
   emission accounts) moved 0/27, so if EORA also lands near zero the MRIO choice
   can be dismissed in a sentence.
+- [x] **PATSTAT v2 ingested (2026-09-02).** Headline now runs on v2 applications
+  (like-for-like with the grants series); the switch from the OECD stand-in moved
+  0/27. v2 truncates a year earlier than OECD (2021 at 82% of OECD, 2022 at 19%)
+  but proportionally -- Spearman 0.995 over 2017-2021 -- so the ranking is
+  unaffected.
+- [ ] **Report the double-counting correction as a finding.** The v1 query
+  inflated counts 1.67x overall and DIFFERENTIALLY: Slovakia 2.40x, Greece 2.34x,
+  Hungary 2.27x, Portugal 2.06x, Poland 1.94x against Belgium 1.55x, Denmark
+  1.54x, Finland 1.53x, Netherlands 1.49x. It over-counted the eastern/southern
+  periphery relative to the core, so the old headline UNDERSTATED the
+  core-periphery green-innovation gap; the fix widens it. The correction moves
+  the result in the direction less convenient for a sceptic -- say so explicitly.
 - [ ] Still open: `appln_auth='EP'` excludes national offices, plausibly
   understating the small and eastern states in the low-potential tail -- now more
   load-bearing, since patents carry the recent window.

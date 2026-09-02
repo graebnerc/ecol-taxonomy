@@ -23,7 +23,13 @@ suppressMessages({
 })
 source(here("R/country_classification.R"))
 
-RAW <- here("data/tidy/patstat_green-patents_v2.csv")
+# Accept either the documented location or the query's own filename dropped into
+# data/raw/ -- the latter is what you get by saving the SQL result directly.
+CANDIDATES <- c(here("data/tidy/patstat_green-patents_v2.csv"),
+                here("data/raw/get_green_patents_v2.csv"),
+                here("data/raw/patstat_green-patents_v2.csv"))
+RAW <- CANDIDATES[file.exists(CANDIDATES)][1]
+if (is.na(RAW)) RAW <- CANDIDATES[1]
 OLD <- here("data/tidy/patstat_green-patents.csv")   # the grants-only v1 extract
 
 if (!file.exists(RAW)) {
@@ -41,6 +47,7 @@ if (!file.exists(RAW)) {
   quit(save = "no", status = 0)
 }
 
+message("Reading ", RAW)
 pat <- fread(RAW)
 
 # --- Validation: fail loudly, not silently -----------------------------------

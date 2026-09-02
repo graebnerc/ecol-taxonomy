@@ -47,12 +47,37 @@ message("Applications source: ", src)
 stopifnot("duplicate country-year in the applications series" =
             !anyDuplicated(apps[, .(country, year)]))
 
-cov <- apps[country %in% eu_iso3 & year %between% c(REF_FIRST_YEAR, REF_LAST_YEAR),
-            .(n = uniqueN(country)), by = year][order(year)]
-if (any(cov$n < 27) || nrow(cov) < (REF_LAST_YEAR - REF_FIRST_YEAR + 1L))
-  stop("applications series does not cover all 27 EU states across ",
-       REF_FIRST_YEAR, "-", REF_LAST_YEAR, ":\n",
-       paste(capture.output(print(cov)), collapse = "\n"))
+# TRUE ZEROS vs MISSING DATA. The PATSTAT GROUP BY emits no row for a
+# country-year with no qualifying application, so an absent row is a genuine
+# zero, not a gap -- the same convention get_data.R already applies to the v1
+# grants series (BG, CY, EE, HR, LT, LV, MT, RO). Silently filling every gap
+# with 0 would however hide a real data problem, so a filled cell is only
+# accepted where a zero is PLAUSIBLE: the country must appear elsewhere in the
+# series and its counts in the window must be small. A gap in a country that
+# files in volume is an error, not a zero.
+grid <- CJ(country = eu_iso3, year = REF_FIRST_YEAR:REF_LAST_YEAR)
+apps_win <- merge(grid, apps, by = c("country", "year"), all.x = TRUE)
+
+absent_country <- setdiff(eu_iso3, unique(apps$country))
+if (length(absent_country))
+  stop("EU state(s) absent from the applications series entirely: ",
+       paste(absent_country, collapse = ", "))
+
+gaps <- apps_win[is.na(GreenPatentsApps_n)]
+if (nrow(gaps)) {
+  scale <- apps_win[, .(mx = max(GreenPatentsApps_n, na.rm = TRUE)), by = country]
+  implausible <- merge(gaps, scale, by = "country")[mx > 20]
+  if (nrow(implausible))
+    stop("missing country-year(s) where a true zero is implausible ",
+         "(the country files in volume elsewhere in the window):\n",
+         paste(sprintf("  %s %d (max in window: %d)", implausible$country,
+                       implausible$year, implausible$mx), collapse = "\n"))
+  cat(sprintf("Filling %d absent country-year(s) as true zeros: %s\n", nrow(gaps),
+              paste(sprintf("%s %d", gaps$country, gaps$year), collapse = ", ")))
+  apps_win[is.na(GreenPatentsApps_n), GreenPatentsApps_n := 0]
+}
+apps <- rbind(apps[!(paste(country, year) %in% paste(apps_win$country, apps_win$year))],
+              apps_win)
 
 if ("GreenPatentsApps_n" %in% names(panel)) panel[, GreenPatentsApps_n := NULL]
 panel <- merge(panel, apps, by = c("country", "year"), all.x = TRUE)
@@ -62,9 +87,10 @@ setorder(panel, country, year)
 # mean, so require completeness there; outside it, NA is fine and expected
 # (the applications series starts in 2010).
 win <- panel[country %in% eu_iso3 & year %between% c(REF_FIRST_YEAR, REF_LAST_YEAR)]
-if (anyNA(win$GreenPatentsApps_n))
-  stop("missing applications inside the reference window for: ",
-       paste(unique(win[is.na(GreenPatentsApps_n)]$country), collapse = ", "))
+stopifnot("gap-filling failed - NA remains inside the reference window" =
+            !anyNA(win$GreenPatentsApps_n),
+          "reference window is not fully populated" =
+            nrow(win) == 27L * (REF_LAST_YEAR - REF_FIRST_YEAR + 1L))
 
 fwrite(panel, PANEL)
 cat(sprintf("\nAdded GreenPatentsApps_n from %s.\n", src))
