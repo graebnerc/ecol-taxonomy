@@ -1,0 +1,13 @@
+pair,axis,d_axis,p_axis,part1,d_part1,p_part1,part2,d_part2,p_part2,masked
+Core vs Finance,vulnerability,1.12,0.0486,intensity,-0.38,0.0519,fossil,1.95,0.0221,FALSE
+Core vs Finance,potential,-1.52,0.0718,complexity,-1.62,0.0299,innovation,-0.73,0.381,FALSE
+Core vs Periphery,vulnerability,1.07,0.1123,intensity,0.5,0.1987,fossil,1,0.1585,FALSE
+Core vs Periphery,potential,-1.37,0.0514,complexity,-0.46,0.5435,innovation,-1.66,0.0037,FALSE
+Core vs Workbench,vulnerability,1.63,2e-04,intensity,1.66,1e-04,fossil,0.64,0.1649,FALSE
+Core vs Workbench,potential,-1.56,3e-04,complexity,-0.57,0.094,innovation,-1.85,1e-04,FALSE
+Finance vs Periphery,vulnerability,-0.05,0.9709,intensity,0.88,0.0555,fossil,-0.96,0.091,TRUE
+Finance vs Periphery,potential,0.15,0.819,complexity,1.16,0.2001,innovation,-0.93,0.0254,TRUE
+Finance vs Workbench,vulnerability,0.51,0.1498,intensity,2.04,6e-04,fossil,-1.32,0.0018,FALSE
+Finance vs Workbench,potential,-0.04,0.8979,complexity,1.05,0.011,innovation,-1.12,7e-04,TRUE
+Periphery vs Workbench,vulnerability,0.57,0.2187,intensity,1.16,0.0036,fossil,-0.36,0.321,FALSE
+Periphery vs Workbench,potential,-0.2,0.5747,complexity,-0.11,0.8142,innovation,-0.19,0.021,FALSE

@@ -529,6 +529,38 @@ Slovakia, Slovenia.
 - [x] Noted: the `boundary` flag (|score - median| < 0.10) slightly over-warns --
   it flags Latvia, which is 99.7% stable. Prefer the bootstrap numbers.
 
+## Group COMPOSITION and coherence (LOGGED, 2026-09-02)
+
+`R/appendix_group_composition.R`. The group-mean tests compare axis LEVELS and so
+cannot see that each axis is a twin sub-index plus a standalone -- two groups can
+reach the same score for opposite reasons. Two findings, both more interesting
+than the null result on levels.
+
+**1. Finance and Workbench have identical green potential, composed oppositely.**
+Axis difference -0.04 (p = .90), but green complexity +1.05 (p = .011) and green
+innovation -1.12 (p = .0007) -- BOTH significant. Finance is low-complexity /
+high-innovation; the Workbench is higher-complexity / near-zero-innovation.
+Weaker cases in the same direction: Finance vs Periphery on potential (innovation
+-0.93, p = .025; complexity +1.16, p = .20) and on vulnerability (intensity
++0.88, p = .056; fossil -0.96, p = .091 -- suggestive only).
+
+**2. The groups differ enormously in internal coherence.** Within-group sd:
+Workbench innovation **0.07** (a POINT MASS -- all 11 at the floor) and potential
+0.28, against Periphery complexity **1.48** and Core innovation 1.22.
+
+**This explains the significance pattern.** Workbench and Finance have nearly the
+same mean potential (-0.40 vs -0.35), but the Workbench mean comes from a tight
+distribution and the Finance mean from a wide one. The Workbench-Core contrast is
+the only robust one NOT because its mean is most extreme but because it is the
+only internally coherent group.
+
+- [ ] Write this into the results: it reframes "a four-group model does not beat
+  Core-vs-rest" from a statement about the world into a statement about precision
+  and composition. The growth models DO differ -- in what their burden and
+  capability are made of, and in how coherent they are -- just not in level.
+- [ ] Do not let the level null stand alone in the text; it reads as "growth
+  models are alike", which the composition result contradicts.
+
 ## 4. Alternative emissions data source (Eurostat instead of EXIOBASE)
 
 **Feedback:** Can I get the trade-embodied / production emissions from a source

@@ -175,6 +175,57 @@ the data supports, on both axes, at p = .0002. The broad claim that different
 growth models face *different* transition challenges is not supported. See
 `open-questions.md` §1.
 
+### What the axes hide: composition, and coherence
+
+The level tests above compare *how much* burden or capability a group has. They
+cannot see *what it is made of* — and each axis is a twin sub-index plus a
+standalone, so two groups can reach the same score for opposite reasons. Two
+things follow, and both are more interesting than the null result on levels.
+
+**1. Finance and Workbench have identical green potential, composed oppositely.**
+
+| Finance vs Workbench | difference | p |
+|---|---:|---:|
+| potential (the axis) | −0.04 | 0.90 |
+| green complexity | **+1.05** | **0.011** |
+| green innovation | **−1.12** | **0.0007** |
+
+Both components differ significantly while the axis is indistinguishable. The
+financialised economies are **low-complexity, high-innovation**; the Workbench East
+is **higher-complexity, near-zero-innovation**. Same capability score, opposite
+capability. A difference-in-means on the aggregate cannot detect this, which is
+precisely why the earlier "no four-way structure" result should not be read as
+"the growth models are alike".
+
+Two weaker cases in the same direction: Finance vs Periphery on potential
+(innovation −0.93, p = .025, but complexity +1.16, p = .20), and Finance vs
+Periphery on vulnerability (intensity +0.88, p = .056; fossil −0.96, p = .091 —
+suggestive only, report as such).
+
+**2. The groups differ enormously in internal coherence.** Within-group standard
+deviations:
+
+| group | n | vulnerability | potential | complexity | innovation |
+|---|---:|---:|---:|---:|---:|
+| Core | 6 | 0.92 | 1.05 | 0.92 | 1.22 |
+| Finance | 4 | 0.36 | 1.05 | 0.93 | 0.95 |
+| Periphery | 6 | 1.14 | 1.08 | **1.48** | 0.31 |
+| **Workbench** | 11 | 0.67 | **0.28** | 0.43 | **0.07** |
+
+**The Workbench is a point mass on green innovation** (sd 0.07) — all eleven
+countries sit at essentially the same place, at the floor. It is not a
+distribution around a low mean; it is a bloc. By contrast the Periphery is
+extremely dispersed on complexity (sd 1.48), so "Periphery" is a label covering
+countries with little in common on this dimension.
+
+**This explains the significance pattern.** Workbench and Finance have nearly the
+same mean potential (−0.40 vs −0.35), but the Workbench mean is estimated from a
+tight distribution (sd 0.28) and the Finance mean from a wide one (sd 1.05). The
+Workbench–Core contrast is the only robust one **not because its mean is the most
+extreme, but because it is the only internally coherent group.** Worth saying
+directly: it reframes the null result on levels as a statement about precision
+rather than about the world.
+
 ## 6. External validity
 
 Validated against outcomes not used to build the scores, controlling for income:
