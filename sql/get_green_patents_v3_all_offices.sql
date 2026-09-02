@@ -2,54 +2,59 @@
 ================================================================================
 Green patents WITHOUT the EPO-only restriction -- robustness run.
 
-  SAVE THE RESULT AS:  sql/get_green_patents_v3.csv     <- preferred, next to
-                                                            this query
-  THEN RUN:            Rscript R/appendix_patent_offices.R
+  THIS QUERY IS RUN IN A DIFFERENT REPO / SESSION, so the export lands wherever
+  you run it. Write it to a plain filename in the current directory:
 
-The ingestion script validates the file, cross-checks it against the v2 extract,
-re-scores the map, and exits cleanly with instructions if the file is absent.
-It also accepts data/raw/get_green_patents_v3.csv or
-data/tidy/patstat_green-patents_allauth.csv if that is what your client produces.
+      get_green_patents_v3.csv
 
-WHY sql/ AND NOT data/raw/. Everything under data/raw/ is gitignored, because it
-holds large re-downloadable sources (EXIOBASE, Atlas, EORA). A PATSTAT extract is
-the opposite kind of object: small, and NOT reproducible by anyone without
-database access. Keeping it beside the query that produced it means the result is
+  THEN, from the ecol-taxonomy repo root, point the ingestion at it:
+
+      Rscript R/appendix_patent_offices.R /path/to/get_green_patents_v3.csv
+
+  The script reads it, copies it to sql/get_green_patents_v3.csv so the result is
+  version-controlled beside this query, validates it, cross-checks it against the
+  v2 extract, and re-scores the map. With no argument it looks in
+  sql/, data/raw/ and data/tidy/ and exits cleanly with instructions if it finds
+  nothing.
+
+WHY THE RESULT IS KEPT IN sql/. data/raw/ is gitignored because it holds large
+re-downloadable sources (EXIOBASE, Atlas, EORA). A PATSTAT extract is the
+opposite kind of object: small, and NOT reproducible by anyone without database
+access. Keeping it beside the query that produced it means the result is
 version-controlled together with its provenance, and a co-author who cannot reach
 PATSTAT can still re-run the analysis.
 
 --------------------------------------------------------------------------------
 EXPORTING TO CSV
 --------------------------------------------------------------------------------
-If your client can write files, wrap the query so it lands in the right place
-directly. Otherwise just save the result grid manually -- the ingestion only
-needs a CSV with a header row.
+All paths below are relative to WHERE YOU RUN THE QUERY, not to this repo. If
+your client cannot write files, just save the result grid by hand -- the
+ingestion only needs a CSV with a header row.
 
 psql (client-side write; works with ordinary user rights):
 
     \copy ( <paste the query, without its trailing semicolon> ) \
-      TO 'sql/get_green_patents_v3.csv' WITH (FORMAT csv, HEADER true)
+      TO 'get_green_patents_v3.csv' WITH (FORMAT csv, HEADER true)
 
-  or, keeping the query in this file:
+  or, pointing at this file wherever you have it:
 
     psql -d patstat -v ON_ERROR_STOP=1 --csv \
-      -f sql/get_green_patents_v3_all_offices.sql \
-      -o sql/get_green_patents_v3.csv
+      -f get_green_patents_v3_all_offices.sql \
+      -o get_green_patents_v3.csv
 
   (the -f form also emits the header; strip any trailing row-count line.)
 
-MySQL / MariaDB -- note INTO OUTFILE writes on the SERVER and needs FILE
-privilege plus a path under secure_file_priv, so the client-side form is usually
-easier:
+MySQL / MariaDB -- INTO OUTFILE writes on the SERVER and needs FILE privilege
+plus a path under secure_file_priv, so the client-side form is usually easier:
 
-    mysql -D patstat -B -e "source sql/get_green_patents_v3_all_offices.sql" \
-      | tr '\t' ',' > sql/get_green_patents_v3.csv
+    mysql -D patstat -B -e "source get_green_patents_v3_all_offices.sql" \
+      | tr '\t' ',' > get_green_patents_v3.csv
 
 Python (any DBAPI connection):
 
     import pandas as pd
-    sql = open('sql/get_green_patents_v3_all_offices.sql').read().split(';')[0]
-    pd.read_sql(sql, con).to_csv('sql/get_green_patents_v3.csv', index=False)
+    sql = open('get_green_patents_v3_all_offices.sql').read().split(';')[0]
+    pd.read_sql(sql, con).to_csv('get_green_patents_v3.csv', index=False)
 
 --------------------------------------------------------------------------------
 WHY
@@ -160,8 +165,10 @@ Only worth running if the main query shows a divergence between the EPO-only and
 all-offices rankings. It names the authorities behind it, which is what turns
 "the ranking changes" into an explanation. Cheap once restricted as below.
 
-Save as sql/get_green_patents_v3_by_office.csv; the ingestion script picks
-it up automatically if present and reports the top offices per country.
+Export it the same way, then pass it as a SECOND argument:
+  Rscript R/appendix_patent_offices.R <main.csv> <by_office.csv>
+It is copied to sql/get_green_patents_v3_by_office.csv and the top offices
+per country are reported.
 ================================================================================
 
 SELECT
