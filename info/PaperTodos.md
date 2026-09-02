@@ -403,7 +403,42 @@ R2(vuln~logGDP) 0.28, R2(pot~logGDP) 0.33.
   invariant to the MRIO release across an 18% revision of the emission accounts.
   Referees ask about MRIO choice; this answers it.
 
-## Reference window and the patent measure (OPEN DECISION, 2026-09-01)
+## Reference window and the patent measure (DECIDED & APPLIED, 2026-09-02)
+
+**Applied:** headline is now **2017-2021** on **patent applications**; grants are
+a robustness spec in `07`. `R/config.R` carries `REF_FIRST_YEAR/REF_LAST_YEAR`
+and `PATENT_MEASURE`.
+
+**Cost: 2/27** vs the former 2014-2018 grants headline -- Ireland At risk ->
+Low-stakes and Slovakia Low-stakes -> At risk, a straight swap between the two
+smallest quadrants, both already borderline. Spearman 0.987 / 0.992.
+Diagnostics: cor(vuln,pot) -0.55, R2(vuln~logGDP) 0.27, R2(pot~logGDP) 0.21,
+Cramer's V (quadrant x growth model) 0.50.
+
+**Every recent window agrees perfectly** (0/27 for 2019-2021, 2020-2022, and
+grants-within-2017-2021). Only pre-2019 windows differ, always by the same two
+countries. Grants-vs-applications is 0/27 even inside 2017-2021 where grants are
+severely truncated -- the truncation is proportional across countries, which is a
+stronger version of the licensing result than the 2014-2018 comparison.
+
+- [ ] **Substantive finding to follow up:** R2(potential ~ log GDP) falls
+  monotonically as the window moves forward -- 0.37 (2014-17), 0.33 (2014-18),
+  0.21 (2017-21), 0.19 (2019-21), 0.18 (2020-22). Green capability is becoming
+  LESS income-dependent over time. That is direct evidence on whether the
+  catch-up East is closing the green-capability gap and deserves its own
+  analysis, not a footnote. Cross-check against
+  `R/appendix_capability_trajectory.R`.
+- [x] **EORA comparison prepared:** `2014-2017` is built on both patent measures
+  in `R/appendix_window_options.R`. Holding the WINDOW identical to the EORA
+  coverage isolates the MRIO table choice from the window choice. Half the
+  comparison already exists: EXIOBASE 3.8 -> 3.10.2 (an 18% revision of the
+  emission accounts) moved 0/27, so if EORA also lands near zero the MRIO choice
+  can be dismissed in a sentence.
+- [ ] Still open: `appln_auth='EP'` excludes national offices, plausibly
+  understating the small and eastern states in the low-potential tail -- now more
+  load-bearing, since patents carry the recent window.
+
+## (superseded) Reference window and the patent measure (OPEN DECISION, 2026-09-01)
 
 EXIOBASE no longer caps the window; **green patents do**, via EPO grant lag
 (`sql/get_green_patents.sql` filters `granted='Y'` and counts by filing year).

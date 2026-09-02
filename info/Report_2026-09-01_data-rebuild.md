@@ -1,9 +1,17 @@
-# Overnight report — EXIOBASE 3.10.2 rebuild, patent options, window scoping
+# Report — EXIOBASE 3.10.2 rebuild, patent measure, reference window
 
-**Date:** 2026-09-01 (evening) · **Branch:** `develop`, 28 commits ahead of `main`, *still unpushed to origin*
+**Written:** 2026-09-01 evening · **Updated:** 2026-09-02 with your decisions applied
+**Branch:** `develop`, 33 commits ahead of `main`, *still unpushed to origin*
 
-**The one-line version:** everything rebuilt on current data; the map did not move;
-the patent question answered itself; one action is waiting for you (§7.1).
+**The one-line version:** the headline is now **2017–2021 on patent applications**;
+it moves 2 of 27 countries against the old map and every more-recent window agrees
+perfectly. One action still waiting for you (§7.1).
+
+> **Decisions applied 2026-09-02.** Patent measure → **applications** (grants kept
+> as a robustness spec). Window → **2017–2021**. `R/config.R` now carries
+> `PATENT_MEASURE` and the new window; everything downstream was re-run. The
+> framing decision (descriptive typology vs. explicit H1–H3 test) is deliberately
+> deferred until the data questions close — §7.2.
 
 ---
 
@@ -194,6 +202,64 @@ I have not done it — §7.2.
 
 `R/appendix_window_options.R` · `plots/window_options.png` ·
 `data/tidy/window_options.csv`
+
+---
+
+## 6b. Applied: the new headline, and how much it moved
+
+**2 of 27 countries move** against the former 2014–2018 grants headline — and it
+is a straight swap between the two smallest quadrants, both already flagged
+borderline:
+
+| country | from | to |
+|---|---|---|
+| Ireland | At risk | Low-stakes |
+| Slovakia | Low-stakes | At risk |
+
+Spearman 0.987 on vulnerability, 0.992 on potential. Diagnostics:
+`cor(vuln, pot)` −0.58 → **−0.55**, R²(vuln~logGDP) 0.28 → **0.27**,
+R²(pot~logGDP) 0.33 → **0.21**. Cramér's V (quadrant × growth model) 0.45 → 0.50.
+
+### Every window you asked for, whole typology rebuilt on each
+
+Baseline is the new headline; `quad_changes` counts against it.
+
+| window | cor_vuln | cor_pot | quad Δ | R²(v~GDP) | R²(p~GDP) | cor(axes) | note |
+|---|---:|---:|---:|---:|---:|---:|---|
+| **2017–2021 apps (headline)** | 1.00 | 1.00 | — | 0.27 | 0.21 | −0.55 | |
+| 2014–2018 apps | 0.99 | 1.00 | 2 | 0.28 | 0.33 | −0.59 | former window |
+| 2014–2018 grants | 0.99 | 1.00 | 2 | 0.28 | 0.33 | −0.59 | former headline |
+| **2014–2017 apps** | 0.98 | 0.99 | 2 | 0.28 | 0.37 | −0.59 | **matches your EORA coverage** |
+| **2014–2017 grants** | 0.98 | 0.99 | 2 | 0.28 | 0.37 | −0.59 | **matches your EORA coverage** |
+| 2019–2021 apps | 0.98 | 0.99 | **0** | 0.26 | 0.19 | −0.55 | last 3y, all inputs clean |
+| 2020–2022 apps | 0.97 | 0.98 | **0** | 0.26 | 0.18 | −0.53 | last 3y EXIOBASE supports; apps 2022 ~73% complete |
+| 2017–2021 grants | 1.00 | 1.00 | **0** | 0.27 | 0.21 | −0.55 | grants heavily truncated here |
+
+Three things to take from this:
+
+1. **Every recent window agrees perfectly** (0/27 for 2019–2021, 2020–2022 and
+   grants-in-window). The only disagreement is with pre-2019 windows, and it is
+   always the same two countries. The map is not sensitive to *where* in
+   2017–2022 you put the window — only to whether you are before or after 2019.
+2. **Grants vs applications is 0/27 even inside 2017–2021**, where grants are
+   severely truncated. The truncation is proportional enough across countries
+   that the ranking survives it. That is a stronger result than the 2014–2018
+   comparison and worth quoting.
+3. **R²(potential ~ log GDP) falls monotonically as the window moves forward**:
+   0.37 (2014–17) → 0.33 (2014–18) → 0.21 (2017–21) → 0.19 (2019–21) → 0.18
+   (2020–22). Green capability is becoming *less* income-dependent over time.
+   That is a substantive finding, not a technicality — it is direct evidence on
+   whether the catch-up East is closing the green-capability gap, and it deserves
+   its own look rather than a footnote.
+
+### For the EORA comparison
+
+`2014–2017` is built and committed on both patent measures. Because the *window*
+is held identical to your EORA coverage, recomputing that row on EORA isolates
+the **MRIO table choice** from the window choice. You already have one half of
+that comparison: EXIOBASE 3.8 → 3.10.2, an 18% revision of the emission accounts,
+moved **0/27**. If EORA also lands near zero on the same window, the MRIO choice
+is a non-issue and can be dismissed in a sentence.
 
 ---
 

@@ -37,7 +37,11 @@ has been implemented.
 Numbered pipeline (run in order from the project root; see README):
 
 - `R/config.R` — central settings: reference window (`REF_FIRST_YEAR`/`REF_LAST_YEAR` =
-  2014–2018), output paths. Sourced by the numbered scripts.
+  **2017–2021** since 2026-09-02), the green-patent measure (`PATENT_MEASURE` =
+  `"applications"`; `"grants"` reproduces the pre-2026-09 headline), and output paths.
+  Sourced by the numbered scripts. The window is the most recent one in which every
+  input is observed and complete — EXIOBASE emissions end at 2022 and patent
+  applications at 2021.
 - `R/01_build_indicators.R` — reads `full_taxonomy_data.csv` (+ `new_data.csv`), builds the
   per-country indicator table `data/tidy/taxonomy_indicators.csv`. All per-capita/share
   transforms live in `R/functions/indicators.R::build_indicator_table()`.
