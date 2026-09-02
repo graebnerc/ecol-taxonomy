@@ -3,7 +3,10 @@
 .RData
 .Ruserdata
 .DS_Store
-data/raw/atlas_hs92_6d.csv
-data/raw/*.rds
-data/raw/exiobase/
-data/raw/oecd/
+# Raw downloads are rebuilt by the get_data_* scripts, never committed:
+# ignore everything under data/raw/ by default, so a new source directory
+# cannot slip into the history the way the EORA archives once did.
+data/raw/*
+# ...except the small provenance files that are tracked on purpose.
+!data/raw/atlas_hs92_6d_REFERENCE.txt
+!data/raw/nrg_ind_ren.xlsx
