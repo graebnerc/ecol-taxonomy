@@ -111,6 +111,90 @@ fwrite(imp[, .(destination_group = d_grp, origin_group = o_grp,
                GWP_Gt_per_year = round(GWP / 1e12, 4))],
        here("data/tidy/offshoring_origins.csv"))
 
+# --- 4. The growth-model gradient -- the finding that SURVIVES ---------------
+#
+# The origin COMPOSITION barely differs across blocs (intra-EU share 20-32%
+# everywhere), so "different growth models source from different places" is NOT
+# a finding. What differs systematically is the relationship between what a bloc
+# PRODUCES and what it CONSUMES, and the ordering matches the Graebner et al.
+# growth-model hierarchy exactly. This does not need bilateral data at all --
+# it falls out of the totals -- which makes it the robust version of the
+# offshoring story.
+
+tot <- fread(here("data/tidy/exiobase_totals.csv"))[
+  year %between% c(REF_FIRST_YEAR, REF_LAST_YEAR)]
+tot[, iso3 := countrycode(region, "iso2c", "iso3c", warn = FALSE)]
+tot <- tot[iso3 %in% eu_iso3]
+tot[, grp := as.character(get_country_classification(iso3, "jee"))]
+nyr <- uniqueN(tot$year)
+
+gradient <- tot[, .(pba = sum(GWP_pba) / nyr,
+                    cba = sum(GWP_pba - GWP_Exports + GWP_Imports) / nyr,
+                    va  = sum(ValueAdded_pba) / nyr), by = grp]
+gradient[, `:=`(gap_pct = round(100 * (cba / pba - 1)),
+                int_pba = round(pba / va / 1000))]
+
+# Net intra-EU position, scaled by the bloc's own production emissions: how much
+# of what a bloc emits is actually serving other EU members' final demand.
+intra_eu <- bil[!is.na(o_grp) & !is.na(d_grp) &
+                  o_grp %in% blocs & d_grp %in% blocs & origin != destination,
+                .(v = sum(GWP) / ny), by = .(o_grp, d_grp)]
+netpos <- merge(intra_eu[, .(out = sum(v)), by = o_grp],
+                intra_eu[, .(inn = sum(v)), by = d_grp],
+                by.x = "o_grp", by.y = "d_grp")
+netpos <- merge(netpos, gradient[, .(o_grp = grp, pba)], by = "o_grp")
+netpos[, `:=`(net_Mt = round((out - inn) / 1e9, 1),
+              net_pct_own_pba = round(100 * (out - inn) / pba, 1))]
+
+grad <- merge(gradient[, .(growth_model = grp,
+                           burden_t_pc = NA_real_, gap_pct, int_pba_g_per_eur = int_pba)],
+              netpos[, .(growth_model = o_grp, net_export_to_EU_Mt = net_Mt,
+                         net_pct_of_own_pba = net_pct_own_pba)],
+              by = "growth_model")
+grad[, burden_t_pc := NULL]
+setorder(grad, -gap_pct)
+
+# The two weightings DISAGREE and both are reported, because the difference is
+# itself informative and quoting only one would misrepresent the result:
+#   * bloc AGGREGATE (sum of Gt over members) -- the defensible unit for "how
+#     does this growth model behave"; gives a binary East/West split.
+#   * unweighted COUNTRY MEAN -- "how does a typical member behave"; gives a
+#     four-way gradient, but it is driven by small rich states (LU, MT) whose
+#     ratios dominate an unweighted mean of a four-country bloc.
+cmean <- tot[, .(pba = sum(GWP_pba), cba = sum(GWP_pba - GWP_Exports + GWP_Imports),
+                 va = sum(ValueAdded_pba)), by = .(iso3, grp)][
+  , .(gap_pct_country_mean = round(100 * mean(cba / pba - 1)),
+      int_country_mean = round(mean(pba / va / 1000))), by = grp]
+grad <- merge(grad, cmean, by.x = "growth_model", by.y = "grp")
+setorder(grad, -gap_pct)
+
+cat("\n\n## Production vs consumption, by growth model -- BOTH weightings\n\n")
+print(kable(grad, format = "pipe"))
+cat("\n  gap_pct / int_pba_g_per_eur : bloc aggregates (Gt and value added summed)\n",
+    "  *_country_mean              : unweighted mean over member countries\n\n",
+    "  On AGGREGATES the result is BINARY, not a gradient: the three western blocs\n",
+    "  all consume ~22-27%% more than they produce, while the Workbench consumes\n",
+    "  essentially exactly what it produces (0%%). The four-way ordering only\n",
+    "  appears under unweighted country means, where Luxembourg and Malta drive\n",
+    "  the Finance bloc. Quote the aggregate version; mention the other.\n", sep = "")
+
+# Is it just income? Partial correlation of the country-level gap on the
+# growth-model dummies, net of log GDP p.c.
+ind <- as_tibble(fread(here("data/tidy/taxonomy_indicators.csv")))
+cg <- tot[, .(pba = sum(GWP_pba), cba = sum(GWP_pba - GWP_Exports + GWP_Imports)),
+          by = .(iso3, grp)][, gap := cba / pba - 1]
+cg <- merge(cg, as.data.table(ind)[, .(iso3 = countrycode(country, "country.name", "iso3c"),
+                                       lg = log(GDP_normed))], by = "iso3")
+m_inc  <- summary(lm(gap ~ lg, data = cg))$r.squared
+m_grp  <- summary(lm(gap ~ factor(grp), data = cg))$r.squared
+m_both <- summary(lm(gap ~ lg + factor(grp), data = cg))$r.squared
+cat(sprintf("\n  R2(gap ~ log GDP p.c.)        = %.2f\n", m_inc))
+cat(sprintf("  R2(gap ~ growth model)       = %.2f\n", m_grp))
+cat(sprintf("  R2(gap ~ both)               = %.2f  -> growth model adds %.2f over income alone\n",
+            m_both, m_both - m_inc))
+
+fwrite(grad, here("data/tidy/growth_model_gradient.csv"))
+
 # --- 4. Figure ---------------------------------------------------------------
 
 ord <- c("Core", "Finance", "Periphery", "Workbench")
