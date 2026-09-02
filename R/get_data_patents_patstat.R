@@ -25,7 +25,11 @@ source(here("R/country_classification.R"))
 
 # Accept either the documented location or the query's own filename dropped into
 # data/raw/ -- the latter is what you get by saving the SQL result directly.
-CANDIDATES <- c(here("data/tidy/patstat_green-patents_v2.csv"),
+# sql/ first: data/raw/ is gitignored, and a PATSTAT extract cannot be
+# regenerated without database access, so it belongs beside its query in version
+# control rather than in a directory reserved for re-downloadable sources.
+CANDIDATES <- c(here("sql/get_green_patents_v2.csv"),
+                here("data/tidy/patstat_green-patents_v2.csv"),
                 here("data/raw/get_green_patents_v2.csv"),
                 here("data/raw/patstat_green-patents_v2.csv"))
 RAW <- CANDIDATES[file.exists(CANDIDATES)][1]

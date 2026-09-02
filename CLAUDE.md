@@ -155,6 +155,16 @@ Supporting:
   distortion stays measurable.
 - `sql/get_green_patents.sql` — superseded v1 query, kept for provenance (testing SQL /
   notes are in `_archive/sql/`).
+- `sql/get_green_patents_v3_all_offices.sql` — robustness query without the EPO-only
+  restriction (`appln_auth = 'EP'`), returning EPO-only and all-offices counts side by
+  side so the two cannot drift apart. Consumed by `R/appendix_patent_offices.R`, which
+  asserts the EPO columns reproduce v2 exactly before comparing. **Not yet run.**
+- **PATSTAT query results live in `sql/`, beside the query that produced them**
+  (`sql/get_green_patents_v2.csv`, and `_v3.csv` when it exists). `data/raw/*` is
+  gitignored because it holds large re-downloadable sources; a PATSTAT extract is the
+  opposite — small, and impossible to regenerate without database access — so it is
+  version-controlled with its provenance instead. The ingestion scripts look in `sql/`
+  first and fall back to `data/raw/` and `data/tidy/`.
 - `data/tidy/` — analysis-ready CSVs. `full_taxonomy_data.csv` and `taxonomy_indicators.csv`
   are committed vantage points, so the pipeline runs without re-downloading. `data/raw/`
   is gitignored.
