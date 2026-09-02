@@ -18,19 +18,24 @@ transition, and asks whether the transition risks reinforcing existing socio-eco
 polarization (core vs. periphery vs. "workbench" East).
 
 The proposal frames the taxonomy along **four dimensions** organised as two
-*vulnerabilities* and two *potentials* (Fig. 1 of the proposal):
+*vulnerabilities* and two *potentials* (Fig. 1 of the proposal). All four are now
+operationalised, each as one part of a two-part axis (see `04_typology.R`):
 
-| Block | Dimension | Status in repo |
+| Block | Dimension | Implemented as |
 |-------|-----------|----------------|
-| Vulnerability | Current inputs to domestic production (energy sources / mix) | Partial (energy mix shares) |
-| Vulnerability | Energy-intensity of production (esp. export activities) | Partial (final consumption; intensity computed ad hoc) |
-| Potential | Capabilities for environmental activities (innovation) | Partial (green patents only) |
-| Potential | Actual production & service activities (economic complexity, green products) | **Missing (TBD)** |
+| Vulnerability | Energy-intensity of production | **twin sub-index**: carbon intensity + energy intensity, per unit value added |
+| Vulnerability | Current inputs to domestic production (energy sources / mix) | **standalone**: fossil share of gross available energy (demand-side) |
+| Potential | Actual production & service activities (economic complexity, green products) | **twin sub-index**: GCI + GCP (Mealy & Teytelboym 2022) |
+| Potential | Capabilities for environmental activities (innovation) | **standalone**: EPO green patent applications p.c. |
 
-The intended methods: descriptive statistics, PCA, clustering, IO-based footprints
-(production- and consumption-based), regression, patent network analysis, and economic
-complexity (Hidalgo–Hausmann) / product space. So far only **hierarchical clustering**
-has been implemented.
+Implemented methods: descriptive statistics, PCA, IO-based footprints (production- **and**
+consumption-based, incl. bilateral origin×destination flows), green economic complexity
+(Hidalgo–Hausmann / Mealy–Teytelboym), and hierarchical clustering — the last demoted to a
+robustness layer, since silhouette/gap diagnostics favour the continuous 2-D map over hard
+clusters. Regression and patent *network* analysis remain unimplemented and are not
+currently planned.
+
+**The paper is drafted in `writing/`** (see below), not from these scripts directly.
 
 ## Repo layout
 
@@ -45,12 +50,13 @@ Numbered pipeline (run in order from the project root; see README):
 - `R/01_build_indicators.R` — reads `full_taxonomy_data.csv` (+ `new_data.csv`), builds the
   per-country indicator table `data/tidy/taxonomy_indicators.csv`. All per-capita/share
   transforms live in `R/functions/indicators.R::build_indicator_table()`.
-- `R/02_complexity.R` — green economic complexity (Dimension 4). Computes ECI/PCI/GCI/GCP
-  from Atlas HS92 data on the global country set (pooled 2014–2018), extracts EU-27 →
-  `data/tidy/green_complexity_eu.csv`. Math in `R/functions/complexity.R`. Caches the
-  pooled country×product table (`data/raw/pooled_exports_1418.rds`) and a by-year table
-  spanning 2013–2019 (`exports_by_year_1319.rds`; window ±1 so 07 can shift the window),
-  both gitignored, so the 968MB read happens only once. **Run before `01`** so the
+- `R/02_complexity.R` — green economic complexity. Computes ECI/PCI/GCI/GCP from Atlas
+  HS92 data on the global country set, pooled over the reference window, extracts EU-27 →
+  `data/tidy/green_complexity_eu.csv`. Math in `R/functions/complexity.R`. Caching is
+  **window-agnostic**: a wide by-year table (`data/raw/exports_by_year_1224.rds`, 2012–2024)
+  is built once from the 968MB Atlas read, and each window's pooled table is derived from it
+  and cached under a window-stamped name (`pooled_exports_1721.rds`). Changing the reference
+  window therefore costs no Atlas re-read. Both caches gitignored. **Run before `01`** so the
   indicator table folds in GCI.
 - `R/03_descriptives.R` — Phase 2: correlation matrix, income-drivenness (R² of each
   indicator on log GDP p.c.), ranked bar charts. Writes figures + `indicator_*.csv`.
@@ -72,14 +78,20 @@ Numbered pipeline (run in order from the project root; see README):
   sensitivity **against the structured headline** (flat single-PCA blocks, twin mean vs PCA,
   robust scaling, twin:standalone part weight, GCI vs ECI, renewable-only GCI, production-
   based fossil, consumption-based carbon accounting), cluster-number diagnostics
-  (silhouette/gap), outlier drops, and the full-typology indicator-window shift
-  (2013–2017 / 2015–2019). Writes `robustness_specs.csv`.
-- `R/appendix_*.R` — standalone scripts outside the audited `01`–`07` pipeline. Design
-  support (`structure_map` flat vs two-part axes, `decomposed_map`, `pc1_cos2`,
-  `quadrant_profiles` = the classification table + per-quadrant descriptives,
-  `burden_responsibility` = the production-vs-consumption footprint layer) and
-  exploratory extensions (`window_coverage`, `capability_trajectory`,
-  `vulnerability_drift`, `forward_validation`).
+  (silhouette/gap), outlier drops, patent grants-vs-applications, and the full-typology
+  indicator-window shift (reference window ±1). Writes `robustness_specs.csv`.
+- `R/appendix_*.R` — standalone scripts outside the audited `01`–`07` pipeline.
+  *Design support*: `structure_map` (flat vs two-part axes), `decomposed_map`, `pc1_cos2`,
+  `quadrant_profiles` (classification table + per-quadrant descriptives),
+  `patent_options` (grants vs applications: truncation profile and rank agreement),
+  `window_options` (whole typology rebuilt on eight candidate windows, incl. a
+  2014–2017 row matching EORA coverage so the MRIO choice can be isolated from the
+  window choice).
+  *Findings*: `burden_responsibility` (production- vs consumption-based footprints),
+  `offshoring_origins` (bilateral test of the offshoring mechanism claim + the
+  growth-model gradient under both weightings).
+  *Exploratory*: `window_coverage`, `capability_trajectory`, `vulnerability_drift`,
+  `forward_validation`.
 - `R/functions/typology.R` — shared scoring helpers (`scale_mat`, `block_score`,
   `axis_score`, `assign_quadrant`) used by `04` and `07`. `axis_score` builds the two-part
   (twin sub-index + standalone) axes; the four dimensions live in `R/config.R`
@@ -102,17 +114,27 @@ Supporting:
   and dropped downstream; the last complete year is 2022.
 - `R/update_panel_exiobase.R` — swaps only the five EXIOBASE columns into the panel,
   asserting every other column is unchanged.
-- `R/get_data_patents_oecd.R` / `R/get_data_patents_patstat.R` — the green-patent
-  measures. The headline variable (EPO **grants** by filing year) is grant-lag
-  truncated from 2019, which is what caps the reference window; OECD ENV-TECH supplies
-  an **applications** counterpart, and `sql/get_green_patents_v2.sql` (ready to run,
-  data not yet retrieved) supplies the like-for-like PATSTAT version and fixes a
-  double-counting defect in `sql/get_green_patents.sql`.
+- `R/get_data_patents_patstat.R` — ingests and validates the PATSTAT **v2** extract
+  (`sql/get_green_patents_v2.sql`), which is the current source of both patent measures.
+  Quantifies the two defects v2 fixes and writes `data/tidy/green_patents_panel.csv`.
+  Exits cleanly with instructions if the extract is absent.
+- `R/get_data_patents_oecd.R` — OECD ENV-TECH applications, kept as an independent
+  cross-check on PATSTAT and as a fallback source. Carries both measures on the same
+  underlying EPO data, which is what allowed grants-vs-applications to be compared
+  without a source change confounding it.
+- `R/update_panel_patents.R` — adds `GreenPatentsApps_n` to the panel, preferring the
+  PATSTAT v2 extract and falling back to OECD. An absent country-year is a **true zero**
+  (the SQL `GROUP BY` emits no row), but it is filled only where a zero is plausible —
+  country present elsewhere, small counts in the window — and errors otherwise.
 - `R/get_data_extra.R` — builds the external-validator panel `data/tidy/new_data.csv`
   (GDP PPP/real + `renew_share_overall`), one row per country-year. `DOWNLOAD = TRUE`
   rebuilds from WDI + Eurostat `nrg_ind_ren`; `DOWNLOAD = FALSE` (default) reproduces it
   offline from `_archive/data/new_data_blended_raw.csv` by selecting the overall (REN)
   series. Fixes audit finding B1 (the old file duplicated each country-year four times).
+- `R/build_writing_pack.R` — regenerates the machine parts of `writing/` (evidence tables,
+  figures, `numbers.md`) from the pipeline output. **Run after any analysis change**, or the
+  drafting pack silently goes stale — the writing assistant cannot detect drift because it
+  cannot see the pipeline.
 - `R/build_green_list.R` — reconstructs the green-product list in HS1992 6-digit from the
   OECD CLEG (`info/OECD-Report_List.pdf`, Table A.1) via the HS2007→HS1992 concordance
   (`info/HS 2007-to-HS1992 .xls`). Writes `data/tidy/green_products_hs6.csv` (244 codes,
@@ -123,8 +145,16 @@ Supporting:
   France) and to `geo_struc` (Central / Eastern / Southern Europe). Sourced by all scripts.
 - `quarto/CountryTaxonomy.qmd` — the (legacy) report source, to be rebuilt around the
   numbered pipeline in Phase 7; its old rendered `.html`/`.pdf` are in `_archive/quarto/`.
-- `sql/get_green_patents.sql` — live PATSTAT query for EPO-tagged green patents (testing
-  SQL / notes are in `_archive/sql/`).
+- `sql/get_green_patents_v2.sql` — **the current** PATSTAT query. Returns applications and
+  grants side by side by filing year, and fixes a defect in `get_green_patents.sql`: that
+  query is `COUNT(appln.appln_id)` over joins to the CPC and applicant tables, so each
+  application was counted once per matching CPC symbol × same-country applicant. The
+  inflation was 1.67× overall and **differential** (Slovakia 2.40×, Greece 2.34× vs
+  Netherlands 1.49×), i.e. it over-counted the eastern/southern periphery relative to the
+  core. v2 uses `COUNT(DISTINCT ...)` and returns the old behaviour as `n_raw_join` so the
+  distortion stays measurable.
+- `sql/get_green_patents.sql` — superseded v1 query, kept for provenance (testing SQL /
+  notes are in `_archive/sql/`).
 - `data/tidy/` — analysis-ready CSVs. `full_taxonomy_data.csv` and `taxonomy_indicators.csv`
   are committed vantage points, so the pipeline runs without re-downloading. `data/raw/`
   is gitignored.
@@ -132,25 +162,34 @@ Supporting:
 - `info/` — proposal, Mealy & Teytelboym green-complexity paper, OECD CLEG + HS concordance,
   OECD EPS, and the implementation plan.
 - `writing/` — **self-contained pack for drafting the paper**, so a writing assistant can
-  work with access to this directory alone. Hand-written narrative
-  (`results-summary.md`, `open-questions.md`, `README.md`) plus generated `evidence/`
-  (result tables + `numbers.md`) and `figures/`; drafts go in `writing/output/`.
+  work with access to this directory alone. It has **its own `writing/CLAUDE.md`**, which is
+  what such an assistant loads (the root file is invisible to it); that file carries the
+  drafting rules — never invent a number, `evidence/numbers.md` is authoritative, nothing in
+  `open-questions.md` is settled, do not soften the caveats. Alongside it: the hand-written
+  `results-summary.md` and `open-questions.md`, generated `evidence/` (result tables +
+  `numbers.md`) and `figures/`, and `output/` for drafts.
   Regenerate the generated parts with `Rscript R/build_writing_pack.R` after ANY
-  pipeline change — otherwise the pack silently goes stale.
+  pipeline change — otherwise the pack silently goes stale, and the assistant cannot
+  detect it.
 - `_archive/` — superseded scripts/plots/report/notes, reference only (see `_archive/README.md`).
 
 ## Key data columns (`data/tidy/full_taxonomy_data.csv`)
 
 Panel, country (ISO3) × year, EU-27. Notable columns:
 - `GWP_Imports`, `GWP_Exports` — consumption-side emissions embodied in trade (EXIOBASE, GWP).
-  **Country totals only — no origin dimension**, so they cannot show *where* a country's
-  embodied imports come from (see `info/PaperTodos.md` § Offshoring).
+  Country totals; for *where* embodied imports originate use `data/tidy/exiobase_bilateral.csv`
+  (49×49 origin×destination), which is what refuted the offshoring-mechanism claim
+  (see `info/PaperTodos.md` § Offshoring).
 - `GWP_pba` — production-based GHG emissions; `ValueAdded_pba`, `Employment_pba` — sectoral totals.
   The headline carbon variable is production-based on purpose (adjustment *burden*); the
   consumption-based counterparts `CarbonIntensityCBA_normed` / `GWP_cba_normed` measure
   *responsibility* and are used for robustness and the interpretive layer, not the axis.
 - `PrimaryEnergyProduction`, `FinalEnergyConsumption`, `EnergyExports`/`Imports`/`NetTrade` (GWh, Eurostat).
-- `population` (1000s), `GreenPatents_n`, `ShareRenewables_PrimEnProd`, `ShareFossils_PrimEnProd`.
+- `population` (1000s), `ShareRenewables_PrimEnProd`, `ShareFossils_PrimEnProd`.
+- Green patents: `GreenPatents_n` (EPO **grants** by filing year) and `GreenPatentsApps_n`
+  (EPO **applications**, added by `R/update_panel_patents.R`). `indicators.R` builds both as
+  `GreenPatentsGrants_normed` / `GreenPatentsApps_normed` and `PATENT_MEASURE` selects the
+  headline, so `07` can test the other without rebuilding the panel.
 - `new_data.csv` adds `GDP_ppp`, `GDP_real`, `ShareFossils_GrossAvEn`, and the overall
   renewable share `renew_share_overall` (Eurostat SHARES REN). One row per country-year;
   built by `R/get_data_extra.R` (do not re-introduce the old blended multi-indicator rows).
@@ -165,15 +204,35 @@ each script before scaling — normalisation is **not** baked into the tidy CSV.
 - This is an RStudio project (`ecol-taxonomy.Rproj`); reports are Quarto.
 - Prose in reports is English; a few code comments are in German.
 
-## Known open problems (state as of last commit)
+## State of play (2026-09-02)
 
-1. Two of the four proposal dimensions (brown employment, green products / economic
-   complexity) are not yet operationalised.
-2. The pipeline is now consolidated (`01`–`03`), but the clustering variable set still
-   needs principled selection (Phase 3 of `info/ImplementationPlan.md`).
-3. Per-capita normalisation makes economic scale dominate, so clusters largely reproduce
-   the known rich-North / poorer-East–South development-model split (limited novelty).
-4. All four dimensions are pooled into one Euclidean distance, so the vulnerability vs.
-   potential structure of Fig. 1 is not preserved in the output.
-5. No PCA, no cluster-number validation (silhouette/gap), no stability checks; the authors
-   note the cluster discrimination "is not very convincing."
+The analysis is complete and stable; what remains is writing and a few optional checks.
+
+**Settled.** All four proposal dimensions are operationalised. The headline is the
+two-part-axis typology on a **2017–2021** window with **EXIOBASE 3.10.2** and **EPO patent
+applications**. The map survives everything tested: 0/27 under the MRIO release change
+(an 18% revision of the emission accounts), 0/27 under grants-vs-applications, 0/27 across
+every window from 2017 on. It moves most (8/27) under flat single-PCA aggregation, which is
+precisely why the two-part construction is argued for rather than asserted.
+
+**Open — see `writing/open-questions.md` for the full list with evidence.**
+
+1. **Gating: descriptive typology or an explicit H1–H3 test?** H1–H3 are referenced
+   throughout the project material and written down nowhere. The evidence constrains the
+   choice: the *narrow* claim (catch-up East more vulnerable **and** less capable than the
+   Core) is strongly supported, but the *broad* claim (four differentiated growth models) is
+   not — Finance, Periphery and Workbench are statistically indistinguishable from one
+   another. The pattern is Core vs everyone else.
+2. GCI wording — it correlates ~0.998 with a plain green-product count, so it is green
+   *diversity* rather than sophistication. A referee will check.
+3. Target journal, and whether to make a policy ask.
+4. Optional checks that each close a referee line: EORA on the 2014–2017 window (isolates
+   MRIO choice from window choice), a patent run without the EPO-only restriction, sectoral
+   energy splits for the flagged countries.
+
+**A note on how this pipeline fails.** Three times in two days it returned *plausible
+numbers* rather than an error: EXIOBASE nowcast years with a zeroed dominant stressor, an
+NA emission column that only worked because zero-output sectors masked it, and a window
+silently shortening itself because `build_indicator_table()` averages with `na.rm = TRUE`.
+Each is now guarded. When adding anything here, prefer an assertion that fails loudly over
+a computation that quietly succeeds.
