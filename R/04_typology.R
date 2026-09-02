@@ -86,7 +86,7 @@ p_map <- ggplot(scores, aes(vulnerability, potential, colour = group)) +
   labs(title = "EU-27 green-transition typology",
        x = "Vulnerability  (transition burden)  →",
        y = "Potential  (green capability)  →",
-       colour = "Growth model",
+       colour = "Development model",
        caption = sprintf("Hollow rings: within %.2f of a median axis - quadrant is sensitive to the median-tie convention.", BOUNDARY_EPS)) +
   theme_minimal()
 ggsave(here("plots/typology_map.pdf"), p_map, width = 9, height = 7)

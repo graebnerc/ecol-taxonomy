@@ -2,7 +2,7 @@
 # Reads data/tidy/taxonomy_indicators.csv and produces:
 #   * a correlation matrix of all indicators (figure + csv)
 #   * how much each indicator is driven by income (R^2 of indicator ~ log GDP p.c.)
-#   * ranked bar charts per indicator, coloured by growth-model group
+#   * ranked bar charts per indicator, coloured by development-model group
 # This is a WP1 deliverable in its own right and motivates the block structure.
 
 here::i_am("R/03_descriptives.R")

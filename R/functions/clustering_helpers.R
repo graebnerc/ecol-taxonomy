@@ -32,7 +32,7 @@ plot_dendrogram <- function(agnes_obj, k, title = NULL) {
 }
 
 #' Alluvial plot linking the data-driven clusters to an external classification
-#' (e.g. the Graebner et al. growth-model groups).
+#' (e.g. the Graebner et al. development-model groups).
 #'
 #' @param clusters Named integer vector from cutree() (names = country).
 #' @param classify_fun Function mapping ISO3 -> group label.

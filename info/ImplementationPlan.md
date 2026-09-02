@@ -84,7 +84,7 @@ Environmental Innovation and Societal Transitions, or Journal of Economic Struct
 ## Phase 2 — Descriptive analysis (WP1 deliverable in its own right)  [DONE]
 
 `R/03_descriptives.R`.
-- [x] Ranked bar charts per indicator, coloured by growth-model group (`plots/descriptives_rankings.pdf`).
+- [x] Ranked bar charts per indicator, coloured by development-model group (`plots/descriptives_rankings.pdf`).
 - [x] Correlation matrix (`plots/descriptives_correlations.pdf`, `indicator_correlations.csv`)
       + income-drivenness: R² of each indicator on log GDP p.c. (`indicator_income_r2.csv`).
       Key finding: GCI (0.01) and GCP (0.00) and fossil/renewable shares are essentially
@@ -123,7 +123,7 @@ fossil share of primary energy. PC1 = 61% var, all-positive loadings.
       variables / the two scores; validate cluster number with
       indicators (and separately on the two scores). Validate cluster number with
       silhouette + gap statistic (not just the agnes `ac` coefficient). Show dendrogram.
-- [ ] Cross-tabulate clusters vs. quadrants vs. growth-model groups (alluvial). Do the
+- [ ] Cross-tabulate clusters vs. quadrants vs. development-model groups (alluvial). Do the
       data-driven clusters agree with the 2-D quadrants? Do they add info beyond GDP?
 
 ## Phase 5 — Validation & comparison with other classifications  [DONE]
@@ -138,11 +138,11 @@ fossil share of primary energy. PC1 = 61% var, all-positive loadings.
       20/27 EU states — 7 small/newer-EU missing, 6 of them "At risk", so read as
       indicative): potential → EPS +0.34 raw / **+0.42** partial; vulnerability → EPS −0.27 —
       green capability predicts stricter policy net of income. TODO: env. patents validator.
-- [x] Comparison with Gräbner et al. (2020) growth models — **supports H1–H3**:
+- [x] Comparison with Gräbner et al. (2020) development models — **supports H1–H3**:
       group means → Core (vuln −0.71, pot +0.85), Periphery (−0.35, +0.10), Workbench
       (**+0.88, −0.18**), Finance (−0.83, −0.92). Regressions vs Core: Workbench
       vulnerability **+1.60 (p<0.001)**, potential **−1.03 (p<0.05)** — catch-up economies
-      are systematically more exposed and less capable. Quadrant × growth model Cramér's
+      are systematically more exposed and less capable. Quadrant × development model Cramér's
       V = **0.71** (bias-corrected 0.67, Monte-Carlo Fisher p<1e-5); quadrant × data-driven
       cluster (05) V = 0.64 (robustness). Figures:
       `plots/validation_scores_by_group.{pdf,png}`, `plots/validation_alluvial.{pdf,png}`.
@@ -192,7 +192,7 @@ fossil share of primary energy. PC1 = 61% var, all-positive loadings.
       Discussion (polarization / H1–H3) → Policy implications → Conclusion.
 - [ ] Rebuild `quarto/CountryTaxonomy.qmd` around the new pipeline; fix placeholder titles
       ("Titel", "student curricula across several semesters").
-- [ ] Position against Gräbner et al. (2020) growth models and Mealy & Teytelboym (2022).
+- [ ] Position against Gräbner et al. (2020) development models and Mealy & Teytelboym (2022).
 
 ---
 

@@ -13,7 +13,7 @@
 #     validator for POTENTIAL (complexity + patents contain no fossil term;
 #     cor = +0.25). For vulnerability, lean on gdp_growth and EPS, or a renewable-
 #     DEPLOYMENT trajectory (see info/PaperTodos.md - symmetric structure / item 1).
-# (B) Comparison with the Graebner et al. (2020) growth-model groups (JEE) and
+# (B) Comparison with the Graebner et al. (2020) development-model groups (JEE) and
 #     the geographic grouping: group-mean scores, contingency of quadrants, an
 #     alluvial map, and Cramer's V. Also cross-tabs against the data-driven
 #     clusters from 05_clustering.R.
@@ -80,9 +80,9 @@ cat("Expect: potential +/higher renewables, growth & policy stringency (EPS);\n"
     "vulnerability -/lower. (partial_cor controls for log GDP p.c.)\n", sep = "")
 
 # ---- (B) Comparison with development-model & geographic groups ---------------
-cat("\n=== (B) Mean scores by growth-model group (Graebner et al. 2020) ===\n")
+cat("\n=== (B) Mean scores by development-model group (Graebner et al. 2020) ===\n")
 grp_tbl <- dat |>
-  group_by(`Growth model` = group) |>
+  group_by(`Development model` = group) |>
   summarise(n = n(),
             vulnerability = mean(vulnerability),
             potential     = mean(potential), .groups = "drop") |>
@@ -126,7 +126,7 @@ report_group <- function(var, label) {
                     p_ols = round(co[-1, 4], 4))
   pr <- perm_vs_ref(y, dat$group)
   out <- merge(pr, ols, by = "group", all.x = TRUE)
-  cat(sprintf("\n--- %s by growth-model group (differences vs Core) ---\n", label))
+  cat(sprintf("\n--- %s by development-model group (differences vs Core) ---\n", label))
   print(out[order(out$diff_vs_Core), ], row.names = FALSE)
   invisible(out)
 }
@@ -196,7 +196,7 @@ fwrite(rbind(cbind(score = "potential", perm_pot),
              cbind(score = "vulnerability", perm_vuln)),
        here("data/tidy/validation_group_tests.csv"))
 
-# Contingency of quadrant x growth model + Cramer's V. With n = 27 and a 4x4
+# Contingency of quadrant x development model + Cramer's V. With n = 27 and a 4x4
 # table every expected count is < 5, so the chi-square p-value is invalid
 # (finding M2). We keep V as a DESCRIPTIVE index of association and take the
 # p-value from a Monte-Carlo Fisher test instead. V is also reported with
@@ -218,8 +218,8 @@ report_assoc <- function(tab, what, B = 1e5) {
               what, cram_v(tab), cram_v(tab, TRUE), ps))
 }
 tab <- table(quadrant = dat$quadrant, group = as.character(dat$group))
-cat("\n=== Quadrant x growth model ===\n"); print(tab)
-report_assoc(tab, "quadrant, growth model")
+cat("\n=== Quadrant x development model ===\n"); print(tab)
+report_assoc(tab, "quadrant, development model")
 
 # Cross-tab against the data-driven clusters (05_clustering.R), if present
 cl_path <- here("data/tidy/cluster_membership.csv")
@@ -239,20 +239,20 @@ p_grp <- ggplot(score_long, aes(reorder(group, value), value, fill = group)) +
   geom_hline(yintercept = 0, colour = "grey70") +
   geom_boxplot(alpha = .5, outlier.shape = NA) + geom_jitter(width = .12, size = 1.3) +
   facet_wrap(~score) + coord_flip() +
-  labs(title = "Typology scores by growth-model group",
+  labs(title = "Typology scores by development-model group",
        x = NULL, y = "standardised score") +
   theme_minimal() + theme(legend.position = "none")
 ggsave(here("plots/validation_scores_by_group.pdf"), p_grp, width = 10, height = 5)
 ggsave(here("plots/validation_scores_by_group.png"), p_grp, width = 10, height = 5, dpi = 150)
 
 alluv <- dat |>
-  transmute(country, `Growth model` = as.character(group), Quadrant = quadrant) |>
+  transmute(country, `Development model` = as.character(group), Quadrant = quadrant) |>
   pivot_longer(-country, names_to = "axis", values_to = "code")
 p_al <- ggplot(alluv,
                aes(x = axis, stratum = code, alluvium = country, fill = code, label = code)) +
   ggalluvial::geom_flow(stat = "alluvium", lode.guidance = "frontback", color = "darkgray") +
   ggalluvial::geom_stratum() + ggplot2::geom_text(stat = "stratum", size = 2.6) +
-  labs(title = "Growth model -> transition quadrant") +
+  labs(title = "Development model -> transition quadrant") +
   theme_void() + theme(legend.position = "none", plot.title = element_text(hjust = .5))
 suppressMessages(ggsave(here("plots/validation_alluvial.pdf"), p_al, width = 8, height = 6))
 suppressMessages(ggsave(here("plots/validation_alluvial.png"), p_al, width = 8, height = 6, dpi = 150))

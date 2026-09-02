@@ -64,7 +64,7 @@ flat <- tibble(country = ind$country,
   - Each axis must be **distinct** from the other and **not merely a proxy for GDP
     per capita** — but income relevance is *expected and welcome*, not something to
     engineer away.
-  - The axes must **differentiate** countries (a visible growth-model story), else
+  - The axes must **differentiate** countries (a visible development-model story), else
     there is nothing to build a narrative on.
   - No **double-counting**: two near-identical indicators should not silently
     dominate a block.
@@ -136,8 +136,8 @@ gg <- tibble(
   metric = c("cor(vulnerability, potential)",
              "R²  vulnerability ~ log GDP p.c.",
              "R²  potential ~ log GDP p.c.",
-             "eta²  vulnerability ~ growth model",
-             "eta²  potential ~ growth model"),
+             "eta²  vulnerability ~ development model",
+             "eta²  potential ~ development model"),
   value = round(c(cor(scores$vulnerability, scores$potential),
                   r2(scores$vulnerability), r2(scores$potential),
                   eta2(scores$vulnerability), eta2(scores$potential)), 2))
@@ -150,7 +150,7 @@ kable(gg, caption = "Go/no-go and differentiation diagnostics (structured axes).
   Income matters in *both* blocks, dominates *neither*. This is by design: within
   each block one part is income-linked and one income-neutral, on opposite
   diagonals (intensity & patents track GDP; fossil & complexity do not).
-- **Differentiation:** eta² (variance explained by growth model) is high on both
+- **Differentiation:** eta² (variance explained by development model) is high on both
   axes — the core–periphery structure is clearly visible.
 
 ## The typology map
@@ -163,7 +163,7 @@ ggplot(scores, aes(vulnerability, potential, colour = group)) +
   geom_point(size = 2.4) +
   ggrepel::geom_text_repel(aes(label = country), size = 3, max.overlaps = 20) +
   labs(x = "Vulnerability  (transition burden) →",
-       y = "Potential  (green capability) →", colour = "Growth model") +
+       y = "Potential  (green capability) →", colour = "Development model") +
   theme_minimal()
 ```
 
@@ -228,36 +228,36 @@ kable(vt, caption = "Correlation of each axis with external validators (partial 
 ## Relation to the development-model classification {#sec-devmodel}
 
 The central polarization question is how the green-transition typology relates to
-the **Gräbner et al. (2020)** European growth-model classification: **Core**
+the **Gräbner et al. (2020)** European development-model classification: **Core**
 (DE, AT, BE, DK, FI, SE), **Finance** (LU, NL, MT, IE), **Periphery**
 (FR, GR, IT, PT, ES, CY), **Workbench** (the eastern catch-up economies).
 
 ```{r devmodel-means}
-dat |> group_by(`Growth model` = group) |>
+dat |> group_by(`Development model` = group) |>
   summarise(n = n(),
             vulnerability = round(mean(vulnerability), 2),
             potential     = round(mean(potential), 2), .groups = "drop") |>
   arrange(desc(potential)) |>
-  kable(caption = "Mean axis scores by growth-model group.")
+  kable(caption = "Mean axis scores by development-model group.")
 ```
 
 ```{r devmodel-contingency}
-tab <- table(Quadrant = dat$quadrant, `Growth model` = dat$group)
+tab <- table(Quadrant = dat$quadrant, `Development model` = dat$group)
 cram_v <- function(tab) {
   n <- sum(tab); r <- nrow(tab); k <- ncol(tab)
   chi <- suppressWarnings(chisq.test(tab)$statistic)
   sqrt((as.numeric(chi) / n) / (min(r, k) - 1))
 }
 kable(as.data.frame.matrix(tab),
-      caption = sprintf("Quadrant × growth model (Cramér's V = %.2f; descriptive, n = 27).",
+      caption = sprintf("Quadrant × development model (Cramér's V = %.2f; descriptive, n = 27).",
                         cram_v(tab)))
 ```
 
 ```{r devmodel-alluvial, fig.width=7, fig.height=5}
 al <- dat |>
-  transmute(country, `Growth model` = as.character(group), Quadrant = quadrant) |>
+  transmute(country, `Development model` = as.character(group), Quadrant = quadrant) |>
   pivot_longer(-country, names_to = "axis", values_to = "code") |>
-  mutate(axis = factor(axis, levels = c("Growth model", "Quadrant")))
+  mutate(axis = factor(axis, levels = c("Development model", "Quadrant")))
 ggplot(al, aes(x = axis, stratum = code, alluvium = country, fill = code, label = code)) +
   ggalluvial::geom_flow(stat = "alluvium", lode.guidance = "frontback", color = "darkgray") +
   ggalluvial::geom_stratum() + geom_text(stat = "stratum", size = 2.6) +
@@ -266,7 +266,7 @@ ggplot(al, aes(x = axis, stratum = code, alluvium = country, fill = code, label 
 ```
 
 - **The typology tracks the development model, but does not reproduce it**
-  (Cramér's V moderate, not 1): growth model and transition quadrant are clearly
+  (Cramér's V moderate, not 1): development model and transition quadrant are clearly
   associated, yet the mapping is many-to-many.
 - **Core → mostly Winners; Workbench → mostly At risk** — the transition risks
   **reinforcing** the existing core–periphery divide (the polarization hypothesis).

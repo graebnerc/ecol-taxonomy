@@ -2,7 +2,7 @@
 #
 # Two deliverables, both built from the frozen headline output so they cannot
 # drift from 04_typology.R:
-#   (1) the full EU-27 classification (growth model, both axes, the four part
+#   (1) the full EU-27 classification (development model, both axes, the four part
 #       scores, quadrant, borderline flag) -> data/tidy/quadrant_classification.csv
 #   (2) what a "typical" member of each quadrant looks like on the underlying
 #       indicators, in interpretable units  -> data/tidy/quadrant_profiles.csv
@@ -40,7 +40,7 @@ dat <- scores |>
 
 classification <- dat |>
   transmute(
-    country, growth_model = group, quadrant,
+    country, development_model = group, quadrant,
     vulnerability = round(vulnerability, 2), potential = round(potential, 2),
     intensity = round(intensity, 2), fossil = round(fossil, 2),
     complexity = round(complexity, 2), innovation = round(innovation, 2),
@@ -66,7 +66,7 @@ prof_vars <- c(
 
 prof <- dat |>
   transmute(
-    country, quadrant, growth_model = group,
+    country, quadrant, development_model = group,
     carbon_int      = CarbonIntensity_normed / 1000,
     energy_int      = EnergyIntensity_normed,
     fossil_share    = ShareFossils_normed * 100,
@@ -82,12 +82,12 @@ profiles <- prof |>
             across(all_of(unname(prof_vars)), \(x) round(mean(x), 2)),
             .groups = "drop")
 
-# Axis scores per quadrant, and growth-model composition, alongside the levels.
+# Axis scores per quadrant, and development-model composition, alongside the levels.
 axis_means <- dat |>
   group_by(quadrant) |>
   summarise(across(c(vulnerability, potential, intensity, fossil,
                      complexity, innovation), \(x) round(mean(x), 2)),
-            growth_models = paste(sort(unique(as.character(group))), collapse = ", "),
+            development_models = paste(sort(unique(as.character(group))), collapse = ", "),
             .groups = "drop")
 
 profiles <- left_join(profiles, axis_means, by = "quadrant")
@@ -140,13 +140,13 @@ cat("\n## Country classification (EU-27)\n\n")
 print(kable(classification, format = "pipe"))
 
 cat("\n\n## Quadrant profiles - mean of each indicator\n\n")
-print(kable(profiles |> select(quadrant, n, growth_models,
+print(kable(profiles |> select(quadrant, n, development_models,
                                all_of(unname(prof_vars))), format = "pipe"))
 
 cat("\n\n## Quadrant profiles - mean axis and part scores (z)\n\n")
 print(kable(axis_means, format = "pipe"))
 
-cat("\n\n## Quadrant x growth model\n\n")
+cat("\n\n## Quadrant x development model\n\n")
 print(kable(as.data.frame.matrix(table(Quadrant = dat$quadrant, dat$group)),
             format = "pipe"))
 cat("\n")

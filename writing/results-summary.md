@@ -95,7 +95,7 @@ lean on.
 
 ## 5. The polarization result
 
-Quadrant × growth model (Gräbner et al. 2020):
+Quadrant × development model (Gräbner et al. 2020):
 
 | quadrant | Core | Finance | Periphery | Workbench |
 |---|---:|---:|---:|---:|
@@ -106,7 +106,7 @@ Quadrant × growth model (Gräbner et al. 2020):
 
 All six Core countries are Winners; 8 of 11 Workbench economies are At risk.
 Cramér's V = 0.50 (bias-corrected 0.38), Monte-Carlo Fisher p = 0.003.
-eta²(vulnerability ~ growth model) = 0.40, eta²(potential ~ growth model) = 0.41.
+eta²(vulnerability ~ development model) = 0.40, eta²(potential ~ development model) = 0.41.
 
 **The headline:** those least equipped for the transition also carry the largest
 burden. The transition threatens to *reinforce* the core–periphery divide.
@@ -121,11 +121,11 @@ cannot explain, and Luxembourg vs Ireland/Malta are all rich.
 
 ### How far does this actually differentiate? Less than four groups
 
-The temptation is to read the map as four growth models facing four different
+The temptation is to read the map as four development models facing four different
 transition situations. **It does not support that**, and the claim needs stating
 precisely because it is easy to overreach.
 
-**Differences are in the mean z-scored axis scores by growth-model group**
+**Differences are in the mean z-scored axis scores by development-model group**
 (n = Core 6, Finance 4, Periphery 6, Workbench 11) — nothing else.
 
 **The direct test.** Does a four-group model explain more than a **Core-vs-rest
@@ -137,7 +137,7 @@ binary**? Permutation test shuffling labels within the non-Core set only:
 | potential | 0.40 | 0.41 | 0.11 | 0.88 |
 
 The four-way split adds nothing. So write "Core versus the rest", not "four
-growth models face different challenges".
+development models face different challenges".
 
 **But only the Workbench contrast is solid.** Pairwise permutation tests, using
 only the two groups involved:
@@ -172,7 +172,7 @@ what n = 27 can resolve.
 **What this means for the framing decision.** The narrow claim — the catch-up
 East is both more vulnerable and less capable than the Core — is exactly the one
 the data supports, on both axes, at p = .0002. The broad claim that different
-growth models face *different* transition challenges is not supported. See
+development models face *different* transition challenges is not supported. See
 `open-questions.md` §1.
 
 ### What the axes hide: composition, and coherence
@@ -195,7 +195,7 @@ financialised economies are **low-complexity, high-innovation**; the Workbench E
 is **higher-complexity, near-zero-innovation**. Same capability score, opposite
 capability. A difference-in-means on the aggregate cannot detect this, which is
 precisely why the earlier "no four-way structure" result should not be read as
-"the growth models are alike".
+"the development models are alike".
 
 Two weaker cases in the same direction: Finance vs Periphery on potential
 (innovation −0.93, p = .025, but complexity +1.16, p = .20), and Finance vs
@@ -226,7 +226,7 @@ extreme, but because it is the only internally coherent group.** Worth saying
 directly: it reframes the null result on levels as a statement about precision
 rather than about the world.
 
-### Are the quadrants coherent types? No — and neither are the growth models
+### Are the quadrants coherent types? No — and neither are the development models
 
 If the quadrants are the paper's unit, the same question applies to them. Mean
 within-unit sd across the four components:
@@ -234,9 +234,9 @@ within-unit sd across the four components:
 | unit | mean within-unit sd |
 |---|---:|
 | quadrants | **0.75** |
-| growth models | **0.72** |
+| development models | **0.72** |
 
-The quadrants are no more internally coherent than the growth models. And inside
+The quadrants are no more internally coherent than the development models. And inside
 a quadrant the two components of each axis are **negatively** correlated:
 
 | quadrant | n | intensity ↔ fossil | complexity ↔ innovation |
@@ -355,13 +355,13 @@ East's high burden is overwhelmingly its **own** carbon-intensive,
 low-value-added production rather than production for the West — which makes the
 polarization **structural rather than a transfer**, and arguably harder to fix.
 
-On growth-model aggregates the production-vs-consumption gap is **binary, not a
+On development-model aggregates the production-vs-consumption gap is **binary, not a
 gradient**: the three western blocs all consume ~22–28% more than they produce
 and all produce at ~230–270 g CO₂e/€, while the Workbench consumes essentially
 exactly what it produces and produces at ~2.5× the intensity. A four-way ordering
 appears only under an unweighted mean over member countries, where Luxembourg and
 Malta dominate a four-country Finance bloc — do not quote that version without
-saying so. Note also that growth model adds only ~0.05 R² over log GDP p.c. alone
+saying so. Note also that development model adds only ~0.05 R² over log GDP p.c. alone
 in explaining this gap, so it should not carry an "it's not just income" argument.
 
 ## 8b. Does the MRIO table choice matter? No.
@@ -430,7 +430,7 @@ filter, returning both counts from one scan.
 **The bias is real and systematic**, in precisely the predicted direction — EPO
 share of all green filings, reference window:
 
-| growth model | mean EPO share |
+| development model | mean EPO share |
 |---|---:|
 | Workbench | **12.8%** |
 | Periphery | 18.0% |

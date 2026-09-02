@@ -102,7 +102,7 @@ if (!nrow(mk)) {
 fwrite(res, here("data/tidy/group_composition.csv"))
 
 # --- The same question of the QUADRANTS ---------------------------------------
-# If the paper makes quadrants rather than growth models its unit, the same test
+# If the paper makes quadrants rather than development models its unit, the same test
 # applies: is each quadrant a coherent TYPE, or do countries arrive there by
 # different routes? Answering this decides whether the four cells can be written
 # as types at all -- a framing question, not a robustness one.
@@ -112,13 +112,13 @@ s[, q := factor(short_q(quadrant),
                 levels = c("Winners", "Exposed", "Low-stakes", "At risk"))]
 P <- c("intensity", "fossil", "complexity", "innovation")
 
-cat("\n\n## Are QUADRANTS more coherent than growth models?\n\n")
+cat("\n\n## Are QUADRANTS more coherent than development models?\n\n")
 qsd <- s[, c(list(n = .N), lapply(.SD, function(x) round(sd(x), 2))),
          by = q, .SDcols = P][order(q)]
 print(kable(qsd, format = "pipe"))
 mq <- mean(unlist(s[, lapply(.SD, sd), by = q, .SDcols = P][, -1]))
 mg <- mean(unlist(s[, lapply(.SD, sd), by = group, .SDcols = P][, -1]))
-cat(sprintf("\n  mean within-unit sd: quadrants %.2f | growth models %.2f\n", mq, mg))
+cat(sprintf("\n  mean within-unit sd: quadrants %.2f | development models %.2f\n", mq, mg))
 cat("  (similar = the quadrants are no more internally coherent than the growth\n",
     "   models, so neither classification should be written as a set of types)\n", sep = "")
 
@@ -165,7 +165,7 @@ p <- ggplot(long, aes(score, group)) +
   facet_wrap(~component, ncol = 2) +
   scale_y_discrete(limits = rev(GROUPS)) +
   labs(x = "z-score", y = NULL,
-       title = "The axes hide compositional differences between growth models",
+       title = "The axes hide compositional differences between development models",
        subtitle = paste("Dots = countries, diamond = group mean. Two groups can share",
                         "an axis score\nwhile differing on the parts that make it up.")) +
   theme_minimal(base_size = 9) +

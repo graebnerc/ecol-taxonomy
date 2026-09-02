@@ -47,7 +47,7 @@ copy_tables <- c(
   "validation_group_means.csv" = "validation_group_means.csv",
   "burden_responsibility.csv"  = "burden_responsibility.csv",
   "offshoring_origins.csv"     = "offshoring_origins.csv",
-  "growth_model_gradient.csv"  = "growth_model_gradient.csv",
+  "development_model_gradient.csv"  = "development_model_gradient.csv",
   "patent_options.csv"         = "patent_options.csv",
   "country_profiles.csv"       = "country_profiles.csv",
   "energy_by_sector.csv"       = "energy_by_sector.csv",
@@ -115,8 +115,8 @@ md <- c(
   sprintf("| cor(vulnerability, potential) | %.2f |", cor(s$vulnerability, s$potential)),
   sprintf("| R2 vulnerability ~ log GDP p.c. | %.2f |", r2(s$vulnerability)),
   sprintf("| R2 potential ~ log GDP p.c. | %.2f |", r2(s$potential)),
-  sprintf("| eta2 vulnerability ~ growth model | %.2f |", eta2(s$vulnerability)),
-  sprintf("| eta2 potential ~ growth model | %.2f |", eta2(s$potential)), "",
+  sprintf("| eta2 vulnerability ~ development model | %.2f |", eta2(s$vulnerability)),
+  sprintf("| eta2 potential ~ development model | %.2f |", eta2(s$potential)), "",
   "## Within-block correlations (the two-part axis design)", "",
   "| pair | r |", "|---|---:|",
   sprintf("| carbon intensity ~ energy intensity (twin) | %.2f |",
@@ -132,7 +132,7 @@ md <- c(md, "| quadrant | n | countries |", "|---|---:|---|",
         sprintf("| %s | %d | %s |", qt$quadrant, qt$n, qt$countries), "",
         sprintf("Borderline (quadrant is convention-sensitive): **%s**",
                 paste(s[boundary == TRUE]$country, collapse = ", ")), "",
-        "## Quadrant x growth model", "")
+        "## Quadrant x development model", "")
 tb <- table(s$quadrant, s$group)
 md <- c(md, paste0("| quadrant | ", paste(colnames(tb), collapse = " | "), " |"),
         paste0("|---|", paste(rep("---:", ncol(tb)), collapse = "|"), "|"),

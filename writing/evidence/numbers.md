@@ -1,6 +1,6 @@
 # Key numbers
 
-*Generated 2026-09-02 from commit 18ba390 by R/build_writing_pack.R.*
+*Generated 2026-09-02 from commit 330877a by R/build_writing_pack.R.*
 
 Every figure below is computed from the committed pipeline output. **Use these
 values verbatim; do not recompute, round differently, or estimate.** If a number
@@ -20,8 +20,8 @@ the draft needs is not here, say so rather than inventing it.
 | cor(vulnerability, potential) | -0.55 |
 | R2 vulnerability ~ log GDP p.c. | 0.27 |
 | R2 potential ~ log GDP p.c. | 0.21 |
-| eta2 vulnerability ~ growth model | 0.40 |
-| eta2 potential ~ growth model | 0.41 |
+| eta2 vulnerability ~ development model | 0.40 |
+| eta2 potential ~ development model | 0.41 |
 
 ## Within-block correlations (the two-part axis design)
 
@@ -43,7 +43,7 @@ the draft needs is not here, say so rather than inventing it.
 
 Borderline (quadrant is convention-sensitive): **Ireland, Latvia, Slovakia, Slovenia**
 
-## Quadrant x growth model
+## Quadrant x development model
 
 | quadrant | Core | Finance | Periphery | Workbench |
 |---|---:|---:|---:|---:|
@@ -99,7 +99,7 @@ Spearman rank correlation vs the headline; quadrant changes out of 27.
 ## Files in this pack
 
 **Tables** (`evidence/`): 
-`scores_by_country.csv`, `indicators_by_country.csv`, `quadrant_classification.csv`, `quadrant_profiles.csv`, `robustness_specs.csv`, `window_options.csv`, `validation_external.csv`, `validation_group_means.csv`, `burden_responsibility.csv`, `offshoring_origins.csv`, `growth_model_gradient.csv`, `patent_options.csv`, `country_profiles.csv`, `energy_by_sector.csv`, `eora_crosscheck.csv`, `patent_offices.csv`, `capability_convergence.csv`, `validation_group_tests.csv`, `quadrant_stability.csv`, `group_composition.csv`, `quadrant_coherence.csv`
+`scores_by_country.csv`, `indicators_by_country.csv`, `quadrant_classification.csv`, `quadrant_profiles.csv`, `robustness_specs.csv`, `window_options.csv`, `validation_external.csv`, `validation_group_means.csv`, `burden_responsibility.csv`, `offshoring_origins.csv`, `development_model_gradient.csv`, `patent_options.csv`, `country_profiles.csv`, `energy_by_sector.csv`, `eora_crosscheck.csv`, `patent_offices.csv`, `capability_convergence.csv`, `validation_group_tests.csv`, `quadrant_stability.csv`, `group_composition.csv`, `quadrant_coherence.csv`
 
 **Figures** (`figures/`): 
 `typology_map.png`, `quadrant_profiles.png`, `validation_scores_by_group.png`, `validation_alluvial.png`, `burden_responsibility.png`, `offshoring_origins.png`, `window_options.png`, `patent_options.png`, `appendix_structure_map.png`, `country_profiles.png`, `eora_crosscheck.png`, `patent_offices.png`, `capability_convergence.png`, `quadrant_stability.png`, `group_composition.png`

@@ -5,7 +5,7 @@
 #
 # The vulnerability x potential map (04_typology.R) is the headline; this
 # clustering is kept only as an illustrative robustness layer. K is fixed at 4
-# for continuity with the earlier growth-model comparison, NOT because the data
+# for continuity with the earlier development-model comparison, NOT because the data
 # support four groups: 07_robustness.R finds silhouette peaks weakly at k=3 and
 # the gap statistic gives k=1 (little discrete structure), which is itself the
 # argument for the continuous map over hard clustering.
@@ -48,7 +48,7 @@ message(sprintf("Cophenetic correlation: %.3f", cor(dist_mat, cophenetic(hc_ward
 dend <- plot_dendrogram(hc_ward, k = K, title = "EU-27 ecological taxonomy")
 ggsave(file.path(PLOT_DIR, "dendrogram.pdf"), dend, width = 8, height = 8)
 
-# Clusters vs growth-model groups --------------------------------------------
+# Clusters vs development-model groups --------------------------------------------
 clusters <- cutree(as.hclust(hc_ward), k = K)
 alluvial <- plot_cluster_alluvial(
   clusters,

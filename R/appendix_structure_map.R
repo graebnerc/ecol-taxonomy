@@ -72,7 +72,7 @@ p <- ggplot(plot_df, aes(vulnerability, potential)) +
                           sum(cmp$moved != "")),
        x = "Vulnerability  (transition burden)  ->",
        y = "Potential  (green capability)  ->",
-       colour = "Growth model") +
+       colour = "Development model") +
   theme_minimal() + theme(legend.position = "bottom")
 
 ggsave(here("plots/appendix_structure_map.pdf"), p, width = 13, height = 7)

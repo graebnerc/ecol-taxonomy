@@ -20,7 +20,7 @@ The only articulation that exists anywhere is a speaker note:
 > H1 catch-up/Workbench more vulnerable · H2 less capable · H3 they combine into
 > the polarization quadrant.
 
-**What the evidence supports.** Regressed on growth model with Core as reference:
+**What the evidence supports.** Regressed on development model with Core as reference:
 
 | vs Core | Finance | Periphery | Workbench |
 |---|---:|---:|---:|
@@ -30,7 +30,7 @@ The only articulation that exists anywhere is a speaker note:
 - **Narrow hypothesis** — *the catch-up East is both more vulnerable and less
   capable than the Core* → **strongly supported**, p = .0002 on both axes in a
   pairwise permutation test. Would make a clean H1–H3 test.
-- **Broad hypothesis** — *different growth models face different transition
+- **Broad hypothesis** — *different development models face different transition
   challenges* (plural, differentiated) → **not supported**. A four-group model
   does not beat a Core-vs-rest binary (F = 1.15 and 0.11, p = .34 and .88).
   Note this is a limit of *resolution*: the design could only detect non-Core
@@ -61,7 +61,7 @@ complexity" with an explicit footnote; or report both framings.
 
 *Ecological Economics* / *Socio-Economic Review* / *Cambridge Journal of
 Economics*. This determines the reference set and the register (how much
-growth-model literature, how much complexity literature), so it should be settled
+development-model literature, how much complexity literature), so it should be settled
 before drafting rather than after.
 
 ## 4. Policy ask — make one or not?
@@ -81,21 +81,21 @@ So they do not reopen mid-draft:
 - reference window — **2017–2021**
 - green list — **OECD CLEG 244 codes**, footnote the 293-code alternative
 
-## 6. Unit of analysis: quadrants or growth models? (RESOLVED, with a twist)
+## 6. Unit of analysis: quadrants or development models? (RESOLVED, with a twist)
 
 **Recommendation: the two-dimensional MAP is the unit; quadrants are exposition;
-growth models are validation.** Not four types, and not a growth-model paper.
+development models are validation.** Not four types, and not a development-model paper.
 
-**Why quadrants over growth models.** The typology is the contribution; the
-growth-model classification is someone else's. And growth models organise this
+**Why quadrants over development models.** The typology is the contribution; the
+development-model classification is someone else's. And development models organise this
 data poorly at the level of means — a four-group model does not beat a
-Core-vs-rest binary (§5). Cramér's V = 0.50 between quadrants and growth models is
+Core-vs-rest binary (§5). Cramér's V = 0.50 between quadrants and development models is
 exactly the right relationship for a *validation*: high enough that the typology
 tracks known structure, low enough that it is not redundant. That is an argument
 **for** the typology, not a competing frame. One subsection, not a spine.
 
 **The twist: quadrants are not coherent types either.** Mean within-unit sd across
-the four components is **0.75 for quadrants against 0.72 for growth models** — the
+the four components is **0.75 for quadrants against 0.72 for development models** — the
 quadrants are, if anything, marginally *less* coherent. Worse, inside a quadrant
 the components are **negatively correlated**: in *At risk*, intensity ↔ fossil
 r = −0.58 and complexity ↔ innovation r = −0.53. Members trade one off against
@@ -112,16 +112,53 @@ interpretive layer** — naming the *route* by which a country arrives where it 
 That is more informative than either label and it is what the two-part axis design
 was built to support.
 
-**What to keep of the growth-model material:** the validation subsection (V = 0.50,
-Core→Winners, Workbench→At risk), and the composition result — Finance and
-Workbench have identical potential composed oppositely (§5) — which is a genuine
-contribution to the comparative political economy literature and gives the paper a
-foothold there. Secondary result, one or two paragraphs.
+### How much space for the development models?
+
+**A full subsection — earned by two tested findings, not by authorship.**
+
+The development-model classification is the author's own (Gräbner et al. 2020),
+which cuts both ways: there is a legitimate interest in developing it further, and
+a referee will watch for an author validating their own prior work. The way to
+have both is to let the *evidence* set the space.
+
+There are **two genuine contributions to that literature here**, both permutation-
+tested, and neither is a level result:
+
+1. **Composition.** Finance and Workbench have statistically identical green
+   potential composed oppositely — complexity +1.05 (p = .011), innovation −1.12
+   (p = .0007). The labels capture *different kinds* of capability, not different
+   amounts.
+2. **Coherence.** The Workbench is a point mass on green innovation (sd 0.07);
+   the Periphery is dispersed on complexity (sd 1.48). The labels differ in how
+   much work they do.
+
+That is enough for a proper subsection. But **lead it with the null**: a
+four-group model does not beat a Core-vs-rest binary, and only the Workbench–Core
+contrast is robust. Reporting the unflattering result first is what makes the
+positive ones credible when the classification is your own — and finding (2) is
+mildly self-critical anyway, since it says the *Periphery* label is doing less
+work than the *Workbench* label on this dimension.
+
+**What would be overselling, and should be avoided:**
+
+- *"Different development models face different transition challenges"* — the
+  level claim. Not supported (§5).
+- Treating this paper as **validation of the classification**. It is not: the
+  four-way split adds nothing over Core-vs-rest here. The paper uses the
+  classification and refines it; it does not vindicate it.
+- Leaning on Cramér's V = 0.50 as agreement. It is moderate. Its value is that
+  the typology is *neither redundant with nor unrelated to* the classification —
+  which is an argument for the typology, not for the classification.
+
+**Terminology:** they are **development models** (the author's term for this
+classification). The adjacent Baccaro–Pontusson literature calls its objects
+**growth models**; the two are related but distinct research programmes and the
+paper should not blur them.
 
 ## 7. Slovenia — fragile to the SAMPLE, not to the data
 
 Slovenia is the single Workbench country among the Winners, so it carries weight
-in the "the map is not just the growth model" argument. The bootstrap refines
+in the "the map is not just the development model" argument. The bootstrap refines
 what its fragility actually is: it is **100% stable** under year resampling but
 moves in **12 of 27** leave-one-out runs. It sits close to a threshold rather
 than having noisy inputs.

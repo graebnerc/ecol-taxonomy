@@ -68,11 +68,11 @@ Numbered pipeline (run in order from the project root; see README):
   (demand-side); potential = green complexity (GCI + GCP) + green innovation (patents).
   Rationale/derivation in `info/PaperTodos.md`.
 - `R/05_clustering.R` — clustering robustness layer (Ward on the six block variables,
-  dendrogram, alluvial vs. growth-model groups, membership); helpers in
+  dendrogram, alluvial vs. development-model groups, membership); helpers in
   `R/functions/clustering_helpers.R`.
 - `R/06_validation.R` — Phase 5: external validity of the scores (renewable share, GDP
   growth; partial correlations net of GDP p.c.) and comparison with the Gräbner et al.
-  growth-model / geographic groups (group means, quadrant contingency, Cramér's V,
+  development-model / geographic groups (group means, quadrant contingency, Cramér's V,
   alluvial). Writes `validation_*.csv` and `plots/validation_*`.
 - `R/07_robustness.R` — Phase 6 (section A): per-year vs pooled complexity, score-spec
   sensitivity **against the structured headline** (flat single-PCA blocks, twin mean vs PCA,
@@ -89,7 +89,7 @@ Numbered pipeline (run in order from the project root; see README):
   window choice).
   *Findings*: `burden_responsibility` (production- vs consumption-based footprints),
   `offshoring_origins` (bilateral test of the offshoring mechanism claim + the
-  growth-model gradient under both weightings).
+  development-model gradient under both weightings).
   *Exploratory*: `window_coverage`, `capability_trajectory`, `vulnerability_drift`,
   `forward_validation`.
 - `R/functions/typology.R` — shared scoring helpers (`scale_mat`, `block_score`,
@@ -141,7 +141,7 @@ Supporting:
   consumed by `02_complexity.R`) and `green_products_cleg_hs2007.csv` (provenance).
 - `R/country_classification.R` — defines `base_countries` (EU-27) and
   `get_country_classification(x, classification)` mapping ISO codes to the Gräbner et al.
-  (2020) growth-model groups (`jee`: Core / Finance / Periphery / Workbench / Germany /
+  (2020) development-model groups (`jee`: Core / Finance / Periphery / Workbench / Germany /
   France) and to `geo_struc` (Central / Eastern / Southern Europe). Sourced by all scripts.
 - `quarto/CountryTaxonomy.qmd` — the (legacy) report source, to be rebuilt around the
   numbered pipeline in Phase 7; its old rendered `.html`/`.pdf` are in `_archive/quarto/`.
@@ -232,7 +232,7 @@ precisely why the two-part construction is argued for rather than asserted.
 1. **Gating: descriptive typology or an explicit H1–H3 test?** H1–H3 are referenced
    throughout the project material and written down nowhere. The evidence constrains the
    choice: the *narrow* claim (catch-up East more vulnerable **and** less capable than the
-   Core) is strongly supported, but the *broad* claim (four differentiated growth models) is
+   Core) is strongly supported, but the *broad* claim (four differentiated development models) is
    not — Finance, Periphery and Workbench are statistically indistinguishable from one
    another. The pattern is Core vs everyone else.
 2. GCI wording — it correlates ~0.998 with a plain green-product count, so it is green

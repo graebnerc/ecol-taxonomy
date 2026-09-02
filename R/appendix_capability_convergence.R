@@ -163,7 +163,7 @@ m <- merge(sa[, .(iso3, country, pot_a = potential, gci_a = GCI, lg_a = lg)],
 m[, group := as.character(get_country_classification(iso3, "jee"))]
 m[, `:=`(d_pot = pot_b - pot_a, d_gci = gci_b - gci_a)]
 
-cat("\n  Change in green capability by growth model (z-units, global scaling):\n\n")
+cat("\n  Change in green capability by development model (z-units, global scaling):\n\n")
 print(kable(m[, .(n = .N, d_potential = round(mean(d_pot), 2),
                   d_GCI = round(mean(d_gci), 2)), by = group][order(-d_GCI)],
             format = "pipe"))

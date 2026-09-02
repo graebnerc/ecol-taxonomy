@@ -207,7 +207,7 @@ item 1 too.
   robustness tweak.
 - **SUPERSEDED** by the symmetric four-dimension structure below. The decomposed
   spec (income R²=0.00) was rejected: income *is* relevant and should not be forced
-  out, and the map was undifferentiated (eta²(growth model)=0.28, countries bunched,
+  out, and the map was undifferentiated (eta²(development model)=0.28, countries bunched,
   story invisible). Kept only as a robustness spec in `07`.
 
 ## Symmetric four-dimension structure (ADOPTED as headline, implemented)
@@ -215,7 +215,7 @@ item 1 too.
 **Origin:** the real objection to the flat headline was two *collinear* variables
 in one block (carbon vs energy intensity, r=0.68) — apparent double-counting.
 Diagnosis: that redundancy is **load-bearing** — the two intensities are what make
-vulnerability income-linked *and* growth-model-separated (eta²=0.62); dropping
+vulnerability income-linked *and* development-model-separated (eta²=0.62); dropping
 either flattens the story. They are not two variables but **two indicators of one
 construct** (emission intensity of production; GHG/VA = (GHG/energy)×(energy/VA)).
 
@@ -286,7 +286,7 @@ Swapping `CarbonIntensity_normed` for its consumption-based counterpart
 |---|---|---|
 | Spearman(vuln) vs baseline | — | **0.98** |
 | R²(vuln ~ log GDP p.c.) | 0.25 | 0.25 |
-| eta²(vuln ~ growth model) | 0.37 | 0.41 |
+| eta²(vuln ~ development model) | 0.37 | 0.41 |
 | quadrant changes | — | **2/27** (Ireland, Slovakia) |
 
 So the map is **not** an artifact of production-based accounting. This is the
@@ -304,7 +304,7 @@ without destabilising the headline.
 | Low-stakes | 349 | 486 | +38% | 5.7 | 7.9 | +38% |
 | At risk | 560 | 598 | +7% | 8.4 | 9.4 | +11% |
 
-(intensity in g CO₂e per EUR value added.) By growth model the rise is Core +38%,
+(intensity in g CO₂e per EUR value added.) By development model the rise is Core +38%,
 **Finance +70%**, Periphery +7%, Workbench +7%. The Winners↔At-risk intensity gap
 narrows from **2.7× to 2.0×** — about a quarter of it closes — and the ordering
 never changes. Largest offshoring ratios (CBA/PBA footprint): Malta 3.11,
@@ -422,7 +422,7 @@ and `PATENT_MEASURE`.
 Low-stakes and Slovakia Low-stakes -> At risk, a straight swap between the two
 smallest quadrants, both already borderline. Spearman 0.987 / 0.992.
 Diagnostics: cor(vuln,pot) -0.55, R2(vuln~logGDP) 0.27, R2(pot~logGDP) 0.21,
-Cramer's V (quadrant x growth model) 0.50.
+Cramer's V (quadrant x development model) 0.50.
 
 **Every recent window agrees perfectly** (0/27 for 2019-2021, 2020-2022, and
 grants-within-2017-2021). Only pre-2019 windows differ, always by the same two
@@ -556,7 +556,7 @@ only internally coherent group.
 
 - [ ] Write this into the results: it reframes "a four-group model does not beat
   Core-vs-rest" from a statement about the world into a statement about precision
-  and composition. The growth models DO differ -- in what their burden and
+  and composition. The development models DO differ -- in what their burden and
   capability are made of, and in how coherent they are -- just not in level.
 - [ ] Do not let the level null stand alone in the text; it reads as "growth
   models are alike", which the composition result contradicts.

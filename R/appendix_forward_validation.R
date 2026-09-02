@@ -80,7 +80,7 @@ p <- ggplot(long, aes(potential, val)) +
   geom_text(data = ann, aes(x = -Inf, y = Inf, label = lab), hjust = -0.05, vjust = 1.4,
             size = 3.6, colour = kobalt, inherit.aes = FALSE) +
   facet_wrap(~outcome, scales = "free_y") +
-  scale_colour_manual(values = grp_cols, name = "Growth model") +
+  scale_colour_manual(values = grp_cols, name = "Development model") +
   labs(
     title = "Does the frozen 2014–18 map forecast 2018–23 developments?",
     subtitle = "Baseline potential score (x) vs outcomes that never entered the scores",

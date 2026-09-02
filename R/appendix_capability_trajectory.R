@@ -68,7 +68,7 @@ fwrite(traj, here("data/tidy/capability_trajectory.csv"))
 
 cat(sprintf("\ncor(baseline GCI, ΔGCI) = %.2f  (negative => catch-up / convergence)\n",
             cor(traj$GCI_base, traj$dGCI)))
-cat("\nΔGCI (2019-23 minus 2014-18), relative to world, by growth model:\n")
+cat("\nΔGCI (2019-23 minus 2014-18), relative to world, by development model:\n")
 print(traj[, .(mean_dGCI = round(mean(dGCI), 2), n = .N), by = group])
 
 # --- figure: baseline capability vs change (catch-up diagnostic) -------------
@@ -81,7 +81,7 @@ p <- ggplot(traj, aes(GCI_base, dGCI)) +
   geom_smooth(method = "lm", se = TRUE, colour = kobalt, fill = steel, alpha = 0.15, linewidth = 0.7) +
   geom_point(aes(colour = group), size = 2.6) +
   ggrepel::geom_text_repel(aes(label = iso3, colour = group), size = 2.9, max.overlaps = 20, show.legend = FALSE) +
-  scale_colour_manual(values = grp_cols, name = "Growth model") +
+  scale_colour_manual(values = grp_cols, name = "Development model") +
   labs(title = "Did green capability converge, 2014–18 → 2019–23?",
        subtitle = sprintf("Baseline GCI vs its change (relative to the world)  |  r = %.2f  →  %s",
                           rr, ifelse(rr < -0.2, "laggards catching up", "no convergence")),

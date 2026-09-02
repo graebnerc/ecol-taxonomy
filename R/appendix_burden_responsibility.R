@@ -71,7 +71,7 @@ fwrite(dat |> transmute(country, group, quadrant,
          arrange(quadrant, desc(offshoring)),
        here("data/tidy/burden_responsibility.csv"))
 
-# --- The asymmetry, by quadrant and by growth model --------------------------
+# --- The asymmetry, by quadrant and by development model --------------------------
 
 summarise_by <- function(df, key) {
   df |> group_by(across(all_of(key))) |>
@@ -90,7 +90,7 @@ by_group <- summarise_by(dat, "group")
 
 cat("\n## Burden vs responsibility, by quadrant\n\n")
 print(kable(by_quad, format = "pipe"))
-cat("\n\n## Burden vs responsibility, by growth model\n\n")
+cat("\n\n## Burden vs responsibility, by development model\n\n")
 print(kable(by_group, format = "pipe"))
 
 cat("\n\n## The asymmetry in one line\n\n")

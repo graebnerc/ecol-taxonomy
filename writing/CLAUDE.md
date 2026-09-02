@@ -91,7 +91,7 @@ theirs, the application is the contribution.
 **The headline finding has a boundary.** All six Core countries are Winners and 8
 of 11 Workbench economies are At risk, which supports the polarization story. But
 the three non-Core groups are **statistically indistinguishable from each other**
-— the pattern is Core vs everyone else, not four differentiated growth models. Do
+— the pattern is Core vs everyone else, not four differentiated development models. Do
 not write the plural claim. See `results-summary.md` §5.
 
 **The offshoring story was refuted and reframed.** An earlier version claimed the
@@ -110,3 +110,12 @@ story, you are working from a superseded framing. See `results-summary.md` §8.
 - Numbers in text: match the precision used in `evidence/numbers.md`.
 - Country groups follow Gräbner et al. (2020): Core / Finance / Periphery /
   Workbench. Quadrants are Winners / Exposed but capable / Low-stakes / At risk.
+- Call them **development models**, never "growth models". That is the author's
+  term for this classification, and the author is a co-author of it. The adjacent
+  Baccaro–Pontusson literature does call its objects growth models — related but
+  a distinct research programme, so do not blur the two.
+- The classification is **the author's own prior work**. Do not write the paper as
+  validating it: the four-way split adds nothing over a Core-vs-rest binary here
+  (`results-summary.md` §5). The paper *uses and refines* it. Where the
+  development-model results appear, lead with that null before the positive
+  composition and coherence findings.

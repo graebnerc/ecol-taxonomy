@@ -218,7 +218,7 @@ borderline:
 
 Spearman 0.987 on vulnerability, 0.992 on potential. Diagnostics:
 `cor(vuln, pot)` −0.58 → **−0.55**, R²(vuln~logGDP) 0.28 → **0.27**,
-R²(pot~logGDP) 0.33 → **0.21**. Cramér's V (quadrant × growth model) 0.45 → 0.50.
+R²(pot~logGDP) 0.33 → **0.21**. Cramér's V (quadrant × development model) 0.45 → 0.50.
 
 ### Every window you asked for, whole typology rebuilt on each
 

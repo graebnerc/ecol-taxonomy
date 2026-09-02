@@ -30,7 +30,7 @@ claim changes.
 > I build a two-dimensional national typology — *vulnerability* (emission and
 > energy intensity of production per unit of value added, plus fossil dependency
 > of the energy mix) against *potential* (green economic complexity plus green
-> patenting) — and relate the resulting groups to established European growth-model
+> patenting) — and relate the resulting groups to established European development-model
 > classifications.
 >
 > **What the review must cover.** Three strands, and the relationship between them:
@@ -42,13 +42,16 @@ claim changes.
 >    countries rather than within them. Include work arguing the transition is
 >    convergence-friendly — I need the counter-position, not only support.
 >
-> 2. **European growth models and core–periphery structure.** The comparative
->    political economy literature on European growth regimes and macroeconomic
->    divergence, centred on the core / finance-led / periphery / eastern
->    "workbench" classification of Gräbner, Heimberger, Kapeller and Schütz
->    (2020), and the demand-led growth-regimes debate (Baccaro and Pontusson).
->    Include critiques of these classifications, especially of how they treat the
->    eastern catch-up economies.
+> 2. **European development models, growth models, and core–periphery structure.**
+>    Note the terminology: the classification I use is the **development-model**
+>    typology of Gräbner, Heimberger, Kapeller and Schütz (2020) — core /
+>    finance-led / periphery / eastern "workbench". The adjacent and larger
+>    literature calls its objects **growth models** or growth regimes (Baccaro and
+>    Pontusson and the demand-led growth-regimes debate). Search **both terms**:
+>    they name overlapping but distinct research programmes, and a search on only
+>    one will miss half the field. I need the relationship between them, and
+>    critiques of both — especially of how either treats the eastern catch-up
+>    economies.
 >
 > 3. **Economic complexity and green complexity.** The product-space and economic
 >    complexity framework (Hidalgo and Hausmann), and its green extension — the
@@ -60,19 +63,21 @@ claim changes.
 > **The requirement that matters most.** State explicitly and unambiguously
 > whether existing work already **combines** strands 2 and 3 — that is, whether
 > anyone has used economic complexity or green complexity alongside comparative
-> political economy growth models, or built a country-level typology of green
+> political economy development- or growth-model typologies, or built a
+> country-level typology of green
 > transition readiness or vulnerability for the EU. Name the closest existing work
 > and say how close it is. Do not pad this with loosely related items: I need to
 > know whether my combination is new.
 >
 > **Framing.** The review should build towards the gap between strands 2 and 3 —
-> the growth-model literature describes structural divergence but not
+> the development-model literature describes structural divergence but not
 > environmental capability, and the complexity literature measures capability but
 > is not connected to political-economy structure. Write it as a synthesis
 > leading to that gap, not as three separate summaries.
 
 **Filters.** Year: leave open, or set no earlier than **2005** — the foundational
-complexity work is 2009 and the growth-model literature is largely post-2015, but
+complexity work is 2009 and the development- and growth-model literature is largely
+post-2015, but
 a hard recent cutoff would drop the foundations. SJR: **Q1–Q2**, but be aware this
 may exclude relevant JRC/EEA policy reports and working papers, which are worth a
 separate manual look.
