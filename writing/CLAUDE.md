@@ -48,7 +48,15 @@ Everything is descriptive association — Cramér's V, partial correlations,
 Monte-Carlo Fisher. There is no large-sample inference to be had. Avoid causal
 verbs ("drives", "causes", "leads to") unless the source text uses them.
 
-**6. Write into `output/` only.** Treat everything else as read-only. If
+**6. Citations must come from `literature/`.** If it is not in
+`literature/references.bib` or the notes there, do not cite it. Never generate a
+citation from memory — write `[CITATION NEEDED: what the claim is]` instead. This
+is the same rule as rule 1, for the same reason: you cannot verify, so a
+plausible-looking fabricated reference is the most damaging thing you can produce.
+If `literature/` is empty, the review has not been run yet — flag that rather than
+filling the gap.
+
+**7. Write into `output/` only.** Treat everything else as read-only. If
 `results-summary.md` or `open-questions.md` needs correcting, say so rather than
 editing it — those are maintained against the pipeline you cannot see.
 
@@ -61,6 +69,8 @@ editing it — those are maintained against the pipeline you cannot see.
 | `evidence/numbers.md` | every headline figure, stamped with the commit it came from | generated |
 | `evidence/*.csv` | the underlying result tables | generated |
 | `figures/*.png` | the figures available to the paper | generated |
+| `literature-prompts.md` | search prompts for the literature review | hand-written |
+| `literature/` | search results, notes, `references.bib` | populated externally |
 | `output/` | drafts, sections, assembled manuscript | you |
 
 Read `results-summary.md` first; it is the briefing. `evidence/numbers.md` is the
