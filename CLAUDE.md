@@ -90,8 +90,11 @@ Numbered pipeline (run in order from the project root; see README):
   *Findings*: `burden_responsibility` (production- vs consumption-based footprints),
   `offshoring_origins` (bilateral test of the offshoring mechanism claim + the
   development-model gradient under both weightings).
-  *Exploratory*: `window_coverage`, `capability_trajectory`, `vulnerability_drift`,
-  `forward_validation`.
+  *Exploratory*: `window_coverage` (what constrains the reference window — coverage
+  derived from the data, not hardcoded) and `forward_validation` (does the frozen map
+  predict what followed? — currently a null once income is controlled).
+  `capability_trajectory` and `vulnerability_drift` were **archived 2026-09-03** as
+  superseded — see `_archive/R/README_superseded_2026-09-03.md`.
 - `R/functions/typology.R` — shared scoring helpers (`scale_mat`, `block_score`,
   `axis_score`, `assign_quadrant`) used by `04` and `07`. `axis_score` builds the two-part
   (twin sub-index + standalone) axes; the four dimensions live in `R/config.R`

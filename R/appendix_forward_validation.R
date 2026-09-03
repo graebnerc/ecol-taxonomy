@@ -1,8 +1,15 @@
-# EXPLORATORY (not part of the audited 01-07 pipeline) -- for co-author discussion.
-# Forward / out-of-sample validation: freeze the 2014-2018 typology, then ask
-# whether a country's baseline position predicts what it did 2018-2023 on outcomes
-# that never entered the scores (renewable share, real GDP). Turns the "window ends
-# 2018" limit into a test: is the baseline map a predictor of subsequent dynamics?
+# Forward / out-of-sample validation: freeze the typology at the reference window,
+# then ask whether a country's position predicts what it did AFTERWARDS on
+# outcomes that never entered the scores (renewable share, real GDP).
+#
+# This is the one genuinely predictive check in the repo. Everything else in 06
+# validates contemporaneously -- it asks whether the scores line up with outcomes
+# measured over the same years, which cannot distinguish a good index from a
+# well-fitted one. Here the outcome window starts where the scoring window ends.
+#
+# UPDATED 2026-09-03 to follow the reference window instead of the hardcoded
+# 2014-2018/2018-2023 it was written with. The baseline is REF_LAST_YEAR and the
+# outcome horizon runs to the last year both validators are available.
 # Writes plots/forward_validation.{png,pdf} and data/tidy/forward_validation.csv.
 
 suppressMessages({
@@ -16,7 +23,25 @@ kobalt <- "#00395B"; steel <- "#69AACD"; green <- "#5FB46E"
 orange <- "#E65032"; gray  <- "#6F6F6F"
 grp_cols <- c(Core = orange, Finance = green, Periphery = steel, Workbench = "#B98BD9")
 
-BASE <- 2018L; LAST <- 2023L   # baseline window ends 2018; latest solid actual = 2023
+source(here("R/config.R"))
+
+# The outcome window opens where the scoring window closes, and runs as far as
+# BOTH validators reach. Derived, not hardcoded, so it follows REF_LAST_YEAR.
+nd0 <- fread(here("data/tidy/new_data.csv"))
+BASE <- REF_LAST_YEAR
+
+# Each validator gets its OWN horizon. The two series end in different years
+# (renewable share runs later than real GDP), and capping both at the shorter one
+# would discard half the available follow-up for no reason. The horizon is
+# reported with every coefficient so a short one cannot be read as a long one.
+horizon <- function(col) max(nd0[!is.na(get(col)) & year > BASE]$year, -Inf)
+LAST_RENEW <- horizon("renew_share_overall")
+LAST_GDP   <- horizon("GDP_real")
+LAST <- max(LAST_RENEW, LAST_GDP)
+if (LAST_RENEW - BASE < 2L && LAST_GDP - BASE < 2L)
+  stop("no validator has at least 2 years of follow-up after ", BASE)
+cat(sprintf("Forward test from baseline %d: renewable share to %d (%d yr), real GDP to %d (%d yr)\n",
+            BASE, LAST_RENEW, LAST_RENEW - BASE, LAST_GDP, LAST_GDP - BASE))
 
 sc  <- fread(here("data/tidy/taxonomy_scores.csv"))          # frozen baseline scores
 ind <- fread(here("data/tidy/taxonomy_indicators.csv"))      # for income control (GDP_normed)
@@ -24,11 +49,13 @@ nd  <- fread(here("data/tidy/new_data.csv"))                 # post-2018 outcome
 
 sc[, iso3 := countrycode(country, "country.name", "iso3c")]
 
-wide <- function(y) nd[year == y, .(iso3 = iso3c, renew = renew_share_overall, gdp = GDP_real)]
-b <- wide(BASE); l <- wide(LAST)
-out <- merge(b, l, by = "iso3", suffixes = c("_b", "_l"))
-out[, `:=`(d_renew    = renew_l - renew_b,               # pp change in renewable share
-           gdp_growth = 100 * (gdp_l / gdp_b - 1))]      # % real GDP growth 2018->2023
+pick <- function(y, col) nd[year == y, .(iso3 = iso3c, v = get(col))]
+rb <- pick(BASE, "renew_share_overall"); rl <- pick(LAST_RENEW, "renew_share_overall")
+gb <- pick(BASE, "GDP_real");            gl <- pick(LAST_GDP,   "GDP_real")
+out <- merge(merge(rb, rl, by = "iso3", suffixes = c("_rb", "_rl")),
+             merge(gb, gl, by = "iso3", suffixes = c("_gb", "_gl")), by = "iso3")
+out[, `:=`(d_renew    = v_rl - v_rb,                  # pp change in renewable share
+           gdp_growth = 100 * (v_gl / v_gb - 1))]     # % real GDP growth
 
 df <- sc |>
   left_join(ind[, .(country, GDP_normed)], by = "country") |>
@@ -51,11 +78,13 @@ res <- rbindlist(list(
   stat("vulnerability", "gdp_growth", "vulnerability -> GDP growth")
 ))
 fwrite(res, here("data/tidy/forward_validation.csv"))
-cat("Forward validation (baseline 2014-2018 -> outcomes 2018-2023):\n")
+cat(sprintf("Forward validation (scores %d-%d; outcomes from %d)\n",
+            REF_FIRST_YEAR, REF_LAST_YEAR, BASE))
 print(res)
 
 # headline figure: baseline potential -> two out-of-sample outcomes -----------
-lv  <- c("Δ renewable share 2018–2023 (pp)", "Real GDP growth 2018–2023 (%)")
+lv  <- c(sprintf("\u0394 renewable share %d\u2013%d (pp, %d yr)", BASE, LAST_RENEW, LAST_RENEW - BASE),
+         sprintf("Real GDP growth %d\u2013%d (%%, %d yr)", BASE, LAST_GDP, LAST_GDP - BASE))
 long <- rbind(
   data.table(iso3 = df$iso3, group = df$group, potential = df$potential,
              outcome = lv[1], val = df$d_renew),
@@ -82,9 +111,11 @@ p <- ggplot(long, aes(potential, val)) +
   facet_wrap(~outcome, scales = "free_y") +
   scale_colour_manual(values = grp_cols, name = "Development model") +
   labs(
-    title = "Does the frozen 2014–18 map forecast 2018–23 developments?",
+    title = sprintf("Does the %d\u2013%d map forecast what happened next?",
+                    REF_FIRST_YEAR, REF_LAST_YEAR),
     subtitle = "Baseline potential score (x) vs outcomes that never entered the scores",
-    x = "Baseline potential score (frozen 2014–2018)  →",
+    x = sprintf("Baseline potential score (%d\u2013%d)  \u2192",
+                REF_FIRST_YEAR, REF_LAST_YEAR),
     y = NULL,
     caption = "Out-of-sample forward validation. Exploratory — not part of the audited 01–07 pipeline."
   ) +

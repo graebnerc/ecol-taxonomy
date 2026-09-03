@@ -79,9 +79,18 @@ PCA. The flat version discards about a third more of each country's position.
 | GDP, renewable share | WDI, Eurostat SHARES | |
 
 **Reference window: 2017–2021** — the most recent window in which every input is
-observed and complete. Two independent constraints converge on it: EXIOBASE
-emissions are complete only to 2022 (2023–2024 are nowcasts whose dominant
-stressor is identically zero), and patent applications only to 2021.
+observed. Two independent constraints converge on it: EXIOBASE emissions are
+complete only to 2022 (2023–2024 are nowcasts whose dominant stressor is
+identically zero), and patent applications run out shortly after 2021.
+
+> **One honest caveat about the last year.** In the PATSTAT extract actually used,
+> **2021 is already partially truncated** by publication lag — the EU-27 total is
+> **82%** of the figure the independent OECD series gives for that year.
+> It does **not** propagate to the window: across 2017–2021 the series is **99.6%**
+> of the OECD total (earlier years run slightly high and offset it) and the
+> cross-country ranking is unaffected (**Spearman 0.995**). Report the caveat;
+> the window is not compromised. (`R/appendix_window_coverage.R` recomputes this
+> and prints it on every run.)
 
 ## 4. The map
 
@@ -635,3 +644,10 @@ moves the result in the direction *less* convenient for a sceptic.
   quadrant. Resolved; see §8d.
 - **EXIOBASE 2023–2024 are unusable** (dominant stressor identically zero), so no
   window may end after 2022.
+- **Forward validation is a null.** Freezing the map at 2017–2021 and asking
+  whether it predicts what followed gives raw correlations of +0.27 (potential →
+  renewable progress over 2021–2025) and −0.36 (potential → GDP growth over
+  2021–2023), but **partial correlations net of income of only +0.08 and −0.21**.
+  The map does not forecast subsequent renewable progress once income is
+  controlled. The horizons are short (4 and 2 years), so this is weak evidence
+  rather than a refutation — but do not claim predictive validity.
