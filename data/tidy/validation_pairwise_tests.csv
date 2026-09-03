@@ -1,0 +1,7 @@
+axis,comparison,diff,p_pairwise
+vulnerability,Workbench - Core,1.63,2e-04
+vulnerability,Periphery - Core,1.07,0.1102
+vulnerability,Finance - Core,1.12,0.0468
+potential,Workbench - Core,-1.56,3e-04
+potential,Periphery - Core,-1.37,0.0492
+potential,Finance - Core,-1.52,0.0703

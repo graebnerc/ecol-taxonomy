@@ -39,8 +39,8 @@ sub-index (PC1), then combine that with the standalone at **equal weight**.
 
 **Why not a flat PCA over all three variables per block.** The twins are strongly
 correlated (carbon↔energy intensity r = 0.74; GCI↔GCP r = 0.76), so under a flat
-PCA they dominate PC1 and the standalone loads only ~0.14–0.28 — effectively
-ignored. The two-part construction treats them as co-equal *conceptual*
+PCA they dominate PC1 and the standalone is almost ignored — it loads **0.02 for
+fossil dependency and 0.30 for patents**, against ~0.7 for each twin. The two-part construction treats them as co-equal *conceptual*
 dimensions, so neither the twin pair (2 indicators) nor the standalone (1) wins
 by count.
 
@@ -49,9 +49,10 @@ Within each block one part is income-linked and one is income-neutral, on
 opposite diagonals: intensity and patents track GDP p.c.; fossil share and
 complexity do not. Equal-weighting makes income **present but balanced in both
 blocks** — R²(vuln ~ log GDP) = 0.27, R²(pot ~ log GDP) = 0.21. Income is not
-purged (an earlier fully income-neutral specification was rejected: it
-reclassified 18/27 countries and produced an undifferentiated map); it is simply
-no longer the sole driver of either axis.
+purged (a fully income-neutral specification was tested and rejected in July 2026
+on the then-current 2014–2018 window, where it reclassified 18 of 27 countries and
+produced an undifferentiated map; that figure has not been recomputed for the
+present window); it is simply no longer the sole driver of either axis.
 
 The twins are near-orthogonal to their standalone (intensity↔fossil −0.01,
 complexity↔patents 0.19), confirming these are genuinely two dimensions per block
@@ -155,14 +156,19 @@ only the two groups involved:
 
 | axis | Finance − Core | Periphery − Core | Workbench − Core |
 |---|---|---|---|
-| vulnerability | +1.12 (p = .048) | +1.07 (p = .110) | **+1.63 (p = .0002)** |
-| potential | −1.52 (p = .071) | −1.37 (p = .053) | **−1.56 (p = .0002)** |
+| vulnerability | +1.12 (p = .047) | +1.07 (p = .110) | **+1.63 (p = .0002)** |
+| potential | −1.52 (p = .070) | −1.37 (p = .049) | **−1.56 (p = .0003)** |
 
-These are more conservative than the vs-Core values in the table above, which
-shuffle all 27 labels and so borrow strength from groups outside the comparison.
-**Quote the pairwise values for any two-group claim.** Finance and Periphery
-differ from Core in the same direction and by a similar magnitude, but only at
-p ≈ .05–.11.
+*(`evidence/validation_pairwise_tests.csv`.)* These are more conservative than the
+vs-Core values in the table above, which shuffle all 27 labels and so borrow
+strength from groups outside the comparison. **Quote the pairwise values for any
+two-group claim.** Finance and Periphery differ from Core in the same direction
+and by a similar magnitude, but only at p ≈ .05–.11.
+
+> **Do not lean on whether these cross .05.** Finance/vulnerability (.047) and
+> Periphery/potential (.049) sit on the threshold and move across it between
+> Monte-Carlo seeds — an earlier run gave .048 and .053. Report them as
+> *marginal*, not as significant or non-significant.
 
 **The caveat that must not be dropped.** "The non-Core groups are
 indistinguishable" is **a limit of resolution, not a finding of similarity**. With
@@ -317,7 +323,7 @@ Three robustness results deserve to be findings in their own right:
 
 1. **Invariance to the MRIO release.** Rebuilding on EXIOBASE 3.10.2 rather than
    3.8.x — an 18% upward revision of EU production emissions and a 3.5% downward
-   revision of value added, i.e. ~25% higher carbon intensity in level — moves
+   revision of value added, i.e. ~23% higher carbon intensity in level — moves
    **0 of 27** countries. MRIO choice is a standard referee question; this
    answers it.
 2. **Invariance to the patent measure.** Applications and grants rank EU-27
@@ -338,13 +344,22 @@ domestic *adjustment burden* — the plants, workers and energy system a country
 must itself retool. Consumption-based accounting measures something different:
 *responsibility*, whose final demand the emissions serve.
 
-The finding is the **asymmetry between them**. In production terms Winners and
-At-risk countries emit about the same per capita; in consumption terms it
-reverses. The intensity gap narrows but the ordering never changes, which is why
-the consumption-based robustness spec moves 0/27.
+The finding is the **asymmetry between them**. Per capita (t CO₂e):
+
+| quadrant | production | consumption | gap |
+|---|---:|---:|---:|
+| Winners | 8.8 | **12.2** | +39% |
+| At risk | 8.0 | **9.0** | +13% |
+
+Winners and At-risk countries produce almost the same emissions per head, but
+Winners *consume* a third more. Note the gap **widens** in the same direction —
+it does not reverse. (An earlier draft said "reverses"; that was true of the
+2014–2018 vintage, where Winners produced slightly *less* than At-risk countries.
+It is not true here.) The intensity ordering never changes, which is why the
+consumption-based robustness spec moves 0/27.
 
 Net embodied imports p.c. is deliberately **not** an axis variable: it correlates
-~+0.65 with log GDP p.c. and would reimport exactly the income confound the
+**+0.77** with log GDP p.c. and would reimport exactly the income confound the
 per-value-added intensities remove.
 
 ### What the bilateral data refutes
@@ -357,7 +372,7 @@ mechanism of polarization"* **cannot be claimed**. The core offshores to the
 world, not to its own periphery.
 
 The direction still holds — the Workbench East is a net embodied-emission
-exporter to every other EU bloc (~+70 Mt/yr, ~8–9% of its own production
+exporter to every other EU bloc (**+78.7 Mt/yr, 9.3%** of its own production
 emissions) — but that is an order of magnitude too small to be *the mechanism*.
 
 **Framing to use:** state the intra-EU transfer as present, in the predicted
@@ -367,9 +382,10 @@ low-value-added production rather than production for the West — which makes t
 polarization **structural rather than a transfer**, and arguably harder to fix.
 
 On development-model aggregates the production-vs-consumption gap is **binary, not a
-gradient**: the three western blocs all consume ~22–28% more than they produce
-and all produce at ~230–270 g CO₂e/€, while the Workbench consumes essentially
-exactly what it produces and produces at ~2.5× the intensity. A four-way ordering
+gradient**: the three western blocs consume **27–38%** more than they produce
+(Finance 38, Periphery 28, Core 27) and all produce at **232–240 g CO₂e/€**, while
+the Workbench consumes essentially exactly what it produces (**+1%**) at **609
+g/€**, about 2.6× the western rate. A four-way ordering
 appears only under an unweighted mean over member countries, where Luxembourg and
 Malta dominate a four-country Finance bloc — do not quote that version without
 saying so. Note also that development model adds only ~0.05 R² over log GDP p.c. alone
@@ -589,12 +605,18 @@ moves the result in the direction *less* convenient for a sceptic.
   early, plainly.
 - **Quadrants come from median splits**, so four countries near a median are
   convention-sensitive.
-- **GCI ≈ green export diversity.** In this sample GCI correlates ~0.998 with a
-  plain count of green products exported with RCA ≥ 1. Mealy & Teytelboym concede
+- **GCI ≈ green export diversity.** GCI correlates **0.997** with a plain count of
+  green products exported with RCA ≥ 1 (0.996 within the EU-27). It correlates
+  only **0.74** with *total* export diversity, so it is specifically *green*
+  diversity — a more defensible framing than conceding it is "not really
+  complexity". Mealy & Teytelboym concede
   this in their fn. 9. Decide the honest wording — a referee will check.
-- **Green list** is the OECD CLEG 244 codes, not Mealy & Teytelboym's 293.
-  Renewable-only GCI correlates 0.96 with the full version, so the gap is
-  footnote-sized.
+- **Green list** is the OECD CLEG 244 codes, not Mealy & Teytelboym's 293. A
+  renewable-only GCI correlates **0.89** with the full version (not 0.96 — that
+  figure was from the 2014–2018 window and is superseded), and substituting it
+  moves **4 of 27** countries. **The product-list choice is therefore not
+  footnote-sized** — it is one of the larger sensitivities in the robustness
+  table, and should be argued for rather than mentioned in passing.
 - **Patents count EPO filings only** (`appln_auth = 'EP'`). This understates the
   eastern states in levels — measured, and real — but changes no country's
   quadrant. Resolved; see §8d.

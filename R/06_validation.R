@@ -176,6 +176,28 @@ cat(sprintf("  Observed non-Core spread: vulnerability %.2f z, potential %.2f z\
             diff(range(tapply(dat$potential, dat$group, mean)[c("Finance","Periphery","Workbench")]))))
 cat("  => any non-Core difference is below what n = 27 can resolve.\n")
 
+# PAIRWISE two-group tests. The vs-Core values above shuffle all 27 labels and so
+# borrow strength from groups outside the comparison; these use only the two
+# groups involved and are the conservative version to quote for a two-group
+# claim. They were previously computed in an uncommitted scratch script while
+# appearing in writing/results-summary.md -- i.e. a number in the pack that no
+# committed code produced. Fixed.
+cat("\n--- PAIRWISE two-group permutation tests (conservative) ---\n")
+pairwise <- rbindlist(lapply(c("vulnerability", "potential"), function(v) {
+  y <- dat[[v]]; g <- as.character(dat$group)
+  rbindlist(lapply(setdiff(unique(g), "Core"), function(o) {
+    k <- g %in% c("Core", o); yy <- y[k]; gg <- g[k]
+    obs <- mean(yy[gg == o]) - mean(yy[gg == "Core"])
+    set.seed(23)
+    cnt <- sum(replicate(20000L, {
+      gp <- sample(gg); abs(mean(yy[gp == o]) - mean(yy[gp == "Core"])) >= abs(obs) }))
+    data.table(axis = v, comparison = paste(o, "- Core"),
+               diff = round(obs, 2), p_pairwise = round((cnt + 1) / 20001, 4))
+  }))
+}))
+print(pairwise, row.names = FALSE)
+fwrite(pairwise, here("data/tidy/validation_pairwise_tests.csv"))
+
 # The comparison that actually carries the polarization claim, tested directly:
 # Workbench vs Core, one difference rather than three. NB this PAIRWISE test uses
 # only the two groups involved; the vs-Core p-values above shuffle all 27 labels

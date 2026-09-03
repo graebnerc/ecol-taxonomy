@@ -20,6 +20,9 @@ The only articulation that exists anywhere is a speaker note:
 > H1 catch-up/Workbench more vulnerable · H2 less capable · H3 they combine into
 > the polarization quadrant.
 
+*(Source: a speaker note in `presentation/taxonomy_presentation.qmd`, July 2026.
+They have never been written down as formal hypotheses anywhere in the project.)*
+
 **What the evidence supports.** Regressed on development model with Core as reference:
 
 | vs Core | Finance | Periphery | Workbench |
@@ -79,7 +82,9 @@ So they do not reopen mid-draft:
 - brown employment dimension — **out**
 - clustering — **illustrative / robustness only**, not a headline
 - reference window — **2017–2021**
-- green list — **OECD CLEG 244 codes**, footnote the 293-code alternative
+- green list — **OECD CLEG 244 codes**. NB this is *not* a footnote-sized choice:
+  a renewable-only GCI correlates only 0.89 with the full version and moves 4/27
+  countries. Argue for the list, do not just name it.
 
 ## 6. Unit of analysis: quadrants or development models? (RESOLVED, with a twist)
 
