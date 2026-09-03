@@ -128,6 +128,17 @@ precisely because it is easy to overreach.
 **Differences are in the mean z-scored axis scores by development-model group**
 (n = Core 6, Finance 4, Periphery 6, Workbench 11) — nothing else.
 
+> **These p-values come from permutation tests, and the text must explain what
+> that means** — see `CLAUDE.md` rule 7. In short: reshuffle the group labels at
+> random many times, recompute the difference each time, and see how often chance
+> alone produces one as large as observed. With 27 countries and a group of four,
+> the usual t-distribution behind a regression p-value is not trustworthy; the
+> permutation test replaces that assumption with the data's own null distribution.
+> Two things not to overstate: it removes a *distributional assumption*, it does
+> **not** add statistical power — here it is *more* conservative than OLS, which is
+> the point — and it does nothing about small *n*, multiple comparisons or
+> non-independence.
+
 **The direct test.** Does a four-group model explain more than a **Core-vs-rest
 binary**? Permutation test shuffling labels within the non-Core set only:
 
