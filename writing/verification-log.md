@@ -70,6 +70,41 @@ Fixed, and the script now **asserts** that its headline matches
 `taxonomy_scores.csv` before comparing anything, so the baseline cannot drift
 again.
 
+## Third pass: sweep for the same defect class
+
+Having found two scripts producing plausible-but-wrong output, every script was
+checked for the same failure modes: wrong scoring baseline, hardcoded years
+reaching a figure, hardcoded patent variable, and outputs inconsistent with the
+headline.
+
+**Found and fixed**
+
+| script | defect | reached the pack? |
+|---|---|---|
+| `appendix_burden_responsibility.R` | figure axis label hardcoded "(2014-2018 mean)" while the window is 2017–2021 | **yes** — `burden_responsibility.png` is in `figures/` |
+| `appendix_pc1_cos2.R` | header claimed "numbers match 04_typology.R" while computing a flat single PCA per block — the specification abandoned in July | no |
+| `appendix_window_coverage.R` | subtitle described a window comparison that is no longer the live one | no |
+
+**Checked and clean**
+
+- `appendix_structure_map.R` — its "structured" side reproduces the headline
+  exactly (11/3/2/11).
+- All six quadrant-producing outputs match `taxonomy_scores.csv` country by
+  country.
+- `eora_crosscheck.csv` differs on exactly two countries (Ireland, Slovakia) —
+  **correct**, because it runs on the 2014–2017 window by design, and
+  `window_options.csv` independently reports those same two as the difference
+  between that window and the headline.
+- The files in `data/tidy/` older than the window change are all *source inputs*
+  (Eurostat, PATSTAT v1, WDI, the superseded EXIOBASE extract), not stale outputs.
+- No other hardcoded year or patent variable reaches a figure or a table.
+
+**A useful by-product.** Correcting `appendix_pc1_cos2.R` produced a new argument
+for the two-part design that was not previously available: the twin PC1 captures
+83% (intensity) and 65% (complexity) of each country's own variation on average,
+against 65% and 46% under the flat three-variable PCA. Added to
+`results-summary.md` §2.
+
 ## Standing rule
 
 A figure that cannot be reproduced from committed code in the current

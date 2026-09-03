@@ -135,7 +135,8 @@ p <- ggplot(plt, aes(y = country)) +
                "Consumption (responsibility)" = CBA_COL),
     breaks = c("Production (burden)", "Consumption (responsibility)")) +
   scale_x_continuous(expand = expansion(mult = 0.05)) +
-  labs(x = "GHG emissions, t CO2e per capita (2014-2018 mean)", y = NULL,
+  labs(x = sprintf("GHG emissions, t CO2e per capita (%d-%d mean)",
+                   REF_FIRST_YEAR, REF_LAST_YEAR), y = NULL,
        title = "Burden and responsibility diverge, and the gap follows the map",
        subtitle = paste("Production-based emissions are what a country must retool;",
                         "consumption-based are what its demand causes.\nWinners carry the",

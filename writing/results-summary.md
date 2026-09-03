@@ -61,6 +61,13 @@ The twins are near-orthogonal to their standalone (intensity↔fossil −0.01,
 complexity↔patents 0.19), confirming these are genuinely two dimensions per block
 rather than double counting.
 
+A further argument for the two-part construction, from
+`evidence/appendix_pc1_cos2.csv`: the twin PC1 represents countries far better
+than a flat PCA does. Mean per-country cos² — the share of a country's own
+variation the score captures — is **83%** for the intensity twin and **65%** for
+the complexity twin, against **65%** and **46%** under the flat three-variable
+PCA. The flat version discards about a third more of each country's position.
+
 ## 3. Data
 
 | input | source | note |

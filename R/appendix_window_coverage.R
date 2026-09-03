@@ -76,7 +76,10 @@ p <- ggplot() +
   scale_x_continuous(breaks = seq(2012, 2025, 2), limits = c(xstart, 2025.5)) +
   labs(
     title = "Data coverage vs. reference windows",
-    subtitle = "Shifting to 2018–2022 pushes past the EXIOBASE cap and into the truncated patent years",
+    subtitle = paste("Why the window ends where it does: EXIOBASE emissions are",
+                     "complete only to 2022\nand green-patent applications only to 2021.",
+                     "Written for the 2014-2018 window; the headline\nhas since moved to",
+                     "2017-2021 -- see R/appendix_window_options.R for the live comparison."),
     x = NULL, y = NULL,
     caption = "Blue = reliable coverage; orange = truncated/unavailable. Bars clipped at 2012."
   ) +
