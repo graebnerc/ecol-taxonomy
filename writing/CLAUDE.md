@@ -56,7 +56,39 @@ plausible-looking fabricated reference is the most damaging thing you can produc
 If `literature/` is empty, the review has not been run yet — flag that rather than
 filling the gap.
 
-**7. Write into `output/` only.** Treat everything else as read-only. If
+**7. Explain the non-obvious methods on first use.** Readers of an ecological-
+economics or political-economy journal will not all know what a permutation test,
+a bootstrap, Cramér's V or a Monte-Carlo Fisher test is. Each gets **one or two
+plain sentences at first use**, in the text rather than a footnote, saying what it
+does and *why it is used here*. Do not explain ordinary regression, correlation or
+R².
+
+The one you will meet most is the permutation test. Adapt, do not copy verbatim:
+
+> Because the sample is small (27 countries, with one group of only four), the
+> usual t-distribution behind a regression p-value cannot be relied on. We
+> therefore use a permutation test: the growth-model labels are randomly
+> reshuffled across countries 20,000 times, and each time the difference between
+> groups is recomputed. This builds up the distribution of differences that would
+> arise purely by chance if the labels carried no information. The reported
+> p-value is the share of those reshuffles producing a difference at least as
+> large as the one observed.
+
+Two things about it the text must **not** get wrong:
+
+- It removes a **distributional assumption**; it does **not** create statistical
+  power. It is often *more* conservative than the parametric test — here it is
+  exactly why the Finance and Periphery differences on vulnerability stop being
+  significant (`results-summary.md` §5).
+- It does not fix small *n*, multiple comparisons, or non-independence. Say what
+  it solves, not more.
+
+Apply the same treatment to the **bootstrap** in §8f (resampling the window's
+years to see how often a country keeps its quadrant) and to **Cramér's V** (a
+0–1 measure of association between two categorical variables, where 0 is
+independence and 1 is perfect correspondence).
+
+**8. Write into `output/` only.** Treat everything else as read-only. If
 `results-summary.md` or `open-questions.md` needs correcting, say so rather than
 editing it — those are maintained against the pipeline you cannot see.
 
