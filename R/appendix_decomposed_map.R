@@ -22,15 +22,41 @@ ind$group <- get_country_classification(
 
 DECOMP_VARS <- c("CarbonPerEnergy_normed", "EnergyIntensity_normed", "ShareFossils_normed")
 
-score_of <- function(vars) {
-  v <- block_score(ind, vars, "ShareFossils_normed")
-  p <- block_score(ind, POT_VARS, "GCI")
+# DEFECT FIXED 2026-09-03. This script predated the four-dimension restructure and
+# still scored BOTH specs with block_score() -- a flat single PCA over all three
+# block variables. That is no longer the headline: 04_typology.R uses axis_score()
+# (twin sub-index + standalone at equal weight). The comparison was therefore
+# against the wrong baseline, and reported a "headline" map of 4/10/9/4 against
+# the real 11/3/2/11, with Austria and Finland shown as Exposed rather than
+# Winners. Any reclassification count taken from it was wrong.
+#
+# The headline now uses axis_score. The decomposed spec keeps a flat PCA, because
+# its whole point is that the three vulnerability variables are treated as one
+# undifferentiated block -- that IS the specification being tested.
+headline_score <- function() {
+  v <- axis_score(ind, INTENSITY_VARS, "CarbonIntensity_normed", FOSSIL_VAR)
+  p <- axis_score(ind, COMPLEXITY_VARS, "GCI", INNOV_VAR)
   tibble(country = ind$country, group = ind$group,
          vulnerability = v$score, potential = p$score,
          quadrant = assign_quadrant(v$score, p$score, "short"))
 }
-head_s <- score_of(VULN_VARS)     # current headline (demand-side fossil share)
-dec_s  <- score_of(DECOMP_VARS)   # decomposed vulnerability
+decomposed_score <- function(vars) {
+  v <- block_score(ind, vars, "ShareFossils_normed")
+  p <- axis_score(ind, COMPLEXITY_VARS, "GCI", INNOV_VAR)   # potential unchanged
+  tibble(country = ind$country, group = ind$group,
+         vulnerability = v$score, potential = p$score,
+         quadrant = assign_quadrant(v$score, p$score, "short"))
+}
+head_s <- headline_score()
+dec_s  <- decomposed_score(DECOMP_VARS)
+
+# Guard: the headline computed here must match 04_typology.R exactly.
+.hl <- fread(here("data/tidy/taxonomy_scores.csv"))
+.hl$q <- sub(" \\(.*$", "", sub("Exposed but capable", "Exposed",
+          sub("Low-stakes / low capability", "Low-stakes", .hl$quadrant)))
+.chk <- merge(head_s[, c("country", "quadrant")], .hl[, c("country", "q")], by = "country")
+stopifnot("this script's headline does not match 04_typology.R" =
+            all(.chk$quadrant == .chk$q))
 
 # --- Reclassification overview -----------------------------------------------
 cmp <- head_s |>

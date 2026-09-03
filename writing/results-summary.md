@@ -49,10 +49,13 @@ Within each block one part is income-linked and one is income-neutral, on
 opposite diagonals: intensity and patents track GDP p.c.; fossil share and
 complexity do not. Equal-weighting makes income **present but balanced in both
 blocks** — R²(vuln ~ log GDP) = 0.27, R²(pot ~ log GDP) = 0.21. Income is not
-purged (a fully income-neutral specification was tested and rejected in July 2026
-on the then-current 2014–2018 window, where it reclassified 18 of 27 countries and
-produced an undifferentiated map; that figure has not been recomputed for the
-present window); it is simply no longer the sole driver of either axis.
+purged: a fully income-neutral specification — decomposing carbon intensity into
+GHG-per-energy and energy-per-value-added — was tested and rejected. On the
+current window it achieves R²(vulnerability ~ log GDP) = **0.00** but
+**reclassifies 14 of 27 countries** and correlates only 0.44 (Spearman) with the
+headline vulnerability axis, i.e. it is a different map rather than a
+de-biased one (`evidence/appendix_decomposed_reclass.csv`). Income is simply no
+longer the sole driver of either axis.
 
 The twins are near-orthogonal to their standalone (intensity↔fossil −0.01,
 complexity↔patents 0.19), confirming these are genuinely two dimensions per block
@@ -334,8 +337,11 @@ Three robustness results deserve to be findings in their own right:
    perfectly (0/27 for 2019–2021, 2020–2022, 2018–2022). Only pre-2019 windows
    differ, and always by the same two borderline countries (Ireland, Slovakia).
 
-Clustering diagnostics support the continuous map over hard clusters: silhouette
-is low (~0.28 at k=3) and the gap statistic prefers k=1.
+Clustering diagnostics support the continuous map over hard clusters. Average
+silhouette width never exceeds **0.39** at any k from 2 to 8 (0.27 at k = 2,
+0.33 at k = 3, peaking at 0.39 at k = 7) — all well below the ~0.5 usually taken
+to indicate real structure — and the **gap statistic prefers k = 1**, i.e. no
+clustering at all. There is no natural number of clusters to find.
 
 ## 8. Burden vs. responsibility (the offshoring layer)
 

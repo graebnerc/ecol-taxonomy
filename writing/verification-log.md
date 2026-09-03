@@ -41,9 +41,38 @@ figures; the entire convergence table including skew and the log-scale
 comparison; all quadrant-stability figures; the v1 double-counting inflation
 (1.667× and every per-country ratio); the EXIOBASE revision ratios.
 
-## One methodological caveat
+## Second pass (same day): "if it cannot be reproduced, remove it"
 
-The claim that a fully income-neutral specification "reclassified 18/27
-countries" is **historical** — it was measured in July 2026 on the 2014–2018
-window and has not been recomputed for the present specification. It is now
-dated in the text rather than presented as current.
+The first pass *dated* two figures rather than resolving them. That was the wrong
+call — a number that cannot be reproduced in the current setting does not belong
+in the pack. Both turned out to be reproducible, and both were wrong.
+
+| claim as written | actual | note |
+|---|---|---|
+| income-neutral spec "reclassified 18/27" | **14/27** | reproducible after fixing a defect, see below |
+| "silhouette ~0.28 at k = 3" | **0.33** at k = 3; max **0.39** at k = 7 | k = 3 was never the peak |
+
+The silhouette conclusion survives (all values are far below the ~0.5 threshold
+and the gap statistic prefers k = 1), but the numbers quoted were wrong and the
+implication that k = 3 was the best candidate was unsupported.
+
+### A defect found while reproducing the first one
+
+`R/appendix_decomposed_map.R` predated the four-dimension restructure and still
+scored **both** specifications with `block_score()` — a flat single PCA — while
+`04_typology.R` had moved to `axis_score()`. Its "headline" map was therefore not
+the headline: it reported quadrant totals of 4/10/9/4 against the real 11/3/2/11,
+with Austria and Finland shown as *Exposed* rather than *Winners*. Every
+reclassification count taken from that script was against the wrong baseline,
+which is where "18/27" came from.
+
+Fixed, and the script now **asserts** that its headline matches
+`taxonomy_scores.csv` before comparing anything, so the baseline cannot drift
+again.
+
+## Standing rule
+
+A figure that cannot be reproduced from committed code in the current
+specification is removed, not annotated. Re-run this audit after any change to
+the window, the patent measure, or the data vintage — six of the eight errors in
+the first pass came from exactly those.
